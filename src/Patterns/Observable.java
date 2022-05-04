@@ -1,0 +1,28 @@
+package Patterns;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Observable {
+    List<Observateur> observateurs;
+
+    public Observable() {
+        observateurs = new ArrayList<>();
+    }
+
+    public void ajouteObservateur(Observateur o) {
+        observateurs.add(o);
+    }
+
+    public void miseAJour() {
+        Iterator<Observateur> it;
+
+        it = observateurs.iterator();
+        while (it.hasNext()) {
+            Observateur o = it.next();
+            o.metAJour();
+        }
+    }
+}
+
