@@ -4,6 +4,7 @@ import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class InterfaceGraphique implements Runnable, Observateur {
     Jeu jeu;
@@ -31,5 +32,13 @@ public class InterfaceGraphique implements Runnable, Observateur {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
         frame.setVisible(true);
+    }
+
+    private JButton createButton(String s, String c) {
+        JButton but = new JButton(s);
+        but.addActionListener(new AdaptateurCommande(controle, new Commande(c)));
+        but.setAlignmentX(Component.CENTER_ALIGNMENT);
+        but.setFocusable(false);
+        return but;
     }
 }

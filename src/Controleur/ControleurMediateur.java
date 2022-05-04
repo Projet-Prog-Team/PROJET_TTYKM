@@ -5,7 +5,9 @@ import Vue.CollecteurEvenements;
 import Vue.Commande;
 
 public class ControleurMediateur implements CollecteurEvenements {
+
     Jeu jeu;
+
     public ControleurMediateur (Jeu j) {
         jeu = j;
     }
