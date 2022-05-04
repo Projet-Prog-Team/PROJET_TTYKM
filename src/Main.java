@@ -6,6 +6,7 @@ public class Main {
     public static void main(String[] args) {
         Jeu j = new Jeu();
         ControleurMediateur c = new ControleurMediateur(j);
+        System.out.println(j);
         InterfaceGraphique.demarrer(j, c);
     }
 }
