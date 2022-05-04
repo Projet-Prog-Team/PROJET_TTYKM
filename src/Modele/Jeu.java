@@ -50,4 +50,9 @@ public class Jeu extends Observable {
 
         return chaine;
     }
+
+    public Plateau[] getPlateaux() {
+        return plateaux;
+    }
+
 }

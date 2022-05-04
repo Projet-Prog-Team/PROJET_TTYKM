@@ -1,5 +1,6 @@
 package Controleur;
 
+import Modele.EPOQUE;
 import Modele.Jeu;
 import Vue.CollecteurEvenements;
 import Vue.Commande;
@@ -13,8 +14,8 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     @Override
-    public void clicSouris(int l, int c) {
-
+    public void clicSouris(int l, int c, EPOQUE epoque) {
+        System.out.println(epoque+" x : "+c+" y : "+l);
     }
 
     @Override

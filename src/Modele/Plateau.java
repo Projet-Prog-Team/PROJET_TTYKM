@@ -40,4 +40,8 @@ public class Plateau {
         }
         return chaine;
     }
+
+    public Cases[][] getPlateau() {
+        return plateau;
+    }
 }
