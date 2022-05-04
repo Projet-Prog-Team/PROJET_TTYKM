@@ -2,8 +2,6 @@ package Modele;
 
 import Patterns.Observable;
 
-import java.util.Arrays;
-
 public class Jeu extends Observable {
     Plateau[] plateaux = new Plateau[3];
     Joueur[] joueurs = new Joueur[2];
