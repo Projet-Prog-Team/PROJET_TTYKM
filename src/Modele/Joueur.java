@@ -1,38 +1,36 @@
 package Modele;
 
-import java.util.Arrays;
-
 public class Joueur {
     int ID;
-    Pion[] inventaire = new Pion[4];
+    int nbPionsRestants = 4;
     int nbActionsRestantes = 2;
-    EPOQUE Tableau;
+    Pion pionActuel;
+    int focus;
 
     public Joueur(int id) {
         ID = id;
-        for (int i = 0; i < 4; i++) {
-            inventaire[i] = new Pion(this);
-        }
     }
 
-    public void supprimerPion(Pion pion) {
+    public boolean peutSupprimerPion() {
+        return nbPionsRestants == 0;
+    }
 
+    public void supprimerPion() {
+        nbPionsRestants--;
+    }
+    public Pion getPionActuel() { return pionActuel; }
+    public int getFocus() {
+        return focus;
     }
 
     @Override
     public String toString() {
         return "Joueur{" +
                 "ID=" + ID +
-                ", inventaire=" + Arrays.toString(inventaire) +
+                ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
+                ", pionActuel=" + pionActuel +
+                ", focus=" + focus +
                 '}';
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
     }
 }
