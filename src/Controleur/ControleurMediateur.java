@@ -20,6 +20,7 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     @Override
     public boolean commande(Commande c) {
+        System.out.println(c.getCommande());
         switch(c.getCommande()){
             case "":
                 break;

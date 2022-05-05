@@ -19,9 +19,12 @@ public class AdaptateurSouris extends MouseAdapter {
             int l = plateau.getLig(e.getY());
             int c = plateau.getCol(e.getX());
             controle.clicSouris(l, c, plateau.getEpoque());
-            plateau.tracerBrillance(l,c);
+        }else {
+            if(plateau.isInFocus1(e.getX(),e.getY())){
+                controle.commande(new Commande("clicFocus1"+plateau.getEpoque()));
+            }else if(plateau.isInFocus2(e.getX(),e.getY())){
+                controle.commande(new Commande("clicFocus2"+plateau.getEpoque()));
+            }
         }
-
     }
-
 }
