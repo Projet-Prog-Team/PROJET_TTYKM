@@ -1,6 +1,5 @@
 import Controleur.ControleurMediateur;
 import Modele.Jeu;
-import Modele.Pion;
 import Structures.Point;
 import Vue.InterfaceGraphique;
 

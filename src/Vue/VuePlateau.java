@@ -1,9 +1,10 @@
 package Vue;
 
-import Modele.Cases;
 import Modele.Jeu;
+import Modele.Joueur;
 import Modele.Pion;
-import Modele.TYPE;
+
+import java.util.ArrayList;
 
 
 public class VuePlateau {
@@ -38,6 +39,15 @@ public class VuePlateau {
             }
         }
 
-    }
+        // Dessine les brillances de focus
+        if (jeu.getEtape() == 3) {
+            Joueur joueur = jeu.getJoueurActuel();
+            if (joueur.getID() == 1 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 1)) {
+                plateau.tracerBrillanceFocus1();
+            } else if (joueur.getID() == 2 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 2)) {
+                plateau.tracerBrillanceFocus2();
+            }
 
+        }
+    }
 }

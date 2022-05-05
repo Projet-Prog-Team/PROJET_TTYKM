@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class Jeu extends Observable {
     ArrayList<Pion> pions = new ArrayList<>();
     public Joueur[] joueurs = new Joueur[2];
-    public Joueur joueurActuel;
+    Joueur joueurActuel;
 
     public Jeu() {
         init();
@@ -24,6 +24,10 @@ public class Jeu extends Observable {
             Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
             pions.add(p2);
         }
+        joueurs[0].setFocus(0);
+        joueurs[1].setFocus(2);
+        joueurs[0].setPionActuel(getPion(new Point(0, 0), 0));
+        joueurs[1].setPionActuel(getPion(new Point(3, 3), 2));
 
     }
 
@@ -38,12 +42,23 @@ public class Jeu extends Observable {
         return null;
     }
 
+    public Joueur[] getJoueurs() {
+        return joueurs;
+    }
+
+    public Joueur getJoueurActuel() {
+        return joueurActuel;
+    }
+
+    public void setJoueurActuel(Joueur j) {
+        joueurActuel= j;
+    }
+
     public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
         int PionEpoque = joueurActuel.getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
             Pion pionActuel = joueurActuel.getPionActuel();
             if (getPion(pionActuel.coordonnees, epoque) == null) {
-                System.out.println("lalalalol");
                 pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
                     if (joueurActuel.peutSupprimerPion()) {
@@ -52,7 +67,6 @@ public class Jeu extends Observable {
                         joueurActuel.supprimerPion();
                     }
                 }
-                joueurActuel.nbActionsRestantes--;
             }
         }
     }
@@ -121,6 +135,105 @@ public class Jeu extends Observable {
         }
     }
 
+    public ArrayList<Pion> getPions() {
+        return pions;
+    }
+
+    public void switchPlayer() {
+        if(joueurActuel == joueurs[0]) {
+            joueurActuel=joueurs[1];
+        }
+        else {
+            joueurActuel=joueurs[0];
+        }
+        ArrayList<Pion> pionInFocus = pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
+        if (pionInFocus.size() == 1) {
+            // forcer la sélection
+            joueurActuel.setPionActuel(pionInFocus.get(0));
+        } else {
+            joueurActuel.setPionActuel(null);
+        }
+        joueurActuel.nbActionsRestantes=2;
+    }
+
+    public int isWin()
+    {
+        //-1 si pas de gagnant 1 pour joueur1 et 2 joueur2
+        int nb1[] = new int[3];
+        int nb2[] = new int[3];
+        int last [] = new int[3];
+        int result=-2;
+        for(int i=0;i<3;i++)
+        {
+            nb1[i]= pionsFocusJoueur(i,joueurs[0]).size();
+            nb2[i]= pionsFocusJoueur(i,joueurs[1]).size();
+        }
+
+        for(int i=0;i<3;i++)
+        {
+            if(nb1[i] != 0 && nb2[i] == 0)
+            {
+                last[i]=1;
+            }
+            else
+            {
+                if(nb1[i] == 0 && nb2[i] != 0)
+                {
+                    last[i]=2;
+                }
+                else {
+                    last[i]=-1;
+                }
+            }
+
+            if(result == last[i])
+                break;
+            result=last[i];
+        }
+        return result;
+
+    }
+
+    public void selectPion(int l, int c, int epoque) {
+        Pion selected = getPion(new Point(l, c), epoque);
+        if (selected != null && epoque == joueurActuel.getFocus() && selected.getJoueur() == joueurActuel) {
+            joueurActuel.setPionActuel(selected);
+        }
+    }
+
+    // retourne le nombre de pions présents dans le focus pour le joueur
+    public ArrayList<Pion> pionsFocusJoueur(int focus, Joueur j) {
+        ArrayList<Pion> liste = new ArrayList<>();
+        for (Pion pion : pions) {
+            if (pion.getJoueur() == j && pion.getEpoque() == focus) {
+                liste.add(pion);
+            }
+        }
+        return liste;
+    }
+
+    public boolean peutSelectionnerFocus(int epoque, int j) {
+        return j == joueurActuel.getID()
+                && epoque != joueurActuel.getFocus()
+                && pionsFocusJoueur(epoque, joueurActuel).size() != 0;
+    }
+
+    public int getEtape() {
+        if (isWin() != -1) {
+            System.out.println("Joueur qui a gagné : " + isWin());
+            return 4;
+        } else {
+            if (joueurActuel.getPionActuel() == null) {
+                return 1;
+            } else {
+                if (joueurActuel.getNbActionsRestantes() == 0) {
+                    return 3;
+                } else {
+                    return 2;
+                }
+            }
+        }
+    }
     @Override
     public String toString() {
         return "Jeu{" +
@@ -130,8 +243,5 @@ public class Jeu extends Observable {
                 '}';
     }
 
-    public Plateau[] getPlateaux() {
-        return plateaux;
-    }
 
 }
