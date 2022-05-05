@@ -12,7 +12,7 @@ public class PlateauSwing extends JComponent implements Plateau {
     Image bg;
     Image focus1;
     Image focus2;
-    EPOQUE epoque;
+    int epoque;
     VuePlateau vue;
     Graphics2D drawable;
     private final double pionSize = 0.6;
@@ -20,19 +20,19 @@ public class PlateauSwing extends JComponent implements Plateau {
     private int yOffset = 50;
     private int focusRadius = 20;
 
-    PlateauSwing(EPOQUE epoque, Jeu j){
+    PlateauSwing(int epoque, Jeu j){
         this.epoque = epoque;
         vue = new VuePlateau(j,this);
 
         ImageIcon img = null;
         switch(epoque){
-            case PASSE:
+            case EPOQUE.PASSE:
                 img = new ImageIcon("res/Img/passe.png");
                 break;
-            case PRESENT:
+            case EPOQUE.PRESENT:
                 img = new ImageIcon("res/Img/present.png");
                 break;
-            case FUTUR:
+            case EPOQUE.FUTUR:
                 img = new ImageIcon("res/Img/futur.png");
                 break;
         }

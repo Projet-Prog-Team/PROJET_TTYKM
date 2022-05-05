@@ -21,6 +21,8 @@ public class Pion {
 
     public Point getCoordonnees() { return coordonnees; }
 
+    public Joueur getJoueur() { return joueur; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

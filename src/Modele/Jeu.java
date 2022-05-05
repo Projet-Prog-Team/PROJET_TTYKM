@@ -31,6 +31,26 @@ public class Jeu extends Observable {
 
     }
 
+    public void jouerCoup(int l, int c, int epoque) {
+        Pion clic = new Pion(new Point(l, c), epoque, joueurActuel);
+        ArrayList<Pion> cases = casesDispo();
+
+        if (cases.indexOf(clic) != -1) {    // Si coup jouable
+            joueurActuel.nbActionsRestantes--;
+            if (epoque != joueurActuel.getPionActuel().getEpoque()) {
+                changerEpoque(epoque);
+            }
+            else {
+                move(joueurActuel.getPionActuel(), new Point(l, c));
+                if (getPion(joueurActuel.pionActuel.getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
+                    joueurActuel.nbActionsRestantes = 0;
+                }
+            }
+        }
+        System.out.println("nbActionsRestantes  : " + joueurActuel.getNbActionsRestantes());
+        System.out.println("nbPionsRestants  : " + joueurActuel.nbPionsRestants);
+    }
+
     public Pion getPion(Point p, int e) {
         if ((p.getX() <= 3 && p.getX() >= 0) && (p.getY() <= 3 && p.getY() >= 0)) {
             for (Pion pion : pions) {
@@ -65,6 +85,8 @@ public class Jeu extends Observable {
                         pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
                         //ne supprime pas un piont du plateau mais du nombre total encore disponible à placer
                         joueurActuel.supprimerPion();
+                    } else {
+                        pionActuel.epoque = PionEpoque;
                     }
                 }
             }
@@ -92,7 +114,7 @@ public class Jeu extends Observable {
         Point p;
         for (int i = 0; i < 4; i++) {   // Vérification des cases autour du pion selectionné
             p = new Point(coo.getX() + dX[i], coo.getY() + dY[i]);
-            if (getPion(p, epoque) == null) {
+            if (p.getX() >=0 && p.getX() <= 3 && p.getY() >= 0  && p.getY() <= 3) {
                 casesDisponibles.add(new Pion(p, epoque, joueurActuel));
             }
         }
@@ -100,10 +122,7 @@ public class Jeu extends Observable {
         return casesDisponibles;
     }
 
-    public void move(Pion c, Point new_coord, boolean check) {
-        if (check) {
-            joueurActuel.nbActionsRestantes--;
-        }
+    public void move(Pion c, Point new_coord) {
         Point coord = new Point(c.coordonnees.getX(),c.coordonnees.getY());
         Pion voisin = getPion(new_coord,c.epoque);
         c.coordonnees = new_coord;
@@ -118,7 +137,7 @@ public class Jeu extends Observable {
                     pions.remove(voisin);
                 }
                 else {
-                        move(voisin, tmp, false);
+                        move(voisin, tmp);
                 }
             }
         }

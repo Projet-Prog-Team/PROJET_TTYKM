@@ -5,6 +5,7 @@ public class Joueur {
     int nbPionsRestants = 4;
     int nbActionsRestantes = 2;
     Pion pionActuel;
+    int focus;
 
     public int getID() {
         return ID;
@@ -13,8 +14,6 @@ public class Joueur {
     public void setID(int ID) {
         this.ID = ID;
     }
-
-    int focus;
 
     public Joueur(int id) {
         ID = id;
@@ -33,6 +32,7 @@ public class Joueur {
         return focus;
     }
     public void setFocus(int f) {this.focus = f;}
+    public int getNbActionsRestantes() { return nbActionsRestantes; }
     @Override
     public String toString() {
         return "\nJoueur{" +
