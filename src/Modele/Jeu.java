@@ -42,7 +42,8 @@ public class Jeu extends Observable {
         int PionEpoque = joueurActuel.getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
             Pion pionActuel = joueurActuel.getPionActuel();
-            if (getPion(pionActuel.coordonnees, pionActuel.getEpoque()) == null) {
+            if (getPion(pionActuel.coordonnees, epoque) == null) {
+                System.out.println("lalalalol");
                 pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
                     if (joueurActuel.peutSupprimerPion()) {
