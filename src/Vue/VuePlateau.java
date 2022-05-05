@@ -12,30 +12,47 @@ public class VuePlateau {
     Jeu jeu;
     Plateau plateau;
 
-    public VuePlateau(Jeu jeu, Plateau p){
+    public VuePlateau(Jeu jeu, Plateau p) {
         this.jeu = jeu;
         this.plateau = p;
     }
 
     public void dessinerPlateau() {
-        Cases[][] cases = new Cases[4][4];
-        switch (plateau.getEpoque()){
-            case PASSE:
-                cases = jeu.getPlateaux()[0].getPlateau();
-                break;
-            case PRESENT:
-                cases = jeu.getPlateaux()[1].getPlateau();
-                break;
-            case FUTUR:
-                cases = jeu.getPlateaux()[2].getPlateau();
-                break;
+
+        // Dessine les pions
+        ArrayList<Pion> p = jeu.getPions();
+        for (int i = 0; i < p.size(); i++) {
+            Pion pion = p.get(i);
+            if (pion.getEpoque() == plateau.getEpoque()) {
+                plateau.tracerPion(pion.getCoordonnees().getX(), pion.getCoordonnees().getY(), pion.getJoueur().getID());
+            }
         }
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                //if(cases[i][j].getType() == TYPE.PION) {
-                    plateau.tracerPion(i, j);
-                //}
+        // Dessine les focus
+        Joueur[] joueurs = jeu.getJoueurs();
+        if (joueurs[0].getFocus() == plateau.getEpoque()) {
+            plateau.tracerFocus1();
+        }
+        if (joueurs[1].getFocus() == plateau.getEpoque()) {
+            plateau.tracerFocus2();
+        }
+
+        // Desine les pions selectionnables
+        if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
+            ArrayList<Pion> pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
+            for (int i = 0; i < pions.size(); i++) {
+                plateau.tracerBrillance(pions.get(i).getCoordonnees().getX(), pions.get(i).getCoordonnees().getY());
+            }
+        }
+
+        // Dessine les cases disponibles pour le déplacement
+        if (jeu.getEtape() == 2) {
+            p = jeu.casesDispo();
+            for (int i = 0; i < p.size(); i++) {
+                Pion pion = p.get(i);
+                if (pion.getEpoque() == plateau.getEpoque()) {
+                    plateau.tracerBrillance(pion.getCoordonnees().getX(), pion.getCoordonnees().getY());
+                }
             }
         }
 

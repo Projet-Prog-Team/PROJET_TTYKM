@@ -37,7 +37,19 @@ public class ControleurMediateur implements CollecteurEvenements {
     public boolean commande(Commande c) {
         System.out.println(c.getCommande());
         switch(c.getCommande()){
-            case "":
+            case "clicFocus":
+                if(jeu.getEtape()==3){
+                    //choix focus
+                    if (jeu.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
+                        jeu.getJoueurActuel().setFocus(c.getEpoque());
+                        jeu.switchPlayer();
+                        jeu.miseAJour();
+                    } else {
+                        System.out.println("Modification du focus adverse impossible");
+                    }
+                } else if (jeu.getEtape() == 4){
+                    System.out.println("La partie est terminée");
+                }
                 break;
             default:
                 return false;

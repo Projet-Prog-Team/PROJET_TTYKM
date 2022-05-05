@@ -83,7 +83,7 @@ public class Jeu extends Observable {
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
                     if (joueurActuel.peutSupprimerPion()) {
                         pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
-                        //ne supprime pas un piont du plateau mais du nombre total encore disponible à placer
+                        //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
                         joueurActuel.supprimerPion();
                     } else {
                         pionActuel.epoque = PionEpoque;
