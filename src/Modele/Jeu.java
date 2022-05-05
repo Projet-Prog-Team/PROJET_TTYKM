@@ -86,13 +86,16 @@ public class Jeu extends Observable {
         return casesDisponibles;
     }
 
-    public void move(Pion c, Point new_coord) {
+    public void move(Pion c, Point new_coord, boolean check) {
+        if (check) {
+            joueurActuel.nbActionsRestantes--;
+        }
         Point coord = new Point(c.coordonnees.getX(),c.coordonnees.getY());
-        c.coordonnees = new_coord;
         Pion voisin = getPion(new_coord,c.epoque);
-        Point tmp = new Point(new_coord.getX()+(new_coord.getX()-coord.getX())*-1,new_coord.getY()+(new_coord.getY()-coord.getY())*-1);
+        c.coordonnees = new_coord;
+        Point tmp = new Point(new_coord.getX()+(new_coord.getX()-coord.getX()),new_coord.getY()+(new_coord.getY()-coord.getY()));
         if (voisin != null) {
-            if (coord.getX() >= 4 || coord.getY() >= 4) {
+            if (new_coord.getX() >= 4 || new_coord.getY() >= 4 || new_coord.getX()<0 || new_coord.getY()<0) {
                 pions.remove(c);
             } else {
                 if(voisin.joueur == c.joueur)
@@ -101,13 +104,20 @@ public class Jeu extends Observable {
                     pions.remove(voisin);
                 }
                 else {
-                    move(voisin, tmp);
+                        move(voisin, tmp, false);
                 }
             }
         }
         else
         {
-            c.coordonnees = coord;
+            if (new_coord.getX() >= 4 || new_coord.getY() >= 4 || new_coord.getX()<0 || new_coord.getY()<0)
+            {
+                pions.remove(c);
+            }
+            else
+            {
+                c.coordonnees = new_coord;
+            }
         }
     }
 
