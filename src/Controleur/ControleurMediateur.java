@@ -15,14 +15,12 @@ public class ControleurMediateur implements CollecteurEvenements {
     @Override
     public void clicSouris(int l, int c, int epoque) {
         System.out.println(epoque+" x : "+c+" y : "+l);
-        // boolean win = false;
         switch(jeu.getEtape()) {
             case 1:
                 jeu.selectPion(l, c, epoque);
                 break;
             case 2:
                 jeu.jouerCoup(l,c,epoque);
-                // win = jeu.isWin();
                 break;
             case 3:
                 break;
