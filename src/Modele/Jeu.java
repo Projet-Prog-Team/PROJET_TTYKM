@@ -129,4 +129,9 @@ public class Jeu extends Observable {
                 ", joueurActuel=" + joueurActuel +
                 '}';
     }
+
+    public Plateau[] getPlateaux() {
+        return plateaux;
+    }
+
 }
