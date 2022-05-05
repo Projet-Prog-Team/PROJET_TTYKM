@@ -10,6 +10,7 @@ public class Jeu extends Observable {
     private ArrayList<Pion> pions = new ArrayList<>();
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
+    int aGagne;
 
     public Jeu() {
         init();
@@ -28,6 +29,7 @@ public class Jeu extends Observable {
         joueurs[1].setFocus(2);
         joueurs[0].setPionActuel(getPion(new Point(0, 0), 0));
         joueurs[1].setPionActuel(getPion(new Point(3, 3), 2));
+        aGagne = 0;
 
     }
 
@@ -39,16 +41,31 @@ public class Jeu extends Observable {
             joueurActuel.nbActionsRestantes--;
             if (epoque != joueurActuel.getPionActuel().getEpoque()) {
                 changerEpoque(epoque);
-            }
-            else {
+            } else {
                 move(joueurActuel.getPionActuel(), new Point(l, c));
                 if (getPion(joueurActuel.pionActuel.getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
                     joueurActuel.nbActionsRestantes = 0;
                 }
             }
+            if (joueurAGagne(joueurActuel)) {
+                aGagne = joueurActuel.getID();
+            } else if (joueurAGagne(joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
+                aGagne = joueurs[(joueurActuel.getID()) % 2].getID();
+            }
         }
         System.out.println("nbActionsRestantes  : " + joueurActuel.getNbActionsRestantes());
         System.out.println("nbPionsRestants  : " + joueurActuel.nbPionsRestants);
+    }
+
+    boolean joueurAGagne(Joueur joueur) {
+        Joueur adversaire = joueurs[(joueur.getID()) % 2];
+        int nbPlateauxVides = 0;
+        for (int i = 0; i < 3; i++) {
+            if (pionsFocusJoueur(i, adversaire).size() == 0) {
+                nbPlateauxVides++;
+            }
+        }
+        return nbPlateauxVides >= 2;
     }
 
     public Pion getPion(Point p, int e) {
@@ -71,7 +88,7 @@ public class Jeu extends Observable {
     }
 
     public void setJoueurActuel(Joueur j) {
-        joueurActuel= j;
+        joueurActuel = j;
     }
 
     public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
@@ -238,8 +255,8 @@ public class Jeu extends Observable {
     }
 
     public int getEtape() {
-        if (isWin() != -1) {
-            System.out.println("Joueur qui a gagné : " + isWin());
+        if (aGagne != 0) {
+            System.out.println("Joueur qui a gagné : " + aGagne);
             return 4;
         } else {
             if (joueurActuel.getPionActuel() == null) {
