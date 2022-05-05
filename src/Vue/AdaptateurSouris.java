@@ -19,6 +19,7 @@ public class AdaptateurSouris extends MouseAdapter {
             int l = plateau.getLig(e.getY());
             int c = plateau.getCol(e.getX());
             controle.clicSouris(l, c, plateau.getEpoque());
+            plateau.tracerBrillance(l,c);
         }
 
     }

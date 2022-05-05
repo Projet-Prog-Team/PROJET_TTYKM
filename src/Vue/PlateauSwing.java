@@ -51,6 +51,10 @@ public class PlateauSwing extends JComponent implements Plateau {
         vue.dessinerPlateau();
         tracerFocus1();
         tracerFocus2();
+        tracerBrillance(2,2);
+        tracerBrillance(0,2);
+        tracerBrillance(1,3);
+        tracerBrillance(1,1);
     }
 
     @Override
@@ -66,7 +70,7 @@ public class PlateauSwing extends JComponent implements Plateau {
         float b = rand.nextFloat();
         Color randomColor = new Color(r, g, b);
         drawable.setColor(randomColor);
-        drawable.fillOval(getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+ (getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur());
+        drawable.fillOval(getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur());
     }
 
     public void tracerFocus1(){
@@ -79,6 +83,14 @@ public class PlateauSwing extends JComponent implements Plateau {
         int width = getWidth()/5;
         int height = getHeight()/5;
         drawable.drawImage(focus2, (getWidth()-width)/2,yOffset-height/2,width,height, this);
+    }
+
+    public void tracerBrillance(int l, int c){
+        int x = getXoffset()+c*getLargeurCase();
+        int y = getYoffset()+l* getHauteurCase();
+        Color myColour = new Color(95, 255, 163,125 );
+        drawable.setColor(myColour);
+        drawable.fillRect(x,y,getLargeurCase(),getHauteurCase());
     }
 
     public int getXoffset(){
@@ -112,5 +124,6 @@ public class PlateauSwing extends JComponent implements Plateau {
     public int getLig(int y){
         return (y-getYoffset())/getHauteurCase();
     }
+
 
 }
