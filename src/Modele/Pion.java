@@ -39,7 +39,7 @@ public class Pion {
         return "Pion{" +
                 "coordonnees=" + coordonnees +
                 ", epoque=" + epoque +
-                ", joueur=" + joueur +
+                ", joueur=" + joueur.getID() +
                 '}' + "\n";
     }
 }

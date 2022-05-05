@@ -8,8 +8,8 @@ import java.util.Arrays;
 
 public class Jeu extends Observable {
     ArrayList<Pion> pions = new ArrayList<>();
-    Joueur[] joueurs = new Joueur[2];
-    Joueur joueurActuel;
+    public Joueur[] joueurs = new Joueur[2];
+    public Joueur joueurActuel;
 
     public Jeu() {
         init();
@@ -51,6 +51,7 @@ public class Jeu extends Observable {
                         joueurActuel.supprimerPion();
                     }
                 }
+                joueurActuel.nbActionsRestantes--;
             }
         }
     }
@@ -112,9 +113,9 @@ public class Jeu extends Observable {
     @Override
     public String toString() {
         return "Jeu{" +
-                "pions=" + pions + "\n" +
-                ", joueurs=" + Arrays.toString(joueurs) + "\n" +
-                ", joueurActuel=" + joueurActuel + "\n" +
+                "pions=" + pions +
+                ", joueurs=" + Arrays.toString(joueurs) +
+                ", joueurActuel=" + joueurActuel +
                 '}';
     }
 }
