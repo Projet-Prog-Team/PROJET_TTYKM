@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 
 public class Jeu extends Observable {
-    private ArrayList<Pion> pions = new ArrayList<>();
+    private final ArrayList<Pion> pions = new ArrayList<>();
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
     int aGagne;
@@ -37,7 +37,7 @@ public class Jeu extends Observable {
         Pion clic = new Pion(new Point(l, c), epoque, joueurActuel);
         ArrayList<Pion> cases = casesDispo();
 
-        if (cases.indexOf(clic) != -1) {    // Si coup jouable
+        if (cases.contains(clic)) {    // Si coup jouable
             joueurActuel.nbActionsRestantes--;
             if (epoque != joueurActuel.getPionActuel().getEpoque()) {
                 changerEpoque(epoque);
@@ -190,44 +190,6 @@ public class Jeu extends Observable {
             joueurActuel.setPionActuel(null);
         }
         joueurActuel.nbActionsRestantes=2;
-    }
-
-    public int isWin()
-    {
-        //-1 si pas de gagnant 1 pour joueur1 et 2 joueur2
-        int nb1[] = new int[3];
-        int nb2[] = new int[3];
-        int last [] = new int[3];
-        int result=-2;
-        for(int i=0;i<3;i++)
-        {
-            nb1[i]= pionsFocusJoueur(i,joueurs[0]).size();
-            nb2[i]= pionsFocusJoueur(i,joueurs[1]).size();
-        }
-
-        for(int i=0;i<3;i++)
-        {
-            if(nb1[i] != 0 && nb2[i] == 0)
-            {
-                last[i]=1;
-            }
-            else
-            {
-                if(nb1[i] == 0 && nb2[i] != 0)
-                {
-                    last[i]=2;
-                }
-                else {
-                    last[i]=-1;
-                }
-            }
-
-            if(result == last[i])
-                break;
-            result=last[i];
-        }
-        return result;
-
     }
 
     public void selectPion(int l, int c, int epoque) {
