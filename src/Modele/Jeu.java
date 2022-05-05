@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 
 public class Jeu extends Observable {
-    ArrayList<Pion> pions = new ArrayList<>();
+    private ArrayList<Pion> pions = new ArrayList<>();
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
 
