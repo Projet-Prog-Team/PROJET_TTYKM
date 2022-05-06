@@ -12,6 +12,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
     Jeu jeu;
     CollecteurEvenements controle;
     JFrame frame;
+    PlateauSwing passe,present,futur;
 
 
     public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
@@ -21,7 +22,9 @@ public class InterfaceGraphique implements Runnable, Observateur {
     }
     @Override
     public void metAJour() {
-
+        passe.repaint();
+        present.repaint();
+        futur.repaint();
     }
 
     public static void demarrer(Jeu j, CollecteurEvenements c) {
@@ -34,15 +37,15 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         Box horizonBox = Box.createHorizontalBox();
 
-        PlateauSwing passe = new PlateauSwing(EPOQUE.PASSE, jeu);
+        passe = new PlateauSwing(EPOQUE.PASSE, jeu);
         passe.addMouseListener(new AdaptateurSouris(passe, controle));
         horizonBox.add(passe);
 
-        PlateauSwing present = new PlateauSwing(EPOQUE.PRESENT, jeu);
+        present = new PlateauSwing(EPOQUE.PRESENT, jeu);
         present.addMouseListener(new AdaptateurSouris(present, controle));
         horizonBox.add(present);
 
-        PlateauSwing futur = new PlateauSwing(EPOQUE.FUTUR, jeu);
+        futur = new PlateauSwing(EPOQUE.FUTUR, jeu);
         futur.addMouseListener(new AdaptateurSouris(futur, controle));
         horizonBox.add(futur);
 

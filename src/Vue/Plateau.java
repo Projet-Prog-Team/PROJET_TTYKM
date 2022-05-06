@@ -1,8 +1,11 @@
 package Vue;
 
-import Modele.EPOQUE;
-
 public interface Plateau {
-    void tracerPion(int l,int c);
-    EPOQUE getEpoque();
+    void tracerPion(int l,int c, int joueur);
+    void tracerBrillance(int l, int c);
+    void tracerBrillanceFocus1();
+    void tracerBrillanceFocus2();
+    void tracerFocus1();
+    void tracerFocus2();
+    int getEpoque();
 }
