@@ -49,6 +49,26 @@ public class ControleurMediateur implements CollecteurEvenements {
                     System.out.println("La partie est terminée");
                 }
                 break;
+            case "save":
+                System.out.println(c.getSaveName());
+                break;
+            case "load":
+                System.out.println(c.getSaveName());
+                break;
+            case "annuler":
+                break;
+            case "refaire":
+                break;
+            case "newGame":
+                break;
+            case "toggleIA1":
+                break;
+            case "toggleIA2":
+                break;
+            case "setDifficulty":
+                System.out.println(c.getIA());
+                System.out.println(c.getDifficulty());
+                break;
             default:
                 return false;
         }
