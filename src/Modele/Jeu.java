@@ -192,13 +192,16 @@ public class Jeu extends Observable {
             joueurActuel=joueurs[0];
         }
         ArrayList<Pion> pionInFocus = pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
+        joueurActuel.nbActionsRestantes=2;
         if (pionInFocus.size() == 1) {
             // forcer la sélection
             joueurActuel.setPionActuel(pionInFocus.get(0));
+        } else if (pionInFocus.size() == 0){
+            joueurActuel.setPionActuel(new Pion(new Point(-1, -1), joueurActuel.getFocus(), joueurActuel));
+            joueurActuel.nbActionsRestantes=0;
         } else {
             joueurActuel.setPionActuel(null);
         }
-        joueurActuel.nbActionsRestantes=2;
         miseAJour();
     }
     public void move(Pion c, Point new_coord) {

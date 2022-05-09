@@ -3,7 +3,7 @@ package Modele;
 public class Joueur {
     int ID;
     int nbPionsRestants = 4;
-    int nbActionsRestantes = 2;
+    public int nbActionsRestantes = 2;
     Pion pionActuel;
     int focus;
 
