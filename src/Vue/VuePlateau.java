@@ -24,7 +24,7 @@ public class VuePlateau {
         for (int i = 0; i < p.size(); i++) {
             Pion pion = p.get(i);
             if (pion.getEpoque() == plateau.getEpoque()) {
-                plateau.tracerPion(pion.getCoordonnees().getX(), pion.getCoordonnees().getY(), pion.getJoueur().getID());
+                plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), pion.getJoueur().getID());
             }
         }
 
@@ -41,7 +41,7 @@ public class VuePlateau {
         if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
             ArrayList<Pion> pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
             for (int i = 0; i < pions.size(); i++) {
-                plateau.tracerBrillance(pions.get(i).getCoordonnees().getX(), pions.get(i).getCoordonnees().getY());
+                plateau.tracerBrillance(pions.get(i).getCoordonnees().getL(), pions.get(i).getCoordonnees().getC());
             }
         }
 
@@ -51,7 +51,7 @@ public class VuePlateau {
             for (int i = 0; i < p.size(); i++) {
                 Pion pion = p.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerBrillance(pion.getCoordonnees().getX(), pion.getCoordonnees().getY());
+                    plateau.tracerBrillance(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
                 }
             }
         }
