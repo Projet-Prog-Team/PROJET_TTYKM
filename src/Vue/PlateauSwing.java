@@ -46,6 +46,7 @@ public class PlateauSwing extends JComponent implements Plateau {
 
     @Override
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         drawable = (Graphics2D) g;
         drawable.drawImage(bg,xOffset,yOffset,getWidth()-2*xOffset,getHeight()-2*yOffset,this);
         vue.dessinerPlateau();

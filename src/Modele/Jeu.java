@@ -132,9 +132,31 @@ public class Jeu extends Observable {
                 && pionsFocusJoueur(epoque, joueurActuel).size() != 0;
     }
 
+    public String getState(){
+        String state = "";
+        if(getEtape()==1){
+            state="selection";
+        }else if(getEtape()==2){
+            if(joueurActuel.getNbActionsRestantes()==2){
+                state="action1";
+            }else{
+                state="action2";
+            }
+        }else if(getEtape()==3){
+            state = "focus";
+        }else if(getEtape()==4){
+            if(aGagne==1){
+                state = "j1gagne";
+            }else{
+                state = "j2gagne";
+            }
+        }
+
+        return state;
+    }
 
 
-    // ---------------Actions modifiant le jeu---------------
+    // ---------------Actions modifiants le jeu---------------
     public void selectPion(int l, int c, int epoque) {
         Pion selected = getPion(new Point(l, c), epoque);
         if (selected != null && epoque == joueurActuel.getFocus() && selected.getJoueur() == joueurActuel) {

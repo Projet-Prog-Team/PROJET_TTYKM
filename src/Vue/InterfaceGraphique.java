@@ -119,7 +119,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         });
         topBar.add(toggleIA2);
 
-        LabelEtat labelEtat = new LabelEtat("Joueur 1 joue", jeu);
+        LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
         topBar.add(labelEtat.getLabel());
 
         BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
@@ -131,6 +131,10 @@ public class InterfaceGraphique implements Runnable, Observateur {
         topBar.add(boutonRefaire.getButton());
 
         mainBox.add(topBar);
+
+        // Pions joueur 1
+        Inventory inv1 = new Inventory(1, jeu);
+        mainBox.add(inv1.getBox());
 
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
@@ -148,6 +152,11 @@ public class InterfaceGraphique implements Runnable, Observateur {
         plateauBox.add(futur);
 
         mainBox.add(plateauBox);
+
+        // Pions joueur 2
+        Inventory inv2 = new Inventory(2, jeu);
+        mainBox.add(inv2.getBox());
+
 
         Timer t = new Timer(1500, new AdaptateurTemps(controle));
         t.start();

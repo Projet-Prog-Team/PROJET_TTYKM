@@ -43,4 +43,7 @@ public class Joueur {
                 ", focus=" + focus +
                 '}';
     }
+    public int getNbPionsRestants() {
+        return nbPionsRestants;
+    }
 }
