@@ -30,15 +30,28 @@ public class Joueur {
     }
     public void setFocus(int f) {this.focus = f;}
     public int getNbActionsRestantes() { return nbActionsRestantes; }
+
+    @Override
+    public boolean equals(Object obj) {
+        Joueur j = (Joueur) obj;
+        return j.getID() == getID();
+    }
+
     @Override
     public String toString() {
         return "\nJoueur{" +
                 "ID=" + ID +
                 ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
-                ", pionActuel=" + pionActuel +
                 ", focus=" + focus +
                 '}';
+    }
+    public Joueur copy() {
+        Joueur j = new Joueur(getID());
+        j.nbPionsRestants = getNbPionsRestants();
+        j.nbActionsRestantes = getNbActionsRestantes();
+        j.setFocus(getFocus());
+        return j;
     }
     public int getNbPionsRestants() {
         return nbPionsRestants;

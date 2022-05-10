@@ -130,7 +130,7 @@ public class Jeu extends Observable {
     public ArrayList<Pion> pionsFocusJoueur(int focus, Joueur j) {
         ArrayList<Pion> liste = new ArrayList<>();
         for (Pion pion : pions) {
-            if (pion.getJoueur() == j && pion.getEpoque() == focus) {
+            if (pion.getJoueur().equals(j) && pion.getEpoque() == focus) {
                 liste.add(pion);
             }
         }
@@ -248,8 +248,7 @@ public class Jeu extends Observable {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
                 pions.remove(c);
             } else {
-                if(voisin.joueur == c.joueur)
-                {
+                if(voisin.joueur == c.joueur) {
                     pions.remove(c);
                     pions.remove(voisin);
                 }
@@ -258,14 +257,11 @@ public class Jeu extends Observable {
                 }
             }
         }
-        else
-        {
-            if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0)
-            {
+        else {
+            if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
                 pions.remove(c);
             }
-            else
-            {
+            else {
                 c.coordonnees = new_coord;
             }
         }
@@ -273,7 +269,23 @@ public class Jeu extends Observable {
 
 
 
-    // toString
+    // Autres
+    public Jeu copy() {
+        Jeu j = new Jeu();
+        j.pions.clear();
+        for (Pion pion : pions) {
+            Pion p = pion.copy();
+            j.pions.add(p);
+            if (pion == pionActuel) {
+                j.pionActuel = p;
+            }
+        }
+        j.joueurs[0] = joueurs[0].copy();
+        j.joueurs[1] = joueurs[1].copy();
+        j.setJoueurActuel(j.joueurs[getJoueurActuel().getID() - 1]);
+        j.aGagne = aGagne;
+        return j;
+    }
     @Override
     public String toString() {
         return "Jeu{" +
