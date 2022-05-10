@@ -23,6 +23,10 @@ public class Pion {
 
     public Joueur getJoueur() { return joueur; }
 
+    public Pion copy() {
+        return new Pion(getCoordonnees().copy(), getEpoque(), getJoueur().copy());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

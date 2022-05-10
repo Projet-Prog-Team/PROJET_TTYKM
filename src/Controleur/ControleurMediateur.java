@@ -6,12 +6,15 @@ import Structures.Point;
 import Vue.CollecteurEvenements;
 import Vue.Commande;
 
+import javax.swing.*;
+
 public class ControleurMediateur implements CollecteurEvenements {
 
     Jeu jeu;
     IA joueur1, joueur2;
     int [] joueurs;
     String difficulty1, difficulty2;
+
     public ControleurMediateur (Jeu j) {
         jeu = j;
         joueurs = new int[2];

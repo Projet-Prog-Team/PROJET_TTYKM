@@ -7,9 +7,11 @@ import java.util.Arrays;
 
 
 public class Jeu extends Observable {
-    private final ArrayList<Pion> pions = new ArrayList<>();
+    ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
+    Pion pionActuel;
+
     int aGagne;
 
     public Jeu() {
@@ -18,6 +20,7 @@ public class Jeu extends Observable {
 
 
     public void init() {
+        pions = new ArrayList<>();
         joueurs[0] = new Joueur(1);
         joueurs[1] = new Joueur(2);
         for(int i = 0; i < 3; i++) {
@@ -28,10 +31,10 @@ public class Jeu extends Observable {
         }
         joueurs[0].setFocus(0);
         joueurs[1].setFocus(2);
-        joueurs[0].setPionActuel(getPion(new Point(0, 0), 0));
-        joueurs[1].setPionActuel(getPion(new Point(3, 3), 2));
+        setJoueurActuel(joueurs[0]); // joueur 1 commence
+        ArrayList<Pion> pionInFocus = pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
+        setPionActuel(pionInFocus.get(0));
         aGagne = 0;
-
     }
 
 
@@ -49,6 +52,12 @@ public class Jeu extends Observable {
     public void setJoueurActuel(Joueur j) {
         joueurActuel = j;
     }
+    public Pion getPionActuel() {
+        return pionActuel;
+    }
+    public void setPionActuel(Pion pionActuel) {
+        this.pionActuel = pionActuel;
+    }
     public Pion getPion(Point p, int e) {
         if ((p.getL() <= 3 && p.getL() >= 0) && (p.getC() <= 3 && p.getC() >= 0)) {
             for (Pion pion : pions) {
@@ -64,7 +73,7 @@ public class Jeu extends Observable {
             System.out.println("Joueur qui a gagné : " + aGagne);
             return 4;
         } else {
-            if (joueurActuel.getPionActuel() == null) {
+            if (getPionActuel() == null) {
                 return 1;
             } else {
                 if (joueurActuel.getNbActionsRestantes() == 0) {
@@ -75,6 +84,7 @@ public class Jeu extends Observable {
             }
         }
     }
+
 
 
 
@@ -90,7 +100,7 @@ public class Jeu extends Observable {
         return nbPlateauxVides >= 2;
     }
     public ArrayList<Pion> casesDispo() {   // Retourne une liste des pions jouables pour le joueur cou
-        Pion pionActuel = joueurActuel.getPionActuel();
+        Pion pionActuel = getPionActuel();
         ArrayList<Pion> casesDisponibles = new ArrayList<>();
         Point coo = pionActuel.getCoordonnees();
         int epoque = pionActuel.getEpoque();
@@ -131,7 +141,6 @@ public class Jeu extends Observable {
                 && epoque != joueurActuel.getFocus()
                 && pionsFocusJoueur(epoque, joueurActuel).size() != 0;
     }
-
     public String getState(){
         String state = "";
         if(getEtape()==1){
@@ -154,13 +163,18 @@ public class Jeu extends Observable {
 
         return state;
     }
+    public ArrayList<Pion> getPreview(int l, int c, int epoque) {
+        Jeu j = copy();
+        j.jouerCoup(l, c, epoque);
+        return j.getPions();
+    }
 
 
     // ---------------Actions modifiants le jeu---------------
     public void selectPion(int l, int c, int epoque) {
         Pion selected = getPion(new Point(l, c), epoque);
         if (selected != null && epoque == joueurActuel.getFocus() && selected.getJoueur() == joueurActuel) {
-            joueurActuel.setPionActuel(selected);
+            setPionActuel(selected);
         }
         miseAJour();
     }
@@ -169,12 +183,13 @@ public class Jeu extends Observable {
         ArrayList<Pion> cases = casesDispo();
 
         if (cases.contains(clic)) {    // Si coup jouable
-            joueurActuel.nbActionsRestantes--;
-            if (epoque != joueurActuel.getPionActuel().getEpoque()) {
+            if (epoque != getPionActuel().getEpoque()) {
+                joueurActuel.nbActionsRestantes--;
                 changerEpoque(epoque);
             } else {
-                move(joueurActuel.getPionActuel(), new Point(l, c));
-                if (getPion(joueurActuel.pionActuel.getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
+                move(getPionActuel(), new Point(l, c));
+                joueurActuel.nbActionsRestantes--;
+                if (getPion(getPionActuel().getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
                     joueurActuel.nbActionsRestantes = 0;
                 }
             }
@@ -184,14 +199,12 @@ public class Jeu extends Observable {
                 aGagne = joueurs[(joueurActuel.getID()) % 2].getID();
             }
         }
-        System.out.println("nbActionsRestantes  : " + joueurActuel.getNbActionsRestantes());
-        System.out.println("nbPionsRestants  : " + joueurActuel.nbPionsRestants);
         miseAJour();
     }
     public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
-        int PionEpoque = joueurActuel.getPionActuel().getEpoque();
+        int PionEpoque = getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
-            Pion pionActuel = joueurActuel.getPionActuel();
+            Pion pionActuel = getPionActuel();
             if (getPion(pionActuel.coordonnees, epoque) == null) {
                 pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
@@ -217,12 +230,12 @@ public class Jeu extends Observable {
         joueurActuel.nbActionsRestantes=2;
         if (pionInFocus.size() == 1) {
             // forcer la sélection
-            joueurActuel.setPionActuel(pionInFocus.get(0));
+            setPionActuel(pionInFocus.get(0));
         } else if (pionInFocus.size() == 0){
-            joueurActuel.setPionActuel(new Pion(new Point(-1, -1), joueurActuel.getFocus(), joueurActuel));
+            setPionActuel(new Pion(new Point(-1, -1), joueurActuel.getFocus(), joueurActuel));
             joueurActuel.nbActionsRestantes=0;
         } else {
-            joueurActuel.setPionActuel(null);
+            setPionActuel(null);
         }
         miseAJour();
     }
@@ -241,7 +254,7 @@ public class Jeu extends Observable {
                     pions.remove(voisin);
                 }
                 else {
-                        move(voisin, tmp);
+                    move(voisin, tmp);
                 }
             }
         }

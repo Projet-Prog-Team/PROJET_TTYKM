@@ -5,9 +5,9 @@ import java.util.Objects;
 public class Point {
     int l;
     int c;
-    public Point(int x, int y) {
-        this.l = x;
-        this.c = y;
+    public Point(int l, int c) {
+        this.l = l;
+        this.c = c;
     }
 
     @Override
@@ -24,6 +24,10 @@ public class Point {
         if (o == null || getClass() != o.getClass()) return false;
         Point point = (Point) o;
         return l == point.l && c == point.c;
+    }
+
+    public Point copy() {
+        return new Point(l, c);
     }
 
     @Override

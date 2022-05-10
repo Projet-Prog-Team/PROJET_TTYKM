@@ -4,7 +4,6 @@ public class Joueur {
     int ID;
     int nbPionsRestants = 4;
     public int nbActionsRestantes = 2;
-    Pion pionActuel;
     int focus;
 
     public int getID() {
@@ -26,8 +25,6 @@ public class Joueur {
     public void supprimerPion() {
         nbPionsRestants--;
     }
-    public Pion getPionActuel() { return pionActuel; }
-    public void setPionActuel(Pion p) {this.pionActuel = p;}
     public int getFocus() {
         return focus;
     }
