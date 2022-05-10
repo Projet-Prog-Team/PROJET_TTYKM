@@ -39,19 +39,19 @@ public class VuePlateau {
             for (int i = 0; i < pions.size(); i++) {
                 Pion pion = pions.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(),255, pion.getJoueur().getID());
+                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(),1, pion.getJoueur().getID());
                 }
             }
             Pion pionActuel =  jeu.getPionActuel();
             if(pionActuel.getEpoque()== plateau.getEpoque()){
-                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),100, pionActuel.getJoueur().getID());
+                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
             }
         }else{
             pions = jeu.getPions();
             for (int i = 0; i < pions.size(); i++) {
                 Pion pion = pions.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 255, pion.getJoueur().getID());
+                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
                 }
             }
         }

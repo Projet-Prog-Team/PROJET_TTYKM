@@ -134,6 +134,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         } else {
             joueur2 = IA.nouvelle(jeu, type);
         }
+        jeu.miseAJour();
     }
 
     public void setDifficultyIA(int ia, String difficulty) {
@@ -146,5 +147,13 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     public void enablePreview(int l, int c, int epoque){
         jeu.enablePreview(l,c,epoque);
+    }
+
+    public boolean isEnabledIA1(){
+        return joueurs[0] == 1;
+    }
+
+    public boolean isEnabledIA2(){
+        return joueurs[1] == 1;
     }
 }

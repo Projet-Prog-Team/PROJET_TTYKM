@@ -4,6 +4,7 @@ import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class LabelEtat implements Observateur {
 
@@ -12,6 +13,7 @@ public class LabelEtat implements Observateur {
 
     LabelEtat(String s, Jeu j){
         label = new JLabel(s);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
         jeu = j;
         jeu.ajouteObservateur(this);
     }
@@ -19,7 +21,7 @@ public class LabelEtat implements Observateur {
     @Override
     public void metAJour() {
         String state= "Joueur ";
-        state+=jeu.getJoueurActuel().getID()+" ";
+        state+=jeu.getJoueurActuel().getID()==1 ? "Blanc ":"Noir ";
         switch (jeu.getState()){
             case "selection":
                 state+="sélectionne un pion";
@@ -31,12 +33,12 @@ public class LabelEtat implements Observateur {
                 state+="effectue son second mouvement";
                 break;
             case "focus":
-                state+="choisit ou il jouera son prochain tour";
+                state+="choisi où il jouera son prochain tour";
                 break;
             case "j1gagne":
-                state="Joueur 1 à gagné";
+                state="Blanc à gagné";
             case "j2gagne":
-                state="Joueur 2 à gagné";
+                state="Noir à gagné";
                 break;
         }
         label.setText(state);

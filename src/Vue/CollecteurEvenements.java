@@ -7,4 +7,6 @@ public interface CollecteurEvenements {
     boolean commande(Commande c);
     void tic();
     void enablePreview(int l, int c, int epoque);
+    boolean isEnabledIA1();
+    boolean isEnabledIA2();
 }

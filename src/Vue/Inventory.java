@@ -27,10 +27,10 @@ public class Inventory implements Observateur {
         try {
             if(joueur==1){
                 this.joueur = 0;
-                pionBasique = ImageIO.read(new File("res/Img/focus1.png")).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                pionBasique = ImageIO.read(new File("res/Img/blanc.png")).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             }else{
                 this.joueur = 1;
-                pionBasique = ImageIO.read(new File("res/Img/focus2.png")).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                pionBasique = ImageIO.read(new File("res/Img/noir.png")).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             }
         } catch (IOException e) {
             e.printStackTrace();
