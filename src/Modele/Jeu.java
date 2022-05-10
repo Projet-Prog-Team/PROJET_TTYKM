@@ -11,7 +11,7 @@ public class Jeu extends Observable {
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
     Pion pionActuel;
-
+    private ArrayList<Pion> preview;
     int aGagne;
 
     public Jeu() {
@@ -85,8 +85,9 @@ public class Jeu extends Observable {
         }
     }
 
-
-
+    public ArrayList<Pion> getPreview() {
+        return preview;
+    }
 
     // ---------------Infos sur le jeu---------------
     public boolean joueurAGagne(Joueur joueur) {
@@ -163,12 +164,14 @@ public class Jeu extends Observable {
 
         return state;
     }
-    public ArrayList<Pion> getPreview(int l, int c, int epoque) {
+
+    public void enablePreview(int l, int c, int epoque) {
         Jeu j = copy();
         j.jouerCoup(l, c, epoque);
-        return j.getPions();
+        preview = j.getPions();
+        //System.out.println(preview);
+        miseAJour();
     }
-
 
     // ---------------Actions modifiants le jeu---------------
     public void selectPion(int l, int c, int epoque) {
@@ -198,6 +201,7 @@ public class Jeu extends Observable {
             } else if (joueurAGagne(joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
                 aGagne = joueurs[(joueurActuel.getID()) % 2].getID();
             }
+            preview = null;
         }
         miseAJour();
     }
@@ -272,17 +276,17 @@ public class Jeu extends Observable {
     // Autres
     public Jeu copy() {
         Jeu j = new Jeu();
+        j.joueurs[0] = joueurs[0].copy();
+        j.joueurs[1] = joueurs[1].copy();
+        j.setJoueurActuel(j.joueurs[getJoueurActuel().getID() - 1]);
         j.pions.clear();
         for (Pion pion : pions) {
-            Pion p = pion.copy();
+            Pion p = pion.copy(j.joueurs[pion.getJoueur().getID()-1]);
             j.pions.add(p);
             if (pion == pionActuel) {
                 j.pionActuel = p;
             }
         }
-        j.joueurs[0] = joueurs[0].copy();
-        j.joueurs[1] = joueurs[1].copy();
-        j.setJoueurActuel(j.joueurs[getJoueurActuel().getID() - 1]);
         j.aGagne = aGagne;
         return j;
     }

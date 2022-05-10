@@ -23,8 +23,8 @@ public class Pion {
 
     public Joueur getJoueur() { return joueur; }
 
-    public Pion copy() {
-        return new Pion(getCoordonnees().copy(), getEpoque(), getJoueur().copy());
+    public Pion copy(Joueur joueur) {
+        return new Pion(getCoordonnees().copy(), getEpoque(), joueur);
     }
 
     @Override

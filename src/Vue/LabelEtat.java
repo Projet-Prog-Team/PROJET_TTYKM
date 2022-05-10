@@ -18,7 +18,6 @@ public class LabelEtat implements Observateur {
 
     @Override
     public void metAJour() {
-        //TODO: fonction du jeu permettant de connaitre l'etat du jeu
         String state= "Joueur ";
         state+=jeu.getJoueurActuel().getID()+" ";
         switch (jeu.getState()){

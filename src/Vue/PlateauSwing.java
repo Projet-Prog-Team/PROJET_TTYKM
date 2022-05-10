@@ -11,7 +11,7 @@ public class PlateauSwing extends JComponent implements Plateau {
     Image bg;
     Image focus1;
     Image focus2;
-    int epoque;
+    private int epoque;
     VuePlateau vue;
     Graphics2D drawable;
     private final double pionSize = 0.6;
@@ -58,11 +58,11 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     @Override
-    public void tracerPion(int l, int c, int joueur) {
+    public void tracerPion(int l, int c,int alpha, int joueur) {
         if(joueur==1){
-            drawable.setColor(Color.CYAN);
+            drawable.setColor(new Color(0,255,255,alpha));
         }else{
-            drawable.setColor(Color.ORANGE);
+            drawable.setColor(new Color(255,165,0,alpha));
         }
         drawable.fillOval(getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur());
     }
@@ -143,11 +143,19 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     public int getCol(int x){
-        return (x-getXoffset())/getLargeurCase();
+        if(x>getXoffset()){
+            return (x-getXoffset())/getLargeurCase();
+        }else{
+            return -1;
+        }
     }
 
     public int getLig(int y){
-        return (y-getYoffset())/getHauteurCase();
+        if(y>getYoffset()){
+            return (y-getYoffset())/getHauteurCase();
+        }else{
+            return -1;
+        }
     }
 
     public int getFocusRadius() {

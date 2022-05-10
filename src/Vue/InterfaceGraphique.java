@@ -5,7 +5,6 @@ import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
@@ -140,15 +139,21 @@ public class InterfaceGraphique implements Runnable, Observateur {
         Box plateauBox = Box.createHorizontalBox();
 
         passe = new PlateauSwing(EPOQUE.PASSE, jeu);
-        passe.addMouseListener(new AdaptateurSouris(passe, controle));
+        AdaptateurSouris a1 = new AdaptateurSouris(passe, controle);
+        passe.addMouseMotionListener(a1);
+        passe.addMouseListener(a1);
         plateauBox.add(passe);
 
         present = new PlateauSwing(EPOQUE.PRESENT, jeu);
-        present.addMouseListener(new AdaptateurSouris(present, controle));
+        AdaptateurSouris a2 = new AdaptateurSouris(present, controle);
+        present.addMouseMotionListener(a2);
+        present.addMouseListener(a2);
         plateauBox.add(present);
 
         futur = new PlateauSwing(EPOQUE.FUTUR, jeu);
-        futur.addMouseListener(new AdaptateurSouris(futur, controle));
+        AdaptateurSouris a3 = new AdaptateurSouris(futur, controle);
+        futur.addMouseMotionListener(a3);
+        futur.addMouseListener(a3);
         plateauBox.add(futur);
 
         mainBox.add(plateauBox);
@@ -162,7 +167,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         t.start();
         frame.add(mainBox);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1500, 600);
+        frame.setSize(1500, 750);
         frame.setVisible(true);
     }
 

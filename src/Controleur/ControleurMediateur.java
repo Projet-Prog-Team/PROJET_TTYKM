@@ -143,4 +143,8 @@ public class ControleurMediateur implements CollecteurEvenements {
             difficulty2 = difficulty;
         }
     }
+
+    public void enablePreview(int l, int c, int epoque){
+        jeu.enablePreview(l,c,epoque);
+    }
 }

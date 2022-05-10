@@ -14,6 +14,13 @@ public class AdaptateurSouris extends MouseAdapter {
     }
 
     @Override
+    public void mouseMoved(MouseEvent e) {
+        int l = plateau.getLig(e.getY());
+        int c = plateau.getCol(e.getX());
+        controle.enablePreview(l,c,plateau.getEpoque());
+    }
+
+    @Override
     public void mousePressed(MouseEvent e) {
         if(e.getX()>=plateau.getXoffset() && e.getX()<=(plateau.getWidth() - plateau.getXoffset()) && e.getY()>=plateau.getYoffset() && e.getY() <= (plateau.getHeight() - plateau.getYoffset())){
             int l = plateau.getLig(e.getY());

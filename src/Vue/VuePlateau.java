@@ -19,12 +19,40 @@ public class VuePlateau {
 
     public void dessinerPlateau() {
 
-        // Dessine les pions
-        ArrayList<Pion> p = jeu.getPions();
-        for (int i = 0; i < p.size(); i++) {
-            Pion pion = p.get(i);
-            if (pion.getEpoque() == plateau.getEpoque()) {
-                plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), pion.getJoueur().getID());
+        ArrayList<Pion> pions;
+
+        // Dessine les cases disponibles pour le déplacement
+        if (jeu.getEtape() == 2) {
+            pions = jeu.casesDispo();
+            for (int i = 0; i < pions.size(); i++) {
+                Pion pion = pions.get(i);
+                if (pion.getEpoque() == plateau.getEpoque()) {
+                    plateau.tracerBrillance(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+                }
+            }
+        }
+
+
+        // Dessine les pions en mode preview ou non
+        if(jeu.getPreview()!=null && jeu.getEtape()==2){
+            pions = jeu.getPreview();
+            for (int i = 0; i < pions.size(); i++) {
+                Pion pion = pions.get(i);
+                if (pion.getEpoque() == plateau.getEpoque()) {
+                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(),255, pion.getJoueur().getID());
+                }
+            }
+            Pion pionActuel =  jeu.getPionActuel();
+            if(pionActuel.getEpoque()== plateau.getEpoque()){
+                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),100, pionActuel.getJoueur().getID());
+            }
+        }else{
+            pions = jeu.getPions();
+            for (int i = 0; i < pions.size(); i++) {
+                Pion pion = pions.get(i);
+                if (pion.getEpoque() == plateau.getEpoque()) {
+                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 255, pion.getJoueur().getID());
+                }
             }
         }
 
@@ -39,22 +67,12 @@ public class VuePlateau {
 
         // Desine les pions selectionnables
         if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
-            ArrayList<Pion> pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
+            pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
             for (int i = 0; i < pions.size(); i++) {
                 plateau.tracerBrillance(pions.get(i).getCoordonnees().getL(), pions.get(i).getCoordonnees().getC());
             }
         }
 
-        // Dessine les cases disponibles pour le déplacement
-        if (jeu.getEtape() == 2) {
-            p = jeu.casesDispo();
-            for (int i = 0; i < p.size(); i++) {
-                Pion pion = p.get(i);
-                if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerBrillance(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
-                }
-            }
-        }
 
         // Dessine les brillances de focus
         if (jeu.getEtape() == 3) {
