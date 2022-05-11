@@ -1,4 +1,5 @@
 import Controleur.ControleurMediateur;
+import Controleur.IA;
 import Modele.Jeu;
 import Vue.InterfaceGraphique;
 

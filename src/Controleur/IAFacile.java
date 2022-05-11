@@ -1,5 +1,6 @@
 package Controleur;
 
+import Modele.Jeu;
 import Modele.Pion;
 
 import java.util.ArrayList;
@@ -25,11 +26,16 @@ public class IAFacile extends IA {
         return(casesDispo.get(x));
     }
 
-    public int choixFocus() {
+    public Integer choixFocus() {
         int x = r.nextInt(3);
         while (!jeu.peutSelectionnerFocus(x, jeu.getJoueurActuel().getID())) {
             x = r.nextInt(3);
         }
         return x;
+    }
+
+    @Override
+    public int calculCoup(Jeu j, int horizon) {
+        return 0;
     }
 }

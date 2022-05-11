@@ -4,6 +4,7 @@ import Patterns.Observable;
 import Structures.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 
 public class Jeu extends Observable {
@@ -164,12 +165,10 @@ public class Jeu extends Observable {
 
         return state;
     }
-
     public void enablePreview(int l, int c, int epoque) {
         Jeu j = copy();
         j.jouerCoup(l, c, epoque);
         preview = j.getPions();
-        //System.out.println(preview);
         miseAJour();
     }
 

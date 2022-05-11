@@ -163,7 +163,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         mainBox.add(inv2.getBox());
 
 
-        Timer t = new Timer(1, new AdaptateurTemps(controle));
+        Timer t = new Timer(800, new AdaptateurTemps(controle));
         t.start();
         frame.add(mainBox);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

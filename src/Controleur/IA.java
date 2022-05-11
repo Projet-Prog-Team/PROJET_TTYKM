@@ -30,5 +30,7 @@ public abstract class IA {
 
     public abstract Pion jouerCoup();
 
-    public abstract int choixFocus();
+    public abstract Integer choixFocus();
+
+    public abstract int calculCoup(Jeu j, int horizon);
 }
