@@ -1,7 +1,10 @@
 package Modele;
 
 import Patterns.Observable;
+import Structures.Couple;
 import Structures.Point;
+import Structures.Tour;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -91,6 +94,9 @@ public class Jeu extends Observable {
     }
 
     // ---------------Infos sur le jeu---------------
+    public boolean estTermine() {
+        return (aGagne != 0);
+    }
     public boolean joueurAGagne(Joueur joueur) {
         Joueur adversaire = joueurs[(joueur.getID()) % 2];
         int nbPlateauxVides = 0;
@@ -170,6 +176,123 @@ public class Jeu extends Observable {
         j.jouerCoup(l, c, epoque);
         preview = j.getPions();
         miseAJour();
+    }
+    public int Heuristique() {
+        int pionsJoueur1 = joueurs[0].nbPionsRestants;
+        int pionsJoueur2 = joueurs[1].nbPionsRestants;
+
+        for (int i = 0; i < 3; i++) {
+            pionsJoueur1 += pionsFocusJoueur(i, joueurs[0]).size();
+        }
+        for (int i = 0; i < 3; i++) {
+            pionsJoueur2 += pionsFocusJoueur(i, joueurs[1]).size();
+        }
+
+        if (joueurActuel.getID() == 1) {
+            return (pionsJoueur1 - pionsJoueur2);
+        } else {
+            return (pionsJoueur2 - pionsJoueur1);
+        }
+    }
+    public ArrayList<Couple<Jeu, Tour>> branchementsSelect(Jeu j) {   // On considere que le jeu j est dans l'étape selection
+        ArrayList<Couple<Jeu, Tour>> jeux = new ArrayList<>();
+        ArrayList<Pion> pionsToBeSelected = pionsFocusJoueur(getJoueurActuel().getFocus(), getJoueurActuel());
+
+        for (Pion pionTBS : pionsToBeSelected) {
+            Jeu jeuSelect = j.copy();
+            Point cooPionSelect = pionTBS.getCoordonnees();
+            jeuSelect.selectPion(cooPionSelect.getL(), cooPionSelect.getC(), pionTBS.getEpoque());
+            Tour t = new Tour();
+            t.setPionSelectionne(pionTBS);
+            jeux.add(new Couple(jeuSelect, t));
+        }
+        return jeux;
+    }
+    public ArrayList<Couple<Jeu, Tour>> branchementsCoup(Jeu j) {     // j est dans l'étape jouer un coup
+        ArrayList<Couple<Jeu, Tour>> jeux = new ArrayList<>();
+        ArrayList<Pion> casesDispo = j.casesDispo();
+
+        for (Pion caseDispo : casesDispo) {
+            Jeu jeuCoup = j.copy();
+            Point cooCase = caseDispo.getCoordonnees();
+            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque());
+            Tour t = new Tour();
+            if (j.getJoueurActuel().getNbActionsRestantes() == 2) {
+                t.setCoup1(caseDispo);
+            } else {
+                t.setCoup2(caseDispo);
+            }
+            jeux.add(new Couple(jeuCoup, t));
+        }
+        return jeux;
+    }
+    public ArrayList<Couple<Jeu, Tour>> branchementsFocus(Jeu j) {    // j est dans l'étape choisir un focus
+        ArrayList<Couple<Jeu, Tour>> jeux = new ArrayList<>();
+
+        for (int i = 0; i < 3; i++) {
+            if (j.peutSelectionnerFocus(i, j.getJoueurActuel().getID())) {
+                Jeu jeuFocus = j.copy();
+                jeuFocus.getJoueurActuel().setFocus(i);
+                Tour t = new Tour();
+                t.setFocus(i);
+                jeux.add(new Couple(jeuFocus, t));
+            }
+        }
+        return jeux;
+    }
+    public ArrayList<Couple<Jeu, Tour>> Branchements() {
+
+        ArrayList<Couple<Jeu, Tour>> jeuxSelect = new ArrayList<>();
+        ArrayList<Couple<Jeu, Tour>> jeuxCoup1 = new ArrayList<>();
+        ArrayList<Couple<Jeu, Tour>> jeuxCoup2 = new ArrayList<>();
+        ArrayList<Couple<Jeu, Tour>> jeuxFocus = new ArrayList<>();
+
+        switch(getEtape()) {
+            case 1:
+                jeuxSelect = branchementsSelect(this);
+            case 2:
+                if (jeuxSelect.size() == 0) {                           // Si pion deja selectionné
+                    jeuxSelect.add(new Couple(this, new Tour()));
+                }
+
+                if (getJoueurActuel().getNbActionsRestantes() == 2) {   // Si etape du jeu : coup 1
+                    for (Couple<Jeu, Tour> j : jeuxSelect) {
+                        ArrayList<Couple<Jeu, Tour>> coups = branchementsCoup(j.getFirst());
+                        for (Couple<Jeu, Tour> c : coups) {             // Ajout de la selection aux tours de jeuxCoup1
+                            c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                        }
+                        jeuxCoup1.addAll(coups);
+
+                    }
+                } else {                                                // Si etape du jeu : coup 2
+                    jeuxCoup1.add(new Couple(this, new Tour()));
+                }
+
+                for (Couple<Jeu, Tour> j : jeuxCoup1) {
+                    ArrayList<Couple<Jeu, Tour>> coups = branchementsCoup(j.getFirst());
+                    for (Couple<Jeu, Tour> c : coups) {
+                        c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                        c.getSecond().setCoup1(j.getSecond().getCoup1());
+                    }
+                    jeuxCoup2.addAll(coups);
+                }
+            case 3:
+                if (jeuxCoup2.size() == 0) {                            // Si etape du jeu : choix focus
+                    jeuxCoup2.add(new Couple(this, new Tour()));
+                }
+                for (Couple<Jeu, Tour> j : jeuxCoup2) {
+                    ArrayList<Couple<Jeu, Tour>> focus = branchementsFocus(j.getFirst());
+                    for (Couple<Jeu, Tour> f : focus) {
+                        f.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                        f.getSecond().setCoup1(j.getSecond().getCoup1());
+                        f.getSecond().setCoup2(j.getSecond().getCoup2());
+                    }
+                    jeuxFocus.addAll(focus);
+                }
+                break;
+        }
+
+        return jeuxFocus;
     }
 
     // ---------------Actions modifiants le jeu---------------
