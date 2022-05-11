@@ -11,6 +11,8 @@ public class PlateauSwing extends JComponent implements Plateau {
     Image bg;
     Image focus1;
     Image focus2;
+    Image pionBlanc;
+    Image pionNoir;
     private int epoque;
     VuePlateau vue;
     Graphics2D drawable;
@@ -42,6 +44,12 @@ public class PlateauSwing extends JComponent implements Plateau {
 
         img = new ImageIcon("res/Img/focus2.png");
         focus2 = img.getImage();
+
+        img = new ImageIcon("res/Img/blanc.png");
+        pionBlanc = img.getImage();
+
+        img = new ImageIcon("res/Img/noir.png");
+        pionNoir = img.getImage();
     }
 
     @Override
@@ -58,13 +66,19 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     @Override
-    public void tracerPion(int l, int c,int alpha, int joueur) {
+    public void tracerPion(int l, int c, double alpha, int joueur) {
+        Composite compo = drawable.getComposite();
         if(joueur==1){
-            drawable.setColor(new Color(0,255,255,alpha));
+            //drawable.setColor(new Color(0,255,255,alpha));
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(pionBlanc,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
         }else{
-            drawable.setColor(new Color(255,165,0,alpha));
+            //drawable.setColor(new Color(255,165,0,alpha));
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(pionNoir,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
         }
-        drawable.fillOval(getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur());
+        drawable.setComposite(compo);
+        //drawable.fillOval(getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur());
     }
 
     public void tracerFocus1(){
