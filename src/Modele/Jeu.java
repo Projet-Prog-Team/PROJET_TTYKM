@@ -16,6 +16,8 @@ public class Jeu extends Observable {
     Joueur joueurActuel;
     Pion pionActuel;
     private ArrayList<Pion> preview;
+    int previewFocus1;
+    int previewFocus2;
     int aGagne;
 
     public Jeu() {
@@ -91,6 +93,22 @@ public class Jeu extends Observable {
 
     public ArrayList<Pion> getPreview() {
         return preview;
+    }
+
+    public int getPreviewFocus1() {
+        return previewFocus1;
+    }
+
+    public void setPreviewFocus1(int previewFocus1) {
+        this.previewFocus1 = previewFocus1;
+    }
+
+    public int getPreviewFocus2() {
+        return previewFocus2;
+    }
+
+    public void setPreviewFocus2(int previewFocus2) {
+        this.previewFocus2 = previewFocus2;
     }
 
     // ---------------Infos sur le jeu---------------

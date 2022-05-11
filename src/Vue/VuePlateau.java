@@ -27,11 +27,18 @@ public class VuePlateau {
             for (int i = 0; i < pions.size(); i++) {
                 Pion pion = pions.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerBrillance(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+                    plateau.tracerBrillancev2(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
                 }
             }
         }
 
+        // Desine les pions selectionnables
+        if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
+            pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
+            for (int i = 0; i < pions.size(); i++) {
+                plateau.tracerBrillance(pions.get(i).getCoordonnees().getL(), pions.get(i).getCoordonnees().getC());
+            }
+        }
 
         // Dessine les pions en mode preview ou non
         if(jeu.getPreview()!=null && jeu.getEtape()==2){
@@ -56,24 +63,6 @@ public class VuePlateau {
             }
         }
 
-        // Dessine les focus
-        Joueur[] joueurs = jeu.getJoueurs();
-        if (joueurs[0].getFocus() == plateau.getEpoque()) {
-            plateau.tracerFocus1();
-        }
-        if (joueurs[1].getFocus() == plateau.getEpoque()) {
-            plateau.tracerFocus2();
-        }
-
-        // Desine les pions selectionnables
-        if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
-            pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
-            for (int i = 0; i < pions.size(); i++) {
-                plateau.tracerBrillance(pions.get(i).getCoordonnees().getL(), pions.get(i).getCoordonnees().getC());
-            }
-        }
-
-
         // Dessine les brillances de focus
         if (jeu.getEtape() == 3) {
             Joueur joueur = jeu.getJoueurActuel();
@@ -83,6 +72,43 @@ public class VuePlateau {
                 plateau.tracerBrillanceFocus2();
             }
 
+        }
+
+        // Dessine les focus
+        Joueur[] joueurs = jeu.getJoueurs();
+
+        if(jeu.getJoueurActuel().getID()==1){
+            if (joueurs[1].getFocus() == plateau.getEpoque()) {
+                plateau.tracerFocus2(1);
+            }
+            if(jeu.getPreviewFocus1()==3 || jeu.getEtape()!=3){
+                if (joueurs[0].getFocus() == plateau.getEpoque()) {
+                    plateau.tracerFocus1(1);
+                }
+            }else{
+                if (jeu.getPreviewFocus1() == plateau.getEpoque()) {
+                    plateau.tracerFocus1(1);
+                }
+                if (joueurs[0].getFocus() == plateau.getEpoque()) {
+                    plateau.tracerFocus1(0.5);
+                }
+            }
+        }else{
+            if (joueurs[0].getFocus() == plateau.getEpoque()) {
+                plateau.tracerFocus1(1);
+            }
+            if(jeu.getPreviewFocus2()==3 || jeu.getEtape()!=3){
+                if (joueurs[1].getFocus() == plateau.getEpoque()) {
+                    plateau.tracerFocus2(1);
+                }
+            }else{
+                if (jeu.getPreviewFocus2() == plateau.getEpoque()) {
+                    plateau.tracerFocus2(1);
+                }
+                if (joueurs[1].getFocus() == plateau.getEpoque()) {
+                    plateau.tracerFocus2(0.5);
+                }
+            }
         }
     }
 }

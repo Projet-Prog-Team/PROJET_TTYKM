@@ -149,6 +149,10 @@ public class ControleurMediateur implements CollecteurEvenements {
         jeu.enablePreview(l,c,epoque);
     }
 
+    public void setPreviewFocus1(int epoque){ jeu.setPreviewFocus1(epoque); }
+
+    public void setPreviewFocus2(int epoque){ jeu.setPreviewFocus2(epoque); }
+
     public boolean isEnabledIA1(){
         return joueurs[0] == 1;
     }

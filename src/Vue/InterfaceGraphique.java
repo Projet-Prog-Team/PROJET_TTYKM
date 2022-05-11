@@ -16,6 +16,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
     private CollecteurEvenements controle;
     private JFrame frame;
     private PlateauSwing passe,present,futur;
+    private int width = 1500;
 
 
     public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
@@ -132,7 +133,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         // Pions joueur 1
         Inventory inv1 = new Inventory(1, jeu);
-        mainBox.add(inv1.getBox());
+        mainBox.add(inv1.getPanel());
 
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
@@ -159,14 +160,14 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         // Pions joueur 2
         Inventory inv2 = new Inventory(2, jeu);
-        mainBox.add(inv2.getBox());
+        mainBox.add(inv2.getPanel());
 
 
         Timer t = new Timer(500, new AdaptateurTemps(controle));
         t.start();
         frame.add(mainBox, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1500, 750);
+        frame.setSize(width, 750);
         frame.setVisible(true);
     }
 
