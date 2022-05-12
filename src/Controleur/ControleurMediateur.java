@@ -32,7 +32,6 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void clicSouris(int l, int c, int epoque) {
         int id = jeu.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
-            System.out.println(epoque + " x : " + c + " y : " + l);
             switch (jeu.getEtape()) {
                 case 1:
                     jeu.selectPion(l, c, epoque);
@@ -114,10 +113,10 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "newGame":
                 break;
             case "toggleIA1":
-                activerIA(0, difficulty1);
+                activerIA(0, difficulty1, "Heuristique2");
                 break;
             case "toggleIA2":
-                activerIA(1, difficulty2);
+                activerIA(1, difficulty2, "Heuristique3");
                 break;
             case "setDifficulty":
                 setDifficultyIA(c.getIA(), c.getDifficulty());
@@ -129,12 +128,12 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     // Fonctions appelés lors d'un clique sur un bouton
-    public void activerIA(int j, String type) {
+    public void activerIA(int j, String type, String heuristique) {
         joueurs[j] = (joueurs[j] + 1) % 2;
         if (j == 0) {
-            joueur1 = IA.nouvelle(jeu, type);
+            joueur1 = IA.nouvelle(jeu, type, heuristique);
         } else {
-            joueur2 = IA.nouvelle(jeu, type);
+            joueur2 = IA.nouvelle(jeu, type, heuristique);
         }
         jeu.miseAJour();
     }

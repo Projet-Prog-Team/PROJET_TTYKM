@@ -27,6 +27,15 @@ public class Pion {
         return new Pion(getCoordonnees().copy(), getEpoque(), joueur);
     }
 
+    public int distance(Pion p) {
+        Point pCoords = p.getCoordonnees();
+        int c1 = coordonnees.getC();
+        int l1 = coordonnees.getL();
+        int c2 = pCoords.getC();
+        int l2 = pCoords.getL();
+        return (int) Math.abs(Math.sqrt(Math.pow(c1 - c2, 2) + Math.pow(l1 - l2, 2)));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

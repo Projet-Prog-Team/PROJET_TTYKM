@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-public class Jeu extends Observable {
+public class Jeu extends Observable implements Comparable {
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
@@ -188,6 +188,15 @@ public class Jeu extends Observable {
 
         return state;
     }
+    public int distancePionBord(Pion p) {
+        int d = 1;
+        int l = p.getCoordonnees().getL();
+        int c = p.getCoordonnees().getC();
+        if (c == 0 || l == 0 || c == 3 || l == 3) { // Si pion au bord
+            d = 0;
+        }
+        return d;
+    }
     public void enablePreview(int l, int c, int epoque) {
         Jeu j = copy();
         j.jouerCoup(l, c, epoque);
@@ -195,22 +204,73 @@ public class Jeu extends Observable {
         miseAJour();
     }
     public int Heuristique() {
-        int pionsJoueur1 = joueurs[0].nbPionsRestants;
-        int pionsJoueur2 = joueurs[1].nbPionsRestants;
+        if (joueurAGagne(joueurActuel)) { // Si on gagne
+            return 500;
+        } else if (!joueurAGagne(joueurs[joueurActuel.getID() % 2])) { // Si on ne perd pas
+            int pionsJoueur1 = joueurs[0].nbPionsRestants;
+            int pionsJoueur2 = joueurs[1].nbPionsRestants;
 
-        for (int i = 0; i < 3; i++) {
-            pionsJoueur1 += pionsFocusJoueur(i, joueurs[0]).size();
-        }
-        for (int i = 0; i < 3; i++) {
-            pionsJoueur2 += pionsFocusJoueur(i, joueurs[1]).size();
-        }
+            for (int i = 0; i < 3; i++) {
+                pionsJoueur1 += pionsFocusJoueur(i, joueurs[0]).size();
+            }
+            for (int i = 0; i < 3; i++) {
+                pionsJoueur2 += pionsFocusJoueur(i, joueurs[1]).size();
+            }
 
-        if (joueurActuel.getID() == 1) {
-            return (pionsJoueur1 - pionsJoueur2);
-        } else {
-            return (pionsJoueur2 - pionsJoueur1);
+            if (joueurActuel.getID() == 1) {
+                return (pionsJoueur1 - pionsJoueur2)*50;
+            } else {
+                return (pionsJoueur2 - pionsJoueur1)*50;
+            }
+        } else { // Si on perd
+            return -500;
         }
+        /* Objectif : permettre à l'IA de tuer des pions
+        * Renvoie
+        * 200 si on gagne
+        * -200 si on perd
+        * sinon en général 0..100
+        * */
     }
+
+    public int Heuristique2() {
+        int heuristique = Heuristique();
+        int moyennePions = 0;
+        int maxPionsPlateau = 0;
+        int pionsPlateau;
+        for (int i = 0; i < 3; i++) {
+            pionsPlateau = pionsFocusJoueur(i, getJoueurActuel()).size();
+            moyennePions += pionsPlateau;
+            if (pionsPlateau > maxPionsPlateau) {
+                maxPionsPlateau = pionsPlateau;
+            }
+        }
+        moyennePions = (moyennePions*10)/3;
+        return heuristique + (((maxPionsPlateau*10) - moyennePions));
+        /* Objectif : favoriser un équilibre sur le plateau (idéalement ~2 - 2 - 2)
+        * Moyenne des pions 10..30
+        * MaxPions 10..60
+        * MaxPions - Moyenne des pions ~= 20..30
+        * Heuristique total : 100..200 - 20..30 ~= 70..170
+         */
+    }
+
+    public int Heuristique3() {
+        int heuristique = Heuristique2();
+        for (Pion pion : pions) {
+            if (pion.getJoueur() == getJoueurActuel()) {
+                heuristique += 10*distancePionBord(pion);
+            }
+        }
+        return heuristique;
+        /*
+        * Objectif : favoriser les pions au milieu (4 cases au milieu)
+        * distancePionBord = soit 0 soit 1
+        * 10..30 en général
+        * Heuristique total 40..140
+         */
+    }
+    // Idées pour heuristique 4 > faire en sorte de limiter les pions collés
     public ArrayList<Couple<Jeu, Tour>> branchementsSelect(Jeu j) {   // On considere que le jeu j est dans l'étape selection
         ArrayList<Couple<Jeu, Tour>> jeux = new ArrayList<>();
         ArrayList<Pion> pionsToBeSelected = pionsFocusJoueur(getJoueurActuel().getFocus(), getJoueurActuel());
@@ -435,4 +495,8 @@ public class Jeu extends Observable {
     }
 
 
+    @Override
+    public int compareTo(Object o) {
+        return 0;
+    }
 }
