@@ -3,6 +3,7 @@ package Controleur;
 import Modele.Jeu;
 import Modele.Pion;
 import Structures.Point;
+import Vue.AdaptateurTemps;
 import Vue.CollecteurEvenements;
 import Vue.Commande;
 
@@ -15,11 +16,15 @@ public class ControleurMediateur implements CollecteurEvenements {
     int [] joueurs;
     String difficulty1, difficulty2;
 
-    public ControleurMediateur (Jeu j) {
+    Timer t;
+
+    public ControleurMediateur (Jeu j, int temps) {
         jeu = j;
         joueurs = new int[2];
         difficulty1 = "facile";
         difficulty2 = "facile";
+        t = new Timer(temps, new AdaptateurTemps(this));
+        t.start();
     }
 
     // Clique sur une case
@@ -38,7 +43,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                 case 3:
                     break;
                 case 4:
-                    System.out.println("La partie est terminée");
                     break;
             }
         }
@@ -72,7 +76,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                     jeu.switchPlayer();
                     break;
                 case 4:
-                    System.out.println("La partie est terminée");
                     break;
             }
         }
@@ -96,7 +99,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                         }
                     }
                 } else if (jeu.getEtape() == 4){
-                    System.out.println("La partie est terminée");
                 }
                 break;
             case "save":

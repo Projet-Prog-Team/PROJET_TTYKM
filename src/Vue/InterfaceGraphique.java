@@ -162,9 +162,6 @@ public class InterfaceGraphique implements Runnable, Observateur {
         Inventory inv2 = new Inventory(2, jeu);
         mainBox.add(inv2.getPanel());
 
-
-        Timer t = new Timer(500, new AdaptateurTemps(controle));
-        t.start();
         frame.add(mainBox, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(width, 750);

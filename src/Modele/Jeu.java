@@ -76,7 +76,6 @@ public class Jeu extends Observable {
     }
     public int getEtape() {
         if (aGagne != 0) {
-            System.out.println("Joueur qui a gagné : " + aGagne);
             return 4;
         } else {
             if (getPionActuel() == null) {
@@ -131,7 +130,7 @@ public class Jeu extends Observable {
         Point coo = pionActuel.getCoordonnees();
         int epoque = pionActuel.getEpoque();
         if (epoque - 1 >= EPOQUE.PASSE) {   // Si on peut aller vers le passé
-            if (getPion(coo, epoque-1) == null) {
+            if (getPion(coo, epoque-1) == null && getJoueurActuel().getNbPionsRestants() > 0) {
                 casesDisponibles.add(new Pion(coo, epoque-1, joueurActuel));
             }
         }
@@ -352,13 +351,9 @@ public class Jeu extends Observable {
             if (getPion(pionActuel.coordonnees, epoque) == null) {
                 pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
-                    if (joueurActuel.peutSupprimerPion()) {
-                        pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
-                        //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
-                        joueurActuel.supprimerPion();
-                    } else {
-                        pionActuel.epoque = PionEpoque;
-                    }
+                    pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
+                    //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
+                    joueurActuel.supprimerPion();
                 }
             }
         }

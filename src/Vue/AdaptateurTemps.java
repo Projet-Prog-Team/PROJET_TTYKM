@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 public class AdaptateurTemps implements ActionListener {
     CollecteurEvenements controle;
 
-    AdaptateurTemps(CollecteurEvenements c) {
+    public AdaptateurTemps(CollecteurEvenements c) {
         controle = c;
     }
 
