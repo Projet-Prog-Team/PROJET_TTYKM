@@ -16,13 +16,21 @@ public class BoutonAnnuler implements Observateur {
         jeu = j;
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFocusable(false);
+        button.setEnabled(false);
         jeu.ajouteObservateur(this);
     }
 
     @Override
     public void metAJour() {
         // TODO: Fonction du jeu permettant de savoir si un coup peut être refait
-        button.setEnabled(true);
+        if(jeu.MemoryManager.CanCTRLZ())
+        {
+            button.setEnabled(true);
+        }
+        else
+        {
+            button.setEnabled(false);
+        }
     }
 
     public JButton getButton(){

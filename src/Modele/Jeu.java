@@ -1,6 +1,7 @@
 package Modele;
 
 import Patterns.Observable;
+import Modele.ManageFiles;
 import Structures.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,40 +11,51 @@ public class Jeu extends Observable {
     private final ArrayList<Pion> pions = new ArrayList<>();
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
+    public Pion pionActuel;
+    public ManageFiles MemoryManager;
     int aGagne;
+    public final int NBPIONS = 12;
 
     public Jeu() {
         init();
+       
     }
 
     public void init() {
-        joueurs[0] = new Joueur(1);
-        joueurs[1] = new Joueur(2);
+        joueurs[0] = new Joueur(1,NBPIONS/2);
+        joueurs[1] = new Joueur(2,NBPIONS/2);
         for(int i = 0; i < 3; i++) {
             Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
             pions.add(p1);
             Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
             pions.add(p2);
+            joueurs[0].nbPionsRestants--;
+            joueurs[1].nbPionsRestants--;
         }
         joueurs[0].setFocus(0);
         joueurs[1].setFocus(2);
-        joueurs[0].setPionActuel(getPion(new Point(0, 0), 0));
-        joueurs[1].setPionActuel(getPion(new Point(3, 3), 2));
+        pionActuel= getPion(new Point(0, 0), 0);
+        pionActuel=getPion(new Point(3, 3), 2);
         aGagne = 0;
+        MemoryManager=new ManageFiles(this, "C:/Users/theo/Desktop/Code/PROJET_TTYKM/save/");
+        ajouteObservateur(MemoryManager);
 
     }
 
     public void jouerCoup(int l, int c, int epoque) {
-        Pion clic = new Pion(new Point(l, c), epoque, joueurActuel);
+
+
+        Pion clic=new Pion(new Point(l, c), epoque, joueurActuel);
+
         ArrayList<Pion> cases = casesDispo();
 
         if (cases.contains(clic)) {    // Si coup jouable
             joueurActuel.nbActionsRestantes--;
-            if (epoque != joueurActuel.getPionActuel().getEpoque()) {
+            if (epoque != pionActuel.getEpoque()) {
                 changerEpoque(epoque);
             } else {
-                move(joueurActuel.getPionActuel(), new Point(l, c));
-                if (getPion(joueurActuel.pionActuel.getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
+                move(pionActuel, new Point(l, c));
+                if (getPion(pionActuel.getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
                     joueurActuel.nbActionsRestantes = 0;
                 }
             }
@@ -56,6 +68,9 @@ public class Jeu extends Observable {
         System.out.println("nbActionsRestantes  : " + joueurActuel.getNbActionsRestantes());
         System.out.println("nbPionsRestants  : " + joueurActuel.nbPionsRestants);
     }
+
+    public Pion getPionActuel() { return pionActuel; }
+    public void setPionActuel(Pion p) {this.pionActuel = p;}
 
     boolean joueurAGagne(Joueur joueur) {
         Joueur adversaire = joueurs[(joueur.getID()) % 2];
@@ -92,18 +107,19 @@ public class Jeu extends Observable {
     }
 
     public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
-        int PionEpoque = joueurActuel.getPionActuel().getEpoque();
+        int PionEpoque = pionActuel.getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
-            Pion pionActuel = joueurActuel.getPionActuel();
-            if (getPion(pionActuel.coordonnees, epoque) == null) {
-                pionActuel.epoque = epoque;
+            Pion t_pionActuel = pionActuel;
+            if (getPion(t_pionActuel.coordonnees, epoque) == null) {
+                t_pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
                     if (joueurActuel.peutSupprimerPion()) {
-                        pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
+                            pions.add(new Pion(t_pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
+
                         //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
                         joueurActuel.supprimerPion();
                     } else {
-                        pionActuel.epoque = PionEpoque;
+                        t_pionActuel.epoque = PionEpoque;
                     }
                 }
             }
@@ -111,18 +127,20 @@ public class Jeu extends Observable {
     }
 
     public ArrayList<Pion> casesDispo() {   // Retourne une liste des pions jouables pour le joueur cou
-        Pion pionActuel = joueurActuel.getPionActuel();
+        Pion t_pionActuel = pionActuel;
         ArrayList<Pion> casesDisponibles = new ArrayList<>();
-        Point coo = pionActuel.getCoordonnees();
-        int epoque = pionActuel.getEpoque();
+        Point coo = t_pionActuel.getCoordonnees();
+        int epoque = t_pionActuel.getEpoque();
         if (epoque - 1 >= EPOQUE.PASSE) {   // Si on peut aller vers le passé
             if (getPion(coo, epoque-1) == null) {
-                casesDisponibles.add(new Pion(coo, epoque-1, joueurActuel));
+                    casesDisponibles.add(new Pion(coo, epoque-1, joueurActuel));
+                
             }
         }
         if (epoque + 1 <= EPOQUE.FUTUR) {   // Si on peut aller vers le futur
             if (getPion(coo, epoque+1) == null) {
-                casesDisponibles.add(new Pion(coo, epoque+1, joueurActuel));
+                    casesDisponibles.add(new Pion(coo, epoque+1, joueurActuel));
+
             }
         }
 
@@ -132,7 +150,8 @@ public class Jeu extends Observable {
         for (int i = 0; i < 4; i++) {   // Vérification des cases autour du pion selectionné
             p = new Point(coo.getX() + dX[i], coo.getY() + dY[i]);
             if (p.getX() >=0 && p.getX() <= 3 && p.getY() >= 0  && p.getY() <= 3) {
-                casesDisponibles.add(new Pion(p, epoque, joueurActuel));
+                    casesDisponibles.add(new Pion(p, epoque, joueurActuel));
+
             }
         }
 
@@ -175,8 +194,18 @@ public class Jeu extends Observable {
         return pions;
     }
 
+    public void SetPions(Pion[] t_pions)
+    {
+        pions.clear();
+        for(Pion t_pion : t_pions)
+        {
+            if(t_pion!=null)
+                pions.add(t_pion);
+        }
+    }
+
     public void switchPlayer() {
-        if(joueurActuel == joueurs[0]) {
+        if(joueurActuel.getID() == 1) {
             joueurActuel=joueurs[1];
         }
         else {
@@ -185,9 +214,9 @@ public class Jeu extends Observable {
         ArrayList<Pion> pionInFocus = pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
         if (pionInFocus.size() == 1) {
             // forcer la sélection
-            joueurActuel.setPionActuel(pionInFocus.get(0));
+            pionActuel=pionInFocus.get(0);
         } else {
-            joueurActuel.setPionActuel(null);
+            pionActuel=null;
         }
         joueurActuel.nbActionsRestantes=2;
     }
@@ -195,7 +224,7 @@ public class Jeu extends Observable {
     public void selectPion(int l, int c, int epoque) {
         Pion selected = getPion(new Point(l, c), epoque);
         if (selected != null && epoque == joueurActuel.getFocus() && selected.getJoueur() == joueurActuel) {
-            joueurActuel.setPionActuel(selected);
+            pionActuel=selected;
         }
     }
 
@@ -221,7 +250,7 @@ public class Jeu extends Observable {
             System.out.println("Joueur qui a gagné : " + aGagne);
             return 4;
         } else {
-            if (joueurActuel.getPionActuel() == null) {
+            if (pionActuel == null) {
                 return 1;
             } else {
                 if (joueurActuel.getNbActionsRestantes() == 0) {

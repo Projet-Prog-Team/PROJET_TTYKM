@@ -4,8 +4,8 @@ public class Joueur {
     int ID;
     int nbPionsRestants = 4;
     int nbActionsRestantes = 2;
-    Pion pionActuel;
-    int focus;
+
+    private int focus;
 
     public int getID() {
         return ID;
@@ -15,8 +15,9 @@ public class Joueur {
         this.ID = ID;
     }
 
-    public Joueur(int id) {
+    public Joueur(int id,int t_nbpions) {
         ID = id;
+        nbPionsRestants = t_nbpions;
     }
 
     public boolean peutSupprimerPion() {
@@ -26,21 +27,20 @@ public class Joueur {
     public void supprimerPion() {
         nbPionsRestants--;
     }
-    public Pion getPionActuel() { return pionActuel; }
-    public void setPionActuel(Pion p) {this.pionActuel = p;}
+
     public int getFocus() {
         return focus;
     }
     public void setFocus(int f) {this.focus = f;}
     public int getNbActionsRestantes() { return nbActionsRestantes; }
-    @Override
+    /*@Override
     public String toString() {
         return "\nJoueur{" +
                 "ID=" + ID +
                 ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
-                ", pionActuel=" + pionActuel +
+                ", pionActuel=" +  +
                 ", focus=" + focus +
                 '}';
-    }
+    }*/
 }

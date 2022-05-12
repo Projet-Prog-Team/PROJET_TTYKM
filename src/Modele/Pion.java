@@ -15,6 +15,13 @@ public class Pion {
         joueur = j;
     }
 
+    public Pion(Pion tmp)
+    {
+        epoque = tmp.epoque;
+        joueur=tmp.joueur;
+        coordonnees = new Point(tmp.coordonnees);
+    }
+
     public int getEpoque() {
         return epoque;
     }
@@ -43,6 +50,13 @@ public class Pion {
                 ", epoque=" + epoque +
                 ", joueur=" + joueur.getID() +
                 '}' + "\n";
+    }
+
+    public Pion Clone()
+    {
+        Point tmp_point = new Point(coordonnees.getX(), coordonnees.getY());
+        Pion tmp = new Pion(tmp_point,epoque,joueur);
+        return tmp;
     }
 }
 

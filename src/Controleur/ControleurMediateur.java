@@ -56,6 +56,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 System.out.println(c.getSaveName());
                 break;
             case "annuler":
+                jeu.MemoryManager.CTRLZ();
                 break;
             case "refaire":
                 break;
