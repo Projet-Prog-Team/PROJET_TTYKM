@@ -15,7 +15,6 @@ public class ControleurMediateur implements CollecteurEvenements {
     IA joueur1, joueur2;
     int [] joueurs;
     String difficulty1, difficulty2;
-
     Timer t;
 
     public ControleurMediateur (Jeu j, int temps) {
@@ -110,6 +109,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "refaire":
                 break;
+            case "IASpeed":
+                t.stop();
+                t = new Timer(c.getIA(), new AdaptateurTemps(this));
+                t.start();
             case "newGame":
                 break;
             case "toggleIA1":

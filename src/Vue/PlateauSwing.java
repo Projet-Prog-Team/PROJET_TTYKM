@@ -39,16 +39,16 @@ public class PlateauSwing extends JComponent implements Plateau {
         }
         bg = img.getImage();
 
-        img = new ImageIcon("res/Img/focus1.png");
+        img = new ImageIcon("res/Img/focusBlanc.png");
         focus1 = img.getImage();
 
-        img = new ImageIcon("res/Img/focus2.png");
+        img = new ImageIcon("res/Img/focusNoir.png");
         focus2 = img.getImage();
 
-        img = new ImageIcon("res/Img/blanc.png");
+        img = new ImageIcon("res/Img/pionBlanc.png");
         pionBlanc = img.getImage();
 
-        img = new ImageIcon("res/Img/noir.png");
+        img = new ImageIcon("res/Img/pionNoir.png");
         pionNoir = img.getImage();
     }
 

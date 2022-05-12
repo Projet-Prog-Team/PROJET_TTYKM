@@ -12,10 +12,11 @@ public class LabelEtat implements Observateur {
     JLabel label;
 
     LabelEtat(String s, Jeu j){
-        label = new JLabel(s);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label = new JLabel(s, SwingConstants.CENTER);
+        label.setPreferredSize(new Dimension(280,20));
         jeu = j;
         jeu.ajouteObservateur(this);
+        metAJour();
     }
 
     @Override
@@ -36,9 +37,9 @@ public class LabelEtat implements Observateur {
                 state+="choisi où il jouera son prochain tour";
                 break;
             case "j1gagne":
-                state="Blanc à gagné";
+                state="Blanc a gagné";
             case "j2gagne":
-                state="Noir à gagné";
+                state="Noir a gagné";
                 break;
         }
         label.setText(state);
