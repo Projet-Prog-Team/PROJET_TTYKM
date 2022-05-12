@@ -35,13 +35,17 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        switch (args[0]) {
-            case "classique":
-                classique();
-                break;
-            case "test":
-                test(Integer.parseInt(args[1]), args[2], args[3]);
-                break;
+        if (args.length == 0) {
+            classique();
+        } else {
+            switch (args[0]) {
+                case "classique":
+                    classique();
+                    break;
+                case "test":
+                    test(Integer.parseInt(args[1]), args[2], args[3]);
+                    break;
+            }
         }
 
         //InterfaceGraphique.demarrer(j, c);
