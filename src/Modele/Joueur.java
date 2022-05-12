@@ -3,9 +3,8 @@ package Modele;
 public class Joueur {
     int ID;
     int nbPionsRestants = 4;
-    int nbActionsRestantes = 2;
-
-    private int focus;
+    public int nbActionsRestantes = 2;
+    int focus;
 
     public int getID() {
         return ID;
@@ -15,9 +14,8 @@ public class Joueur {
         this.ID = ID;
     }
 
-    public Joueur(int id,int t_nbpions) {
+    public Joueur(int id) {
         ID = id;
-        nbPionsRestants = t_nbpions;
     }
 
     public boolean peutSupprimerPion() {
@@ -27,20 +25,35 @@ public class Joueur {
     public void supprimerPion() {
         nbPionsRestants--;
     }
-
     public int getFocus() {
         return focus;
     }
     public void setFocus(int f) {this.focus = f;}
     public int getNbActionsRestantes() { return nbActionsRestantes; }
-    /*@Override
+
+    @Override
+    public boolean equals(Object obj) {
+        Joueur j = (Joueur) obj;
+        return j.getID() == getID();
+    }
+
+    @Override
     public String toString() {
         return "\nJoueur{" +
                 "ID=" + ID +
                 ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
-                ", pionActuel=" +  +
                 ", focus=" + focus +
                 '}';
-    }*/
+    }
+    public Joueur copy() {
+        Joueur j = new Joueur(getID());
+        j.nbPionsRestants = getNbPionsRestants();
+        j.nbActionsRestantes = getNbActionsRestantes();
+        j.setFocus(getFocus());
+        return j;
+    }
+    public int getNbPionsRestants() {
+        return nbPionsRestants;
+    }
 }

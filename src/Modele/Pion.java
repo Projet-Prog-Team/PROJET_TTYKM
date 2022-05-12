@@ -30,6 +30,10 @@ public class Pion {
 
     public Joueur getJoueur() { return joueur; }
 
+    public Pion copy(Joueur joueur) {
+        return new Pion(getCoordonnees().copy(), getEpoque(), joueur);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

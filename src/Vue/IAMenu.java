@@ -32,7 +32,7 @@ public class IAMenu {
             public void actionPerformed(ActionEvent e) {
                 Commande c = new Commande("setDifficulty");
                 c.setIA(IA);
-                c.setDifficulty("moyen");
+                c.setDifficulty("moyenne");
                 controle.commande(c);
             }
         });

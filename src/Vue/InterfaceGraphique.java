@@ -16,6 +16,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
     private CollecteurEvenements controle;
     private JFrame frame;
     private PlateauSwing passe,present,futur;
+    private int width = 1500;
 
 
     public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
@@ -34,9 +35,21 @@ public class InterfaceGraphique implements Runnable, Observateur {
         SwingUtilities.invokeLater(new InterfaceGraphique(j, c));
     }
 
+    public JMenuItem createMenuItem(String s, String c){
+        JMenuItem menuItem = new JMenuItem(s);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controle.commande(new Commande(c));
+            }
+        });
+        return menuItem;
+    }
+
     @Override
     public void run() {
         frame = new JFrame("That time you killed me");
+        frame.setLayout(new BorderLayout());
 
         Box mainBox = Box.createVerticalBox();
 
@@ -46,13 +59,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // File Menu
         JMenu fileMenu = new JMenu("File");
 
-        JMenuItem newGameMenu = new JMenuItem("Nouvelle partie");
-        newGameMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controle.commande(new Commande("newGame"));
-            }
-        });
+        JMenuItem newGameMenu = createMenuItem("Nouvelle partie","newGame");
         fileMenu.add(newGameMenu);
 
         JMenuItem saveMenu = new JMenuItem("Sauvegarder partie");
@@ -82,15 +89,21 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         // IA Menu
 
-        JMenu IAMenu = new JMenu("IA");
+        JMenu ConfigMenu = new JMenu("Configuration");
 
         IAMenu IA1Menu = new IAMenu(1, controle);
-        IAMenu.add(IA1Menu.getMenu());
+        ConfigMenu.add(IA1Menu.getMenu());
 
         IAMenu IA2Menu = new IAMenu(2, controle);
-        IAMenu.add(IA2Menu.getMenu());
+        ConfigMenu.add(IA2Menu.getMenu());
 
-        menuBar.add(IAMenu);
+        ActiverIA ia1 = new ActiverIA(jeu, controle,1,"toggleIA1");
+        ConfigMenu.add(ia1.getMenuItem());
+
+        ActiverIA ia2 = new ActiverIA(jeu, controle,2,"toggleIA2");
+        ConfigMenu.add(ia2.getMenuItem());
+
+        menuBar.add(ConfigMenu);
 
         // Help
         JMenu HelpMenu = new JMenu("Help");
@@ -98,28 +111,12 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         frame.setJMenuBar(menuBar);
 
-        // Top bar
+        // Lateral Bar
         Box topBar = Box.createHorizontalBox();
 
-        JToggleButton toggleIA1 = new JToggleButton("Activer IA 1");
-        toggleIA1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controle.commande(new Commande("toggleIA1"));
-            }
-        });
-        topBar.add(toggleIA1);
+        topBar.add(Box.createGlue());
 
-        JToggleButton toggleIA2 = new JToggleButton("Activer IA 2");
-        toggleIA2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controle.commande(new Commande("toggleIA2"));
-            }
-        });
-        topBar.add(toggleIA2);
-
-        LabelEtat labelEtat = new LabelEtat("Joueur 1 joue", jeu);
+        LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
         topBar.add(labelEtat.getLabel());
 
         BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
@@ -130,29 +127,44 @@ public class InterfaceGraphique implements Runnable, Observateur {
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
         topBar.add(boutonRefaire.getButton());
 
-        mainBox.add(topBar);
+        topBar.add(Box.createGlue());
+
+        frame.add(topBar, BorderLayout.NORTH);
+
+        // Pions joueur 1
+        Inventory inv1 = new Inventory(1, jeu);
+        mainBox.add(inv1.getPanel());
 
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
 
         passe = new PlateauSwing(EPOQUE.PASSE, jeu);
-        passe.addMouseListener(new AdaptateurSouris(passe, controle));
+        AdaptateurSouris a1 = new AdaptateurSouris(passe, controle);
+        passe.addMouseMotionListener(a1);
+        passe.addMouseListener(a1);
         plateauBox.add(passe);
 
         present = new PlateauSwing(EPOQUE.PRESENT, jeu);
-        present.addMouseListener(new AdaptateurSouris(present, controle));
+        AdaptateurSouris a2 = new AdaptateurSouris(present, controle);
+        present.addMouseMotionListener(a2);
+        present.addMouseListener(a2);
         plateauBox.add(present);
 
         futur = new PlateauSwing(EPOQUE.FUTUR, jeu);
-        futur.addMouseListener(new AdaptateurSouris(futur, controle));
+        AdaptateurSouris a3 = new AdaptateurSouris(futur, controle);
+        futur.addMouseMotionListener(a3);
+        futur.addMouseListener(a3);
         plateauBox.add(futur);
 
         mainBox.add(plateauBox);
 
+        // Pions joueur 2
+        Inventory inv2 = new Inventory(2, jeu);
+        mainBox.add(inv2.getPanel());
 
-        frame.add(mainBox);
+        frame.add(mainBox, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1500, 600);
+        frame.setSize(width, 750);
         frame.setVisible(true);
     }
 
