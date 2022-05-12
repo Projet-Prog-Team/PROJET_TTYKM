@@ -13,7 +13,7 @@ public class LabelEtat implements Observateur {
 
     LabelEtat(String s, Jeu j){
         label = new JLabel(s, SwingConstants.CENTER);
-        label.setPreferredSize(new Dimension(300,20));
+        label.setPreferredSize(new Dimension(280,20));
         jeu = j;
         jeu.ajouteObservateur(this);
         metAJour();

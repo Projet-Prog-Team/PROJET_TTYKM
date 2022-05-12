@@ -152,10 +152,10 @@ public class InterfaceGraphique implements Runnable, Observateur {
             }
         });
         JScrollPane historyPane = new JScrollPane(historyList);
-        c.fill = GridBagConstraints.BOTH;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
-        c.ipady = 200;
+        c.ipady = 150;
         c.insets = new Insets(0,20,0,20);
         lateralPane.add(historyPane, c);
         c.ipady = 0;
@@ -171,21 +171,24 @@ public class InterfaceGraphique implements Runnable, Observateur {
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
         buttonPanel.add(boutonRefaire.getButton());
 
-        JButton boutonSuggestion = new JButton("Suggestion");
-        boutonSuggestion.addActionListener(new AdaptateurCommande(controle, new Commande("suggestion")));
-        boutonSuggestion.setFocusable(false);
-        buttonPanel.add(boutonSuggestion);
-
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
         lateralPane.add(buttonPanel, c);
 
+        JButton boutonSuggestion = new JButton("Suggestion");
+        boutonSuggestion.addActionListener(new AdaptateurCommande(controle, new Commande("suggestion")));
+        boutonSuggestion.setFocusable(false);
+        c.fill = GridBagConstraints.NONE;
+        c.gridx = 0;
+        c.gridy = 2;
+        lateralPane.add(boutonSuggestion, c);
+
         // Label etat du jeu
         LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
         c.fill = GridBagConstraints.NONE ;
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 3;
         lateralPane.add(labelEtat.getLabel(), c);
 
         frame.add(lateralPane, BorderLayout.EAST);
