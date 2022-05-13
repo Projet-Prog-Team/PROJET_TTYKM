@@ -5,9 +5,11 @@ import Structures.Point;
 import java.util.Objects;
 
 public class Pion {
-    Point coordonnees;
+    private Point coordonnees;
     int epoque;
-    Joueur joueur;
+    public int ID;
+    public boolean focused = false;
+    private Joueur joueur;
 
     public Pion(Point c, int e, Joueur j) {
         coordonnees =  c;
@@ -15,23 +17,28 @@ public class Pion {
         joueur = j;
     }
 
-    public Pion(Pion tmp)
-    {
-        epoque = tmp.epoque;
-        joueur=tmp.joueur;
-        coordonnees = new Point(tmp.coordonnees);
+    public Pion(Point c, int e, Joueur j,int t_ID) {
+        coordonnees =  c;
+        epoque = e;
+        joueur = j;
+        ID=t_ID;
     }
+
 
     public int getEpoque() {
         return epoque;
     }
 
     public Point getCoordonnees() { return coordonnees; }
+    public void SetCoordonnees(Point t_coordonnees)
+    {
+        coordonnees = t_coordonnees;
+    }
 
     public Joueur getJoueur() { return joueur; }
 
     public Pion copy(Joueur joueur) {
-        return new Pion(getCoordonnees().copy(), getEpoque(), joueur);
+        return new Pion(getCoordonnees().copy(), getEpoque(), joueur,ID);
     }
 
     @Override
@@ -56,11 +63,5 @@ public class Pion {
                 '}' + "\n";
     }
 
-    public Pion Clone()
-    {
-        Point tmp_point = new Point(coordonnees.getX(), coordonnees.getY());
-        Pion tmp = new Pion(tmp_point,epoque,joueur);
-        return tmp;
-    }
 }
 

@@ -38,7 +38,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     jeu.selectPion(l, c, epoque);
                     break;
                 case 2:
-                    jeu.jouerCoup(l, c, epoque);
+                    jeu.jouerCoup(l, c, epoque,true);
                     break;
                 case 3:
                     break;
@@ -64,13 +64,15 @@ public class ControleurMediateur implements CollecteurEvenements {
                     Pion p = j.selectPion();
                     Point coord = p.getCoordonnees();
                     jeu.selectPion(coord.getL(), coord.getC(), p.getEpoque());
+                    jeu.MemoryManager.AddLog();
                     break;
                 case 2:
                     p = j.jouerCoup();
                     coord = p.getCoordonnees();
-                    jeu.jouerCoup(coord.getL(), coord.getC(), p.getEpoque());
+                    jeu.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),false);
                     break;
                 case 3:
+                    jeu.getPionActuel().focused=false;
                     int focus = j.choixFocus();
                     jeu.getJoueurActuel().setFocus(focus);
                     jeu.switchPlayer();
@@ -93,6 +95,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                         //choix focus
                         if (jeu.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
                             jeu.getJoueurActuel().setFocus(c.getEpoque());
+                            jeu.MemoryManager.AddLog();
                             jeu.switchPlayer();
                         } else {
                             System.out.println("Modification du focus adverse impossible");

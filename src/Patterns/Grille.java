@@ -18,7 +18,16 @@ public class Grille {
 
     public static Pion[] Clone(Pion[]original)
     {
-        return Arrays.copyOf(original, original.length);
+        Pion[] t_pions = new Pion[original.length];
+        int i=0;
+        for(Pion t_pion : original)
+        {
+            if(t_pion!=null)
+                t_pions[i]=t_pion.copy(t_pion.getJoueur());
+            i++;
+        }
+        return t_pions;
+        //return Arrays.copyOf(original, original.length);
         
     }
     public int Compare(Pion[] second)
@@ -29,7 +38,7 @@ public class Grille {
                 return i;
             if(cases[i]!=null && second[i]!=null)
             {
-                if(cases[i].getCoordonnees()!= second[i].getCoordonnees())
+                if(cases[i].getCoordonnees().getC()!= second[i].getCoordonnees().getC() || cases[i].getCoordonnees().getL()!= second[i].getCoordonnees().getL())
                     return i;
                 if(cases[i].getEpoque()!= second[i].getEpoque())
                     return i;

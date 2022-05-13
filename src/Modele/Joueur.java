@@ -2,9 +2,14 @@ package Modele;
 
 public class Joueur {
     int ID;
-    int nbPionsRestants = 4;
+    private int nbPionsRestants;
     public int nbActionsRestantes = 2;
     int focus;
+
+    public Joueur(int id,int nbpions) {
+        ID = id;
+        nbPionsRestants = nbpions;
+    }
 
     public int getID() {
         return ID;
@@ -12,10 +17,6 @@ public class Joueur {
 
     public void setID(int ID) {
         this.ID = ID;
-    }
-
-    public Joueur(int id) {
-        ID = id;
     }
 
     public boolean peutSupprimerPion() {
@@ -47,13 +48,17 @@ public class Joueur {
                 '}';
     }
     public Joueur copy() {
-        Joueur j = new Joueur(getID());
-        j.nbPionsRestants = getNbPionsRestants();
+        Joueur j = new Joueur(getID(),nbPionsRestants);
         j.nbActionsRestantes = getNbActionsRestantes();
         j.setFocus(getFocus());
         return j;
     }
     public int getNbPionsRestants() {
         return nbPionsRestants;
+    }
+
+    public void SetNbPionsRestants(int t_nb)
+    {
+        nbPionsRestants= t_nb;
     }
 }
