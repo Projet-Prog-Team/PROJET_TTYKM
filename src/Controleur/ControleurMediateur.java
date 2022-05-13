@@ -8,11 +8,12 @@ import Vue.CollecteurEvenements;
 import Vue.Commande;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
     Jeu jeu;
-    IA joueur1, joueur2;
+    IA joueur1, joueur2, suggestion;
     int [] joueurs;
     String difficulty1 = "facile", difficulty2 = "facile";
     Timer t;
@@ -21,6 +22,7 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     public ControleurMediateur (Jeu j, int temps) {
         jeu = j;
+        suggestion = IA.nouvelle(j, "difficile", "Heuristique3");
         speed = temps;
         init();
     }
@@ -88,6 +90,23 @@ public class ControleurMediateur implements CollecteurEvenements {
         }
     }
 
+    public void suggestion () {
+        ArrayList<Pion> l = new ArrayList<>();
+        switch(jeu.getEtape()) {
+            case 1:
+                jeu.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
+                break;
+            case 2:
+                jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
+                break;
+            case 3:
+                jeu.setSuggestionFocus(suggestion.choixFocus());
+                break;
+            case 4:
+                break;
+        }
+    }
+
     // Clique sur un bouton
     @Override
     public boolean commande(Commande c) {
@@ -117,6 +136,9 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "annuler":
                 break;
             case "refaire":
+                break;
+            case "suggestion":
+                suggestion();
                 break;
             case "IASpeed":
                 t.stop();

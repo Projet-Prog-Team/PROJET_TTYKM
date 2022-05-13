@@ -20,6 +20,9 @@ public class Jeu extends Observable implements Comparable {
     int previewFocus2;
     int aGagne;
 
+    Pion suggestionSource, suggestionDest;
+    int suggestionFocus;
+
     public Jeu() {
         init();
     }
@@ -110,6 +113,15 @@ public class Jeu extends Observable implements Comparable {
 
     public void setPreviewFocus2(int previewFocus2) {
         this.previewFocus2 = previewFocus2;
+    }
+
+    public void setSuggestionPions(Pion s, Pion d) {
+        suggestionSource = s;
+        suggestionDest = d;
+    }
+
+    public void setSuggestionFocus(int f) {
+        suggestionFocus = f;
     }
 
     // ---------------Infos sur le jeu---------------
@@ -229,9 +241,9 @@ public class Jeu extends Observable implements Comparable {
         }
         /* Objectif : permettre à l'IA de tuer des pions
         * Renvoie
-        * 200 si on gagne
-        * -200 si on perd
-        * sinon en général 0..100
+        * 500 si on gagne
+        * -500 si on perd
+        * sinon en général 0..200
         * */
     }
 
@@ -495,7 +507,6 @@ public class Jeu extends Observable implements Comparable {
                 ", joueurActuel=" + joueurActuel +
                 '}';
     }
-
 
     @Override
     public int compareTo(Object o) {
