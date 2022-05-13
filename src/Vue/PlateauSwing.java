@@ -3,8 +3,11 @@ package Vue;
 import Modele.EPOQUE;
 import Modele.Jeu;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class PlateauSwing extends JComponent implements Plateau {
 
@@ -25,31 +28,37 @@ public class PlateauSwing extends JComponent implements Plateau {
         this.epoque = epoque;
         vue = new VuePlateau(j,this);
 
-        ImageIcon img = null;
+        InputStream in = null;
         switch(epoque){
             case EPOQUE.PASSE:
-                img = new ImageIcon("res/Img/passe.png");
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/passe.png");
                 break;
             case EPOQUE.PRESENT:
-                img = new ImageIcon("res/Img/present.png");
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/present.png");
                 break;
             case EPOQUE.FUTUR:
-                img = new ImageIcon("res/Img/futur.png");
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/futur.png");
                 break;
         }
-        bg = img.getImage();
 
-        img = new ImageIcon("res/Img/focusBlanc.png");
-        focusBlanc = img.getImage();
+        try {
+            bg = ImageIO.read(in);
 
-        img = new ImageIcon("res/Img/focusNoir.png");
-        focusNoir = img.getImage();
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusBlanc.png");
+            focusBlanc = ImageIO.read(in);
 
-        img = new ImageIcon("res/Img/pionBlanc.png");
-        pionBlanc = img.getImage();
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusNoir.png");
+            focusNoir = ImageIO.read(in);
 
-        img = new ImageIcon("res/Img/pionNoir.png");
-        pionNoir = img.getImage();
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc.png");
+            pionBlanc = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir.png");
+            pionNoir = ImageIO.read(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -101,7 +110,7 @@ public class PlateauSwing extends JComponent implements Plateau {
         int y = getYoffset()+l* getHauteurCase();
         Color myColour = new Color(255, 200,0,125 );
         drawable.setColor(myColour);
-        drawable.fillRect(x,y,getLargeurCase(),getHauteurCase());
+        drawable.fillRect(x,y,getLargeurCase()+3,getHauteurCase());
     }
 
     public void tracerBrillanceCase(int l, int c){

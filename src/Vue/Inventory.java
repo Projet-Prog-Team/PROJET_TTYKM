@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class Inventory implements Observateur {
@@ -27,9 +28,11 @@ public class Inventory implements Observateur {
 
         try {
             if(joueur==1){
-                pionBasique = ImageIO.read(new File("res/Img/pionBlanc.png")).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc.png");
+                pionBasique = ImageIO.read(in).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             }else{
-                pionBasique = ImageIO.read(new File("res/Img/pionNoir.png")).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir.png");
+                pionBasique = ImageIO.read(in).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             }
         } catch (IOException e) {
             e.printStackTrace();
