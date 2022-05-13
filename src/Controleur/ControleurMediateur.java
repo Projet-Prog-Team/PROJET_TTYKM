@@ -28,10 +28,10 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void init() {
         t = new Timer(speed, new AdaptateurTemps(this));
         t.start();
-        jeu.init();
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
+        jeu.init();
         activerIA(1, difficulty2, "Heuristique3");
     }
 
@@ -176,5 +176,13 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     public boolean isEnabledIA2(){
         return joueurs[1] == 1;
+    }
+
+    public String getDifficultyIA1(){
+        return difficulty1;
+    }
+
+    public String getDifficultyIA2(){
+        return difficulty2;
     }
 }

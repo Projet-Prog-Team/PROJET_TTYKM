@@ -26,6 +26,7 @@ public class ActiverIA implements Observateur {
                 controleur.commande(new Commande(commande));
             }
         });
+        metAJour();
     }
 
     @Override

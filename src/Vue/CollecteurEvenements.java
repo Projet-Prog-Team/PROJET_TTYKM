@@ -11,4 +11,6 @@ public interface CollecteurEvenements {
     void setPreviewFocus2(int epoque);
     boolean isEnabledIA1();
     boolean isEnabledIA2();
+    String getDifficultyIA1();
+    String getDifficultyIA2();
 }
