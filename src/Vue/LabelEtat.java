@@ -38,6 +38,7 @@ public class LabelEtat implements Observateur {
                 break;
             case "j1gagne":
                 state="Blanc a gagné";
+                break;
             case "j2gagne":
                 state="Noir a gagné";
                 break;
