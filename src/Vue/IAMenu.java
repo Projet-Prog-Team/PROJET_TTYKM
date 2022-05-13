@@ -20,7 +20,7 @@ public class IAMenu  {
             public void valueChanged(ListSelectionEvent e) {
                 Commande c = new Commande("setDifficulty");
                 c.setIA(IA);
-                c.setDifficulty(list.getSelectedValue().toString().toLowerCase());
+                c.setDifficulty(list.getSelectedValue().toString().toLowerCase().trim());
                 controle.commande(c);
             }
         });

@@ -135,6 +135,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 activerIA(1, difficulty2, "Heuristique3");
                 break;
             case "setDifficulty":
+                System.out.println(c.getDifficulty());
                 setDifficultyIA(c.getIA(), c.getDifficulty());
                 break;
             default:
