@@ -8,23 +8,33 @@ import Vue.CollecteurEvenements;
 import Vue.Commande;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
     Jeu jeu;
-    IA joueur1, joueur2;
+    IA joueur1, joueur2, suggestion;
     int [] joueurs;
-    String difficulty1, difficulty2;
-
+    String difficulty1 = "facile", difficulty2 = "facile";
     Timer t;
+
+    int speed;
 
     public ControleurMediateur (Jeu j, int temps) {
         jeu = j;
-        joueurs = new int[2];
-        difficulty1 = "facile";
-        difficulty2 = "facile";
-        t = new Timer(temps, new AdaptateurTemps(this));
+        suggestion = IA.nouvelle(j, "difficile", "Heuristique3");
+        speed = temps;
+        init();
+    }
+
+    public void init() {
+        t = new Timer(speed, new AdaptateurTemps(this));
         t.start();
+        joueurs = new int[2];
+        joueurs[0] = 0;
+        joueurs[1] = 0;
+        jeu.init();
+        activerIA(1, difficulty2, "Heuristique3");
     }
 
     // Clique sur une case
@@ -32,7 +42,6 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void clicSouris(int l, int c, int epoque) {
         int id = jeu.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
-            System.out.println(epoque + " x : " + c + " y : " + l);
             switch (jeu.getEtape()) {
                 case 1:
                     jeu.selectPion(l, c, epoque);
@@ -83,6 +92,23 @@ public class ControleurMediateur implements CollecteurEvenements {
         }
     }
 
+    public void suggestion () {
+        ArrayList<Pion> l = new ArrayList<>();
+        switch(jeu.getEtape()) {
+            case 1:
+                jeu.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
+                break;
+            case 2:
+                jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
+                break;
+            case 3:
+                jeu.setSuggestionFocus(suggestion.choixFocus());
+                break;
+            case 4:
+                break;
+        }
+    }
+
     // Clique sur un bouton
     @Override
     public boolean commande(Commande c) {
@@ -115,15 +141,27 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "refaire":
                 break;
+            case "suggestion":
+                suggestion();
+                break;
+            case "IASpeed":
+                t.stop();
+                speed = c.getIA();
+                t = new Timer(speed, new AdaptateurTemps(this));
+                t.start();
+                break;
             case "newGame":
+                t.stop();
+                init();
                 break;
             case "toggleIA1":
-                activerIA(0, difficulty1);
+                activerIA(0, difficulty1, "Heuristique3");
                 break;
             case "toggleIA2":
-                activerIA(1, difficulty2);
+                activerIA(1, difficulty2, "Heuristique3");
                 break;
             case "setDifficulty":
+                System.out.println(c.getDifficulty());
                 setDifficultyIA(c.getIA(), c.getDifficulty());
                 break;
             default:
@@ -133,21 +171,35 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     // Fonctions appelés lors d'un clique sur un bouton
-    public void activerIA(int j, String type) {
+    public void activerIA(int j, String type, String heuristique) {
         joueurs[j] = (joueurs[j] + 1) % 2;
         if (j == 0) {
-            joueur1 = IA.nouvelle(jeu, type);
+            joueur1 = IA.nouvelle(jeu, type, heuristique);
         } else {
-            joueur2 = IA.nouvelle(jeu, type);
+            joueur2 = IA.nouvelle(jeu, type, heuristique);
         }
         jeu.miseAJour();
+    }
+
+    public void desactiverIA(int j) {
+        if (joueurs[j] == 1) {
+            joueurs[j] = 0;
+        }
     }
 
     public void setDifficultyIA(int ia, String difficulty) {
         if (ia == 1) {
             difficulty1 = difficulty;
+            if (joueurs[0] == 1) {
+                desactiverIA(0); //désactiver
+                activerIA(0, difficulty1, "Heuristique3");
+            }
         } else {
             difficulty2 = difficulty;
+            if (joueurs[1] == 1) {
+                desactiverIA(1); //désactiver
+                activerIA(1, difficulty2, "Heuristique3");
+            }
         }
     }
 
@@ -165,5 +217,13 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     public boolean isEnabledIA2(){
         return joueurs[1] == 1;
+    }
+
+    public String getDifficultyIA1(){
+        return difficulty1;
+    }
+
+    public String getDifficultyIA2(){
+        return difficulty2;
     }
 }

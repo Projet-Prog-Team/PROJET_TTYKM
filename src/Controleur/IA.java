@@ -3,9 +3,11 @@ package Controleur;
 import Modele.Jeu;
 import Modele.Pion;
 
+import java.lang.reflect.Method;
+
 public abstract class IA {
     Jeu jeu;
-    public static IA nouvelle(Jeu j, String type) {
+    public static IA nouvelle(Jeu j, String type, String heuristique) {
         IA resultat = null;
         // Méthode de fabrication pour l'IA, qui crée le bon objet selon la config
         switch (type) {
@@ -16,7 +18,13 @@ public abstract class IA {
                 resultat = new IAMoyenne();
                 break;
             case "difficile":
-                resultat = new IADifficile();
+                Method method = null;
+                try {
+                    method = Jeu.class.getMethod(heuristique);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+                resultat = new IADifficile(method);
                 break;
             default:
                 System.out.println("IA non reconnue");
@@ -32,5 +40,5 @@ public abstract class IA {
 
     public abstract Integer choixFocus();
 
-    public abstract int calculCoup(Jeu j, int horizon);
+    public abstract int calculCoup(Jeu j, int horizon, boolean joueur);
 }

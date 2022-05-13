@@ -5,9 +5,16 @@ import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.net.URL;
 import java.util.Vector;
 
 public class InterfaceGraphique implements Runnable, Observateur {
@@ -15,20 +22,30 @@ public class InterfaceGraphique implements Runnable, Observateur {
     private Jeu jeu;
     private CollecteurEvenements controle;
     private JFrame frame;
-    private PlateauSwing passe,present,futur;
-    private int width = 1500;
-
+    private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
+    private int frameWidth = 1600;
+    private int frameHeight = 700;
+    ImageIcon victory;
+    JLabel victoryLabel;
 
     public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
         jeu = j;
         jeu.ajouteObservateur(this);
         controle = c;
+        URL in = ClassLoader.getSystemResource("Img/victory.gif");
+        victory = new ImageIcon(in);
     }
+
     @Override
     public void metAJour() {
-        passe.repaint();
-        present.repaint();
-        futur.repaint();
+        plateauPasse.repaint();
+        plateauPresent.repaint();
+        plateauFuture.repaint();
+        if(jeu.getEtape()!=4){
+            victoryLabel.setVisible(false);
+        }else{
+            victoryLabel.setVisible(true);
+        }
     }
 
     public static void demarrer(Jeu j, CollecteurEvenements c) {
@@ -49,9 +66,14 @@ public class InterfaceGraphique implements Runnable, Observateur {
     @Override
     public void run() {
         frame = new JFrame("That time you killed me");
-        frame.setLayout(new BorderLayout());
 
-        Box mainBox = Box.createVerticalBox();
+        JLayeredPane layeredPane = new JLayeredPane();
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        victoryLabel = new JLabel(victory);
+        victoryLabel.setVisible(false);
+        layeredPane.add(victoryLabel, Integer.valueOf(1));
 
         // Menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -59,6 +81,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // File Menu
         JMenu fileMenu = new JMenu("File");
 
+        // New game
         JMenuItem newGameMenu = createMenuItem("Nouvelle partie","newGame");
         fileMenu.add(newGameMenu);
 
@@ -71,6 +94,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         });
         fileMenu.add(saveMenu);
 
+        // Load save
         JMenuItem loadMenu = new JMenuItem("Charger partie");
         loadMenu.addActionListener(new ActionListener() {
             @Override
@@ -87,84 +111,153 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         menuBar.add(fileMenu);
 
-        // IA Menu
-
+        // Config Menu
         JMenu ConfigMenu = new JMenu("Configuration");
 
-        IAMenu IA1Menu = new IAMenu(1, controle);
-        ConfigMenu.add(IA1Menu.getMenu());
+        IAMenu IA1DifficultyMenu = new IAMenu(1, controle);
+        ConfigMenu.add(IA1DifficultyMenu.getMenu());
 
-        IAMenu IA2Menu = new IAMenu(2, controle);
-        ConfigMenu.add(IA2Menu.getMenu());
+        IAMenu IA2DifficultyMenu = new IAMenu(2, controle);
+        ConfigMenu.add(IA2DifficultyMenu.getMenu());
 
-        ActiverIA ia1 = new ActiverIA(jeu, controle,1,"toggleIA1");
-        ConfigMenu.add(ia1.getMenuItem());
+        ActiverIA toggleIA1 = new ActiverIA(jeu, controle,1,"toggleIA1");
+        ConfigMenu.add(toggleIA1.getMenuItem());
 
-        ActiverIA ia2 = new ActiverIA(jeu, controle,2,"toggleIA2");
-        ConfigMenu.add(ia2.getMenuItem());
+        ActiverIA toggleIA2 = new ActiverIA(jeu, controle,2,"toggleIA2");
+        ConfigMenu.add(toggleIA2.getMenuItem());
+
+        JLabel IASpeedLabel = new JLabel("Vitesse IA : 1000ms");
+        IASpeedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ConfigMenu.add(IASpeedLabel);
+
+        JSlider IASpeedSlider = new JSlider(1,2000);
+        IASpeedSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                IASpeedLabel.setText("Vitesse IA : "+IASpeedSlider.getValue()+" ms");
+                Commande c = new Commande("IASpeed");
+                c.setIA(IASpeedSlider.getValue());
+                controle.commande(c);
+            }
+        });
+        ConfigMenu.add(IASpeedSlider);
 
         menuBar.add(ConfigMenu);
-
-        // Help
-        JMenu HelpMenu = new JMenu("Help");
-        menuBar.add(HelpMenu);
 
         frame.setJMenuBar(menuBar);
 
         // Lateral Bar
-        Box topBar = Box.createHorizontalBox();
+        JPanel lateralPane = new JPanel();
+        lateralPane.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
 
-        topBar.add(Box.createGlue());
+        // Historique
+        //TODO: avoir le vrai historique
+        String categories[] = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5"};
+        JList historyList = new JList<>(categories);
+        historyList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                controle.commande(new Commande("historique"));
+            }
+        });
+        JScrollPane historyPane = new JScrollPane(historyList);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.ipady = 150;
+        c.insets = new Insets(0,20,0,20);
+        lateralPane.add(historyPane, c);
+        c.ipady = 0;
 
-        LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
-        topBar.add(labelEtat.getLabel());
+        // Boutons annuler/refaire
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
         boutonAnnuler.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annuler")));
-        topBar.add(boutonAnnuler.getButton());
+        buttonPanel.add(boutonAnnuler.getButton());
 
         BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire", jeu);
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
-        topBar.add(boutonRefaire.getButton());
+        buttonPanel.add(boutonRefaire.getButton());
 
-        topBar.add(Box.createGlue());
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 1;
+        lateralPane.add(buttonPanel, c);
 
-        frame.add(topBar, BorderLayout.NORTH);
+        JButton boutonSuggestion = new JButton("Suggestion");
+        boutonSuggestion.addActionListener(new AdaptateurCommande(controle, new Commande("suggestion")));
+        boutonSuggestion.setFocusable(false);
+        c.fill = GridBagConstraints.NONE;
+        c.gridx = 0;
+        c.gridy = 2;
+        lateralPane.add(boutonSuggestion, c);
 
-        // Pions joueur 1
+        // Label etat du jeu
+        LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
+        c.fill = GridBagConstraints.NONE ;
+        c.gridx = 0;
+        c.gridy = 3;
+        lateralPane.add(labelEtat.getLabel(), c);
+
+        mainPanel.add(lateralPane, BorderLayout.EAST);
+
+        // Inventaire joueur 1
         Inventory inv1 = new Inventory(1, jeu);
-        mainBox.add(inv1.getPanel());
+        mainPanel.add(inv1.getPanel(), BorderLayout.NORTH);
 
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
 
-        passe = new PlateauSwing(EPOQUE.PASSE, jeu);
-        AdaptateurSouris a1 = new AdaptateurSouris(passe, controle);
-        passe.addMouseMotionListener(a1);
-        passe.addMouseListener(a1);
-        plateauBox.add(passe);
+        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu);
+        AdaptateurSouris a1 = new AdaptateurSouris(plateauPasse, controle);
+        plateauPasse.addMouseMotionListener(a1);
+        plateauPasse.addMouseListener(a1);
+        plateauBox.add(plateauPasse);
 
-        present = new PlateauSwing(EPOQUE.PRESENT, jeu);
-        AdaptateurSouris a2 = new AdaptateurSouris(present, controle);
-        present.addMouseMotionListener(a2);
-        present.addMouseListener(a2);
-        plateauBox.add(present);
+        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu);
+        AdaptateurSouris a2 = new AdaptateurSouris(plateauPresent, controle);
+        plateauPresent.addMouseMotionListener(a2);
+        plateauPresent.addMouseListener(a2);
+        plateauBox.add(plateauPresent);
 
-        futur = new PlateauSwing(EPOQUE.FUTUR, jeu);
-        AdaptateurSouris a3 = new AdaptateurSouris(futur, controle);
-        futur.addMouseMotionListener(a3);
-        futur.addMouseListener(a3);
-        plateauBox.add(futur);
+        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu);
+        AdaptateurSouris a3 = new AdaptateurSouris(plateauFuture, controle);
+        plateauFuture.addMouseMotionListener(a3);
+        plateauFuture.addMouseListener(a3);
+        plateauBox.add(plateauFuture);
 
-        mainBox.add(plateauBox);
+        mainPanel.add(plateauBox, BorderLayout.CENTER);
 
-        // Pions joueur 2
+        // Inventaire joueur 2
         Inventory inv2 = new Inventory(2, jeu);
-        mainBox.add(inv2.getPanel());
+        mainPanel.add(inv2.getPanel(), BorderLayout.SOUTH);
 
-        frame.add(mainBox, BorderLayout.CENTER);
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                frameWidth = frame.getWidth();
+                frameHeight = frame.getHeight();
+                mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
+                victoryLabel.setBounds((frameWidth-800)/2,(frameHeight-300)/2,800,300);
+            }
+        });
+
+        layeredPane.add(mainPanel,Integer.valueOf(0));
+        frame.add(layeredPane);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(width, 750);
+        frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
     }
 

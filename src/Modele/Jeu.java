@@ -4,27 +4,24 @@ import Patterns.Observable;
 import Structures.Couple;
 import Structures.Point;
 import Structures.Tour;
-import Modele.ManageFiles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Random;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
-
-public class Jeu extends Observable {
+public class Jeu extends Observable implements Comparable {
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
     Pion pionActuel;
     private ArrayList<Pion> preview;
-    public ManageFiles MemoryManager;
-    public final int NBPIONS = 14;
     int previewFocus1;
     int previewFocus2;
     int aGagne;
+
+    Pion suggestionSource, suggestionDest;
+    int suggestionFocus;
 
     public Jeu() {
         init();
@@ -33,15 +30,14 @@ public class Jeu extends Observable {
 
     public void init() {
         pions = new ArrayList<>();
-        joueurs[0] = new Joueur(1,NBPIONS/2);
-        joueurs[1] = new Joueur(2,NBPIONS/2);
+        joueurs[0] = new Joueur(1);
+        joueurs[1] = new Joueur(2);
+        preview = null;
         for(int i = 0; i < 3; i++) {
-            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0],NBPIONS/2-joueurs[0].getNbPionsRestants());
+            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
             pions.add(p1);
-            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1],NBPIONS-joueurs[0].getNbPionsRestants());
+            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
             pions.add(p2);
-            joueurs[0].supprimerPion();
-            joueurs[1].supprimerPion();
         }
         joueurs[0].setFocus(0);
         joueurs[1].setFocus(2);
@@ -49,7 +45,7 @@ public class Jeu extends Observable {
         ArrayList<Pion> pionInFocus = pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
         setPionActuel(pionInFocus.get(0));
         aGagne = 0;
-        MemoryManager= new ManageFiles(this,"save");
+        miseAJour();
     }
 
 
@@ -57,13 +53,6 @@ public class Jeu extends Observable {
     // ---------------Getter & setters---------------
     public ArrayList<Pion> getPions() {
         return pions;
-    }
-    public void SetPions(Pion[] t_pion)
-    {
-        pions.clear();
-        for (Pion tt_pion : t_pion) {
-            pions.add(tt_pion);
-        }
     }
     public Joueur[] getJoueurs() {
         return joueurs;
@@ -79,7 +68,6 @@ public class Jeu extends Observable {
     }
     public void setPionActuel(Pion pionActuel) {
         this.pionActuel = pionActuel;
-        pionActuel.focused=true;
     }
     public Pion getPion(Point p, int e) {
         if ((p.getL() <= 3 && p.getL() >= 0) && (p.getC() <= 3 && p.getC() >= 0)) {
@@ -125,6 +113,15 @@ public class Jeu extends Observable {
 
     public void setPreviewFocus2(int previewFocus2) {
         this.previewFocus2 = previewFocus2;
+    }
+
+    public void setSuggestionPions(Pion s, Pion d) {
+        suggestionSource = s;
+        suggestionDest = d;
+    }
+
+    public void setSuggestionFocus(int f) {
+        suggestionFocus = f;
     }
 
     // ---------------Infos sur le jeu---------------
@@ -205,29 +202,97 @@ public class Jeu extends Observable {
 
         return state;
     }
+    public int distancePionBord(Pion p) {
+        int d = 1;
+        int l = p.getCoordonnees().getL();
+        int c = p.getCoordonnees().getC();
+        if (c == 0 || l == 0 || c == 3 || l == 3) { // Si pion au bord
+            d = 0;
+        }
+        return d;
+    }
     public void enablePreview(int l, int c, int epoque) {
         Jeu j = copy();
-        j.jouerCoup(l, c, epoque,false);
+        j.jouerCoup(l, c, epoque);
         preview = j.getPions();
         miseAJour();
     }
     public int Heuristique() {
-        int pionsJoueur1 = joueurs[0].getNbPionsRestants();
-        int pionsJoueur2 = joueurs[1].getNbPionsRestants();
+        if (joueurAGagne(joueurActuel)) { // Si on gagne
+            return 1000;
+        } else if (!joueurAGagne(joueurs[joueurActuel.getID() % 2])) { // Si on ne perd pas
+            int pionsJoueur1 = joueurs[0].nbPionsRestants;
+            int pionsJoueur2 = joueurs[1].nbPionsRestants;
 
-        for (int i = 0; i < 3; i++) {
-            pionsJoueur1 += pionsFocusJoueur(i, joueurs[0]).size();
-        }
-        for (int i = 0; i < 3; i++) {
-            pionsJoueur2 += pionsFocusJoueur(i, joueurs[1]).size();
-        }
+            for (int i = 0; i < 3; i++) {
+                pionsJoueur1 += pionsFocusJoueur(i, joueurs[0]).size();
+            }
+            for (int i = 0; i < 3; i++) {
+                pionsJoueur2 += pionsFocusJoueur(i, joueurs[1]).size();
+            }
 
-        if (joueurActuel.getID() == 1) {
-            return (pionsJoueur1 - pionsJoueur2);
-        } else {
-            return (pionsJoueur2 - pionsJoueur1);
+            if (joueurActuel.getID() == 1) {
+                if (pionsJoueur1 - pionsJoueur2 < 0) {
+                    return (pionsJoueur1 - pionsJoueur2) * 100;
+                } else {
+                    return (pionsJoueur1 - pionsJoueur2) * 50;
+                }
+            } else {
+                if (pionsJoueur2 - pionsJoueur1 < 0) {
+                    return (pionsJoueur2 - pionsJoueur1) * 100;
+                } else {
+                    return (pionsJoueur2 - pionsJoueur1) * 50;
+                }
+            }
+        } else { // Si on perd
+            return -1000;
         }
+        /* Objectif : permettre à l'IA de tuer des pions
+        * Renvoie
+        * 500 si on gagne
+        * -500 si on perd
+        * sinon en général 0..200
+        * */
     }
+
+    public int Heuristique2() {
+        int heuristique = Heuristique();
+        int moyennePions = 0;
+        int maxPionsPlateau = 0;
+        int pionsPlateau;
+        for (int i = 0; i < 3; i++) {
+            pionsPlateau = pionsFocusJoueur(i, getJoueurActuel()).size();
+            moyennePions += pionsPlateau;
+            if (pionsPlateau > maxPionsPlateau) {
+                maxPionsPlateau = pionsPlateau;
+            }
+        }
+        moyennePions = (moyennePions*10)/3;
+        return heuristique + (((maxPionsPlateau*10) - moyennePions));
+        /* Objectif : favoriser un équilibre sur le plateau (idéalement ~2 - 2 - 2)
+        * Moyenne des pions 10..30
+        * MaxPions 10..60
+        * MaxPions - Moyenne des pions ~= 20..30
+        * Heuristique total : 100..200 - 20..30 ~= 70..170
+         */
+    }
+
+    public int Heuristique3() {
+        int heuristique = Heuristique();
+        for (Pion pion : pions) {
+            if (pion.getJoueur() == getJoueurActuel()) {
+                heuristique += 10*distancePionBord(pion);
+            }
+        }
+        return heuristique;
+        /*
+        * Objectif : favoriser les pions au milieu (4 cases au milieu)
+        * distancePionBord = soit 0 soit 1
+        * 10..30 en général
+        * Heuristique total 40..140
+         */
+    }
+    // Idées pour heuristique 4 > faire en sorte de limiter les pions collés
     public ArrayList<Couple<Jeu, Tour>> branchementsSelect(Jeu j) {   // On considere que le jeu j est dans l'étape selection
         ArrayList<Couple<Jeu, Tour>> jeux = new ArrayList<>();
         ArrayList<Pion> pionsToBeSelected = pionsFocusJoueur(getJoueurActuel().getFocus(), getJoueurActuel());
@@ -249,7 +314,7 @@ public class Jeu extends Observable {
         for (Pion caseDispo : casesDispo) {
             Jeu jeuCoup = j.copy();
             Point cooCase = caseDispo.getCoordonnees();
-            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque(),false);
+            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque());
             Tour t = new Tour();
             if (j.getJoueurActuel().getNbActionsRestantes() == 2) {
                 t.setCoup1(caseDispo);
@@ -337,21 +402,11 @@ public class Jeu extends Observable {
         }
         miseAJour();
     }
-    public void jouerCoup(int l, int c, int epoque,boolean real) {
-        Pion clic;
-        if(joueurActuel.getID()==1)
-        {
-            clic = new Pion(new Point(l, c), epoque, joueurActuel,NBPIONS/2-joueurActuel.getNbActionsRestantes());
-        }
-        else
-        {
-            clic = new Pion(new Point(l, c), epoque, joueurActuel,NBPIONS-joueurActuel.getNbActionsRestantes());
-        }
+    public void jouerCoup(int l, int c, int epoque) {
+        Pion clic = new Pion(new Point(l, c), epoque, joueurActuel);
         ArrayList<Pion> cases = casesDispo();
 
         if (cases.contains(clic)) {    // Si coup jouable
-            if(real)
-                MemoryManager.AddLog();
             if (epoque != getPionActuel().getEpoque()) {
                 joueurActuel.nbActionsRestantes--;
                 changerEpoque(epoque);
@@ -362,7 +417,6 @@ public class Jeu extends Observable {
                     joueurActuel.nbActionsRestantes = 0;
                 }
             }
-            
             if (joueurAGagne(joueurActuel)) {
                 aGagne = joueurActuel.getID();
             } else if (joueurAGagne(joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
@@ -376,12 +430,10 @@ public class Jeu extends Observable {
         int PionEpoque = getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
             Pion pionActuel = getPionActuel();
-            if (getPion(pionActuel.getCoordonnees(), epoque) == null) {
+            if (getPion(pionActuel.coordonnees, epoque) == null) {
                 pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
-                    Pion tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel);
-                    pions.add(tmp);
-                    MemoryManager.UpdateLog(null,tmp);
+                    pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
                     //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
                     joueurActuel.supprimerPion();
                 }
@@ -409,20 +461,15 @@ public class Jeu extends Observable {
         miseAJour();
     }
     public void move(Pion c, Point new_coord) {
-        Point coord = new Point(c.getCoordonnees().getL(),c.getCoordonnees().getC());
+        Point coord = new Point(c.coordonnees.getL(),c.coordonnees.getC());
         Pion voisin = getPion(new_coord,c.epoque);
-        c.SetCoordonnees(new_coord);
+        c.coordonnees = new_coord;
         Point tmp = new Point(new_coord.getL()+(new_coord.getL()-coord.getL()),new_coord.getC()+(new_coord.getC()-coord.getC()));
         if (voisin != null) {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
-                MemoryManager.UpdateLog(c,null);
                 pions.remove(c);
             } else {
-                if(voisin.getJoueur() == c.getJoueur()) {
-                    
-                    MemoryManager.UpdateLog(c,null);
-                    MemoryManager.UpdateLog(voisin,null);
-
+                if(voisin.joueur == c.joueur) {
                     pions.remove(c);
                     pions.remove(voisin);
                 }
@@ -433,14 +480,10 @@ public class Jeu extends Observable {
         }
         else {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
-                
-                MemoryManager.UpdateLog(c,null);
                 pions.remove(c);
             }
             else {
-                Pion tmp2 = c.copy(c.getJoueur());
-                c.SetCoordonnees(new_coord);
-                MemoryManager.UpdateLog(tmp2,c);
+                c.coordonnees = new_coord;
             }
         }
     }
@@ -473,5 +516,8 @@ public class Jeu extends Observable {
                 '}';
     }
 
-
+    @Override
+    public int compareTo(Object o) {
+        return 0;
+    }
 }

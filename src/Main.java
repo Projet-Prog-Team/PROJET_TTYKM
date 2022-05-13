@@ -2,18 +2,16 @@ import Controleur.ControleurMediateur;
 import Modele.Jeu;
 import Vue.InterfaceGraphique;
 
-import java.net.InterfaceAddress;
-
 public class Main {
 
-    public static void test(int nbParties, String dif1, String dif2) {
+    public static void test(int nbParties, String dif1, String dif2, String heuristique1, String heuristique2) {
         int cpt0 = 0;
         int cpt1 = 0;
         for(int i = 0; i < nbParties; i++) {
             Jeu j = new Jeu();
             ControleurMediateur c = new ControleurMediateur(j,1);
-            c.activerIA(0, dif1);
-            c.activerIA(1, dif2);
+            c.activerIA(0, dif1, heuristique1);
+            c.activerIA(1, dif2, heuristique2);
             while(!j.estTermine()) {
 
             }
@@ -43,7 +41,7 @@ public class Main {
                     classique();
                     break;
                 case "test":
-                    test(Integer.parseInt(args[1]), args[2], args[3]);
+                    test(Integer.parseInt(args[1]), args[2], args[3], args[4], args[5]);
                     break;
             }
         }

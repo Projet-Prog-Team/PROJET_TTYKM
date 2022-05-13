@@ -35,7 +35,7 @@ public class IAFacile extends IA {
     }
 
     @Override
-    public int calculCoup(Jeu j, int horizon) {
+    public int calculCoup(Jeu j, int horizon, boolean joueur) {
         return 0;
     }
 }
