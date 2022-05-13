@@ -29,6 +29,7 @@ public class Jeu extends Observable implements Comparable {
         pions = new ArrayList<>();
         joueurs[0] = new Joueur(1);
         joueurs[1] = new Joueur(2);
+        preview = null;
         for(int i = 0; i < 3; i++) {
             Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
             pions.add(p1);
@@ -41,6 +42,7 @@ public class Jeu extends Observable implements Comparable {
         ArrayList<Pion> pionInFocus = pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
         setPionActuel(pionInFocus.get(0));
         aGagne = 0;
+        miseAJour();
     }
 
 

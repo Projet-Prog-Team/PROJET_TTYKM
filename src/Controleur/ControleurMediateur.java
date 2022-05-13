@@ -14,16 +14,25 @@ public class ControleurMediateur implements CollecteurEvenements {
     Jeu jeu;
     IA joueur1, joueur2;
     int [] joueurs;
-    String difficulty1, difficulty2;
+    String difficulty1 = "facile", difficulty2 = "facile";
     Timer t;
+
+    int speed;
 
     public ControleurMediateur (Jeu j, int temps) {
         jeu = j;
-        joueurs = new int[2];
-        difficulty1 = "facile";
-        difficulty2 = "facile";
-        t = new Timer(temps, new AdaptateurTemps(this));
+        speed = temps;
+        init();
+    }
+
+    public void init() {
+        t = new Timer(speed, new AdaptateurTemps(this));
         t.start();
+        jeu.init();
+        joueurs = new int[2];
+        joueurs[0] = 0;
+        joueurs[1] = 0;
+        activerIA(1, difficulty2, "Heuristique3");
     }
 
     // Clique sur une case
@@ -111,13 +120,16 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "IASpeed":
                 t.stop();
-                t = new Timer(c.getIA(), new AdaptateurTemps(this));
+                speed = c.getIA();
+                t = new Timer(speed, new AdaptateurTemps(this));
                 t.start();
                 break;
             case "newGame":
+                t.stop();
+                init();
                 break;
             case "toggleIA1":
-                activerIA(0, difficulty1, "Heuristique2");
+                activerIA(0, difficulty1, "Heuristique3");
                 break;
             case "toggleIA2":
                 activerIA(1, difficulty2, "Heuristique3");
