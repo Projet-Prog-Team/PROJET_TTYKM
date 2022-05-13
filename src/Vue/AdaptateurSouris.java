@@ -18,9 +18,9 @@ public class AdaptateurSouris extends MouseAdapter {
         int l = plateau.getLig(e.getY());
         int c = plateau.getCol(e.getX());
         controle.enablePreview(l,c,plateau.getEpoque());
-        if(plateau.isInFocus1(e.getX(),e.getY())){
+        if(plateau.isInFocusBlanc(e.getX(),e.getY())){
             controle.setPreviewFocus1(plateau.getEpoque());
-        }else if(plateau.isInFocus2(e.getX(),e.getY())){
+        }else if(plateau.isInFocusNoir(e.getX(),e.getY())){
             controle.setPreviewFocus2(plateau.getEpoque());
         }else{
             controle.setPreviewFocus1(3);
@@ -35,12 +35,12 @@ public class AdaptateurSouris extends MouseAdapter {
             int c = plateau.getCol(e.getX());
             controle.clicSouris(l, c, plateau.getEpoque());
         }else {
-            if(plateau.isInFocus1(e.getX(),e.getY())){
+            if(plateau.isInFocusBlanc(e.getX(),e.getY())){
                 Commande c = (new Commande("clicFocus"));
                 c.setJoueur(1);
                 c.setEpoque(plateau.getEpoque());
                 controle.commande(c);
-            }else if(plateau.isInFocus2(e.getX(),e.getY())){
+            }else if(plateau.isInFocusNoir(e.getX(),e.getY())){
                 Commande c = (new Commande("clicFocus"));
                 c.setJoueur(2);
                 c.setEpoque(plateau.getEpoque());

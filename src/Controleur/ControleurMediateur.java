@@ -113,6 +113,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 t.stop();
                 t = new Timer(c.getIA(), new AdaptateurTemps(this));
                 t.start();
+                break;
             case "newGame":
                 break;
             case "toggleIA1":

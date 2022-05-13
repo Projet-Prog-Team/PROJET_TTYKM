@@ -9,8 +9,8 @@ import java.awt.*;
 public class PlateauSwing extends JComponent implements Plateau {
 
     Image bg;
-    Image focus1;
-    Image focus2;
+    Image focusBlanc;
+    Image focusNoir;
     Image pionBlanc;
     Image pionNoir;
     VuePlateau vue;
@@ -40,10 +40,10 @@ public class PlateauSwing extends JComponent implements Plateau {
         bg = img.getImage();
 
         img = new ImageIcon("res/Img/focusBlanc.png");
-        focus1 = img.getImage();
+        focusBlanc = img.getImage();
 
         img = new ImageIcon("res/Img/focusNoir.png");
-        focus2 = img.getImage();
+        focusNoir = img.getImage();
 
         img = new ImageIcon("res/Img/pionBlanc.png");
         pionBlanc = img.getImage();
@@ -78,33 +78,33 @@ public class PlateauSwing extends JComponent implements Plateau {
         drawable.setComposite(compo);
     }
 
-    public void tracerFocus1(double alpha){
+    public void tracerFocusBlanc(double alpha){
         int width = focusRadius*2;
         int height = focusRadius*2;
         Composite compo = drawable.getComposite();
         drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-        drawable.drawImage(focus1, (getWidth()-width)/2,yOffset-height/2,width,height, this);
+        drawable.drawImage(focusBlanc, (getWidth()-width)/2,yOffset-height/2,width,height, this);
         drawable.setComposite(compo);
     }
 
-    public void tracerFocus2(double alpha){
+    public void tracerFocusNoir(double alpha){
         int width = focusRadius*2;
         int height = focusRadius*2;
         Composite compo = drawable.getComposite();
         drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-        drawable.drawImage(focus2, (getWidth()-width)/2,getHeight()-yOffset-height/2,width,height, this);
+        drawable.drawImage(focusNoir, (getWidth()-width)/2,getHeight()-yOffset-height/2,width,height, this);
         drawable.setComposite(compo);
     }
 
-    public void tracerBrillance(int l, int c){
+    public void tracerBrillancePion(int l, int c){
         int x = getXoffset()+c*getLargeurCase();
         int y = getYoffset()+l* getHauteurCase();
-        Color myColour = new Color(95, 255, 163,125 );
+        Color myColour = new Color(255, 200,0,125 );
         drawable.setColor(myColour);
         drawable.fillRect(x,y,getLargeurCase(),getHauteurCase());
     }
 
-    public void tracerBrillancev2(int l, int c){
+    public void tracerBrillanceCase(int l, int c){
         int x = getXoffset()+c*getLargeurCase();
         int y = getYoffset()+l*getHauteurCase();
         Color myColour;
@@ -121,31 +121,31 @@ public class PlateauSwing extends JComponent implements Plateau {
         drawable.fillOval(x+getLargeurCase()/3,y+getHauteurCase()/3,width,height);
     }
 
-    public void tracerBrillanceFocus1(){
+    public void tracerBrillanceFocusBlanc(){
         int xFocus = getWidth()/2;
         int yFocus = yOffset;
-        Color myColour = new Color(255, 204, 0,125 );
+        Color myColour = new Color(255, 200,0, 175);
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
     }
 
-    public void tracerBrillanceFocus2(){
+    public void tracerBrillanceFocusNoir(){
         int xFocus = getWidth()/2;
         int yFocus = getHeight()-yOffset;
-        Color myColour = new Color(255, 204, 0,125 );
+        Color myColour = new Color(255, 200,0,175 );
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
     }
 
 
-    public boolean isInFocus1(int clic_x, int clic_y){
+    public boolean isInFocusBlanc(int clic_x, int clic_y){
         int xFocus = getWidth()/2;
         int yFocus = yOffset;
         double distance = Math.sqrt(Math.pow((clic_x-xFocus),2)+Math.pow((clic_y-yFocus),2));
         return distance<focusRadius;
     }
 
-    public boolean isInFocus2(int clic_x, int clic_y){
+    public boolean isInFocusNoir(int clic_x, int clic_y){
         int xFocus = getWidth()/2;
         int yFocus = getHeight()-yOffset;
         double distance = Math.sqrt(Math.pow((clic_x-xFocus),2)+Math.pow((clic_y-yFocus),2));
@@ -192,7 +192,4 @@ public class PlateauSwing extends JComponent implements Plateau {
         }
     }
 
-    public int getFocusRadius() {
-        return focusRadius;
-    }
 }
