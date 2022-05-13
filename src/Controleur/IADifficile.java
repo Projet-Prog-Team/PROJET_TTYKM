@@ -23,9 +23,9 @@ public class IADifficile extends IA{
         this.method = method;
     }
 
-    public int calculCoup(Jeu j, int horizon) {
+    public int calculCoup(Jeu j, int horizon, boolean joueur) {     // joueur = true <=> calculCoup_Joueur_A
         cpt++;
-        if (j.estTermine() || horizon == 0) {
+        if (j.estTermine() || horizon == 0) {   // Si hoziron atteint ou jeu terminé, on retourne l'évaluation de jeu
             try {
                 return (int) method.invoke(j,null );
             } catch (IllegalAccessException e) {
@@ -33,17 +33,18 @@ public class IADifficile extends IA{
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-        } else {
+        } else {                                // Sinon, on descend dans l'arbre
             ArrayList<Couple<Integer, Tour>> fils = new ArrayList<>();
 
             ArrayList<Couple<Jeu, Tour>> branchements = j.Branchements();
             for (Couple<Jeu, Tour> couple : branchements) {
-                fils.add(new Couple<>(calculCoup_B(couple.getFirst(), horizon - 1), couple.getSecond()));
+                fils.add(new Couple<>(calculCoup(couple.getFirst(), horizon - 1, !joueur), couple.getSecond()));
             }
-            int min = Math.abs(Collections.min(fils).getFirst())+1;
+
+            int minMax = joueur ? Math.abs(Collections.min(fils).getFirst())+1 : Math.abs(Collections.max(fils).getFirst())+1;
             int somme = 0;
             for (int i = 0; i < fils.size(); i++) {
-                int valeur = fils.get(i).getFirst() + min;
+                int valeur = joueur ? (fils.get(i).getFirst() + minMax) : (-1 * fils.get(i).getFirst() + minMax);
                 fils.get(i).setFirst(valeur);
                 somme += fils.get(i).getFirst();
             }
@@ -58,54 +59,14 @@ public class IADifficile extends IA{
             }
 
             tour = fils.get(index).getSecond();
-            return fils.get(index).getFirst() - min;
-        }
-    }
-
-    public int calculCoup_B(Jeu j, int horizon) {
-        cpt++;
-        if (j.estTermine() || horizon == 0) {
-            try {
-                return (int) method.invoke(j,null );
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            ArrayList<Couple<Integer, Tour>> fils = new ArrayList<>();
-
-            ArrayList<Couple<Jeu, Tour>> branchements = j.Branchements();
-            for (Couple<Jeu, Tour> couple : branchements) {
-                fils.add(new Couple<>(calculCoup(couple.getFirst(), horizon - 1), couple.getSecond()));
-            }
-
-            int max = Math.abs(Collections.max(fils).getFirst())+1;
-            int somme = 0;
-            for (int i = 0; i < fils.size(); i++) { // Inverser les signes
-                fils.get(i).setFirst((-1 * fils.get(i).getFirst()) + max); // et tout level à > 0
-                somme += fils.get(i).getFirst();
-            }
-            // Ici, la valeur maximale dans fils correspond à l'heuristique la plus faible (celle qu'on veut choisir)
-
-            Collections.sort(fils);  // Valeurs des fils triées en ordre décroissant
-
-            Random r = new Random();    // Tirage d'un coup aléatoirement
-            int x = r.nextInt(somme);   // On tire entre borne inf et borne sup de fils[1]
-            int index = 0;
-            while (index < fils.size()-1 && x >= fils.get(index).getFirst()) {
-                index++;
-            }
-
-            tour = fils.get(index).getSecond();
-            return (fils.get(index).getFirst() - max) * -1;
+            return joueur ? (fils.get(index).getFirst() - minMax) : (fils.get(index).getFirst() - minMax) * -1;
         }
     }
 
     @Override
     public Pion selectPion() {
         if (tour.getPionSelectionne() == null) {
-            calculCoup(jeu, horizon);
+            calculCoup(jeu, horizon, true);
         }
         return tour.getPionSelectionne();
     }
@@ -114,12 +75,12 @@ public class IADifficile extends IA{
     public Pion jouerCoup() {
         if (jeu.getJoueurActuel().getNbActionsRestantes() == 2) {
             if (tour.getCoup1() == null) {
-                calculCoup(jeu, horizon);
+                calculCoup(jeu, horizon, true);
             }
             return tour.getCoup1();
         } else {
             if (tour.getCoup2() == null) {
-                calculCoup(jeu, horizon);
+                calculCoup(jeu, horizon, true);
             }
             return tour.getCoup2();
         }
@@ -127,7 +88,7 @@ public class IADifficile extends IA{
     @Override
     public Integer choixFocus() {
         if (tour.getFocus() == null) {
-            calculCoup(jeu, horizon);
+            calculCoup(jeu, horizon, true);
         }
         Integer res = tour.getFocus();
         tour = new Tour();  // Tour suivant, il faut recalculer
