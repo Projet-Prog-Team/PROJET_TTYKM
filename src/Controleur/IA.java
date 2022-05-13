@@ -40,5 +40,5 @@ public abstract class IA {
 
     public abstract Integer choixFocus();
 
-    public abstract int calculCoup(Jeu j, int horizon, boolean joueur);
+    public abstract int calculCoup(Jeu j, int horizon);
 }

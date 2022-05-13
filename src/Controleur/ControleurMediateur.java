@@ -113,11 +113,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                 t.stop();
                 t = new Timer(c.getIA(), new AdaptateurTemps(this));
                 t.start();
-                break;
             case "newGame":
                 break;
             case "toggleIA1":
-                activerIA(0, difficulty1, "Heuristique3");
+                activerIA(0, difficulty1, "Heuristique2");
                 break;
             case "toggleIA2":
                 activerIA(1, difficulty2, "Heuristique3");
