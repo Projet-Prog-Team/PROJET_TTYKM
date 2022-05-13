@@ -219,7 +219,7 @@ public class Jeu extends Observable implements Comparable {
     }
     public int Heuristique() {
         if (joueurAGagne(joueurActuel)) { // Si on gagne
-            return 500;
+            return 1000;
         } else if (!joueurAGagne(joueurs[joueurActuel.getID() % 2])) { // Si on ne perd pas
             int pionsJoueur1 = joueurs[0].nbPionsRestants;
             int pionsJoueur2 = joueurs[1].nbPionsRestants;
@@ -232,12 +232,20 @@ public class Jeu extends Observable implements Comparable {
             }
 
             if (joueurActuel.getID() == 1) {
-                return (pionsJoueur1 - pionsJoueur2)*50;
+                if (pionsJoueur1 - pionsJoueur2 < 0) {
+                    return (pionsJoueur1 - pionsJoueur2) * 100;
+                } else {
+                    return (pionsJoueur1 - pionsJoueur2) * 50;
+                }
             } else {
-                return (pionsJoueur2 - pionsJoueur1)*50;
+                if (pionsJoueur2 - pionsJoueur1 < 0) {
+                    return (pionsJoueur2 - pionsJoueur1) * 100;
+                } else {
+                    return (pionsJoueur2 - pionsJoueur1) * 50;
+                }
             }
         } else { // Si on perd
-            return -500;
+            return -1000;
         }
         /* Objectif : permettre à l'IA de tuer des pions
         * Renvoie
@@ -270,7 +278,7 @@ public class Jeu extends Observable implements Comparable {
     }
 
     public int Heuristique3() {
-        int heuristique = Heuristique2();
+        int heuristique = Heuristique();
         for (Pion pion : pions) {
             if (pion.getJoueur() == getJoueurActuel()) {
                 heuristique += 10*distancePionBord(pion);

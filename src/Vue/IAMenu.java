@@ -15,16 +15,6 @@ public class IAMenu  {
 
         String difficultees[] = {"  Facile  ","  Moyenne  ","  Difficile  "};
         JList list = new JList<>(difficultees);
-        list.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                Commande c = new Commande("setDifficulty");
-                c.setIA(IA);
-                c.setDifficulty(list.getSelectedValue().toString().toLowerCase().trim());
-                controle.commande(c);
-            }
-        });
-
         if(IA==1){
             switch(controle.getDifficultyIA1()){
                 case "facile":
@@ -50,6 +40,15 @@ public class IAMenu  {
                     break;
             }
         }
+        list.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                Commande c = new Commande("setDifficulty");
+                c.setIA(IA);
+                c.setDifficulty(list.getSelectedValue().toString().toLowerCase().trim());
+                controle.commande(c);
+            }
+        });
 
         menu.add(list);
     }

@@ -177,11 +177,25 @@ public class ControleurMediateur implements CollecteurEvenements {
         jeu.miseAJour();
     }
 
+    public void desactiverIA(int j) {
+        if (joueurs[j] == 1) {
+            joueurs[j] = 0;
+        }
+    }
+
     public void setDifficultyIA(int ia, String difficulty) {
         if (ia == 1) {
             difficulty1 = difficulty;
+            if (joueurs[0] == 1) {
+                desactiverIA(0); //désactiver
+                activerIA(0, difficulty1, "Heuristique3");
+            }
         } else {
             difficulty2 = difficulty;
+            if (joueurs[1] == 1) {
+                desactiverIA(1); //désactiver
+                activerIA(1, difficulty2, "Heuristique3");
+            }
         }
     }
 
