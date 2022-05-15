@@ -3,9 +3,11 @@ package Modele;
 import Patterns.Observable;
 import Structures.Couple;
 import Structures.Point;
+import Modele.ManageFiles;
 import Structures.Tour;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -16,6 +18,8 @@ public class Jeu extends Observable implements Comparable {
     Joueur joueurActuel;
     Pion pionActuel;
     private ArrayList<Pion> preview;
+    public ManageFiles MemoryManager;
+    public final int NBPIONS = 14;
     int previewFocus1;
     int previewFocus2;
     int aGagne;
@@ -30,14 +34,16 @@ public class Jeu extends Observable implements Comparable {
 
     public void init() {
         pions = new ArrayList<>();
-        joueurs[0] = new Joueur(1);
-        joueurs[1] = new Joueur(2);
+        joueurs[0] = new Joueur(1,NBPIONS/2);
+        joueurs[1] = new Joueur(2,NBPIONS/2);
         preview = null;
         for(int i = 0; i < 3; i++) {
             Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
             pions.add(p1);
             Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
             pions.add(p2);
+            joueurs[0].supprimerPion();
+            joueurs[1].supprimerPion();
         }
         joueurs[0].setFocus(0);
         joueurs[1].setFocus(2);
@@ -54,6 +60,15 @@ public class Jeu extends Observable implements Comparable {
     public ArrayList<Pion> getPions() {
         return pions;
     }
+
+    public void SetPions(Pion[] t_pion)
+    {
+        pions.clear();
+        for (Pion tt_pion : t_pion) {
+            pions.add(tt_pion);
+        }
+    }
+
     public Joueur[] getJoueurs() {
         return joueurs;
     }
@@ -68,6 +83,7 @@ public class Jeu extends Observable implements Comparable {
     }
     public void setPionActuel(Pion pionActuel) {
         this.pionActuel = pionActuel;
+        pionActuel.focused=true;
     }
     public Pion getPion(Point p, int e) {
         if ((p.getL() <= 3 && p.getL() >= 0) && (p.getC() <= 3 && p.getC() >= 0)) {
@@ -213,7 +229,7 @@ public class Jeu extends Observable implements Comparable {
     }
     public void enablePreview(int l, int c, int epoque) {
         Jeu j = copy();
-        j.jouerCoup(l, c, epoque);
+        j.jouerCoup(l, c, epoque,false);
         preview = j.getPions();
         miseAJour();
     }
@@ -221,8 +237,8 @@ public class Jeu extends Observable implements Comparable {
         if (joueurAGagne(joueurActuel)) { // Si on gagne
             return 1000;
         } else if (!joueurAGagne(joueurs[joueurActuel.getID() % 2])) { // Si on ne perd pas
-            int pionsJoueur1 = joueurs[0].nbPionsRestants;
-            int pionsJoueur2 = joueurs[1].nbPionsRestants;
+            int pionsJoueur1 = joueurs[0].getNbPionsRestants();
+            int pionsJoueur2 = joueurs[1].getNbPionsRestants();
 
             for (int i = 0; i < 3; i++) {
                 pionsJoueur1 += pionsFocusJoueur(i, joueurs[0]).size();
@@ -314,7 +330,7 @@ public class Jeu extends Observable implements Comparable {
         for (Pion caseDispo : casesDispo) {
             Jeu jeuCoup = j.copy();
             Point cooCase = caseDispo.getCoordonnees();
-            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque());
+            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque(),false);
             Tour t = new Tour();
             if (j.getJoueurActuel().getNbActionsRestantes() == 2) {
                 t.setCoup1(caseDispo);
@@ -402,11 +418,23 @@ public class Jeu extends Observable implements Comparable {
         }
         miseAJour();
     }
-    public void jouerCoup(int l, int c, int epoque) {
-        Pion clic = new Pion(new Point(l, c), epoque, joueurActuel);
+    public void jouerCoup(int l, int c, int epoque,boolean real) {
+        Pion clic;
+        if(joueurActuel.getID()==1)
+        {
+            clic = new Pion(new Point(l, c), epoque, joueurActuel,NBPIONS/2-joueurActuel.getNbActionsRestantes());
+        }
+        else
+        {
+            clic = new Pion(new Point(l, c), epoque, joueurActuel,NBPIONS-joueurActuel.getNbActionsRestantes());
+        }
+
+        
         ArrayList<Pion> cases = casesDispo();
 
         if (cases.contains(clic)) {    // Si coup jouable
+            if(real)
+                MemoryManager.AddLog();
             if (epoque != getPionActuel().getEpoque()) {
                 joueurActuel.nbActionsRestantes--;
                 changerEpoque(epoque);
@@ -430,10 +458,12 @@ public class Jeu extends Observable implements Comparable {
         int PionEpoque = getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
             Pion pionActuel = getPionActuel();
-            if (getPion(pionActuel.coordonnees, epoque) == null) {
+            if (getPion(pionActuel.getCoordonnees(), epoque) == null) {
                 pionActuel.epoque = epoque;
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
-                    pions.add(new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel));
+                    Pion tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel);    
+                    pions.add(tmp);
+                    MemoryManager.UpdateLog(null,tmp);
                     //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
                     joueurActuel.supprimerPion();
                 }
@@ -461,15 +491,18 @@ public class Jeu extends Observable implements Comparable {
         miseAJour();
     }
     public void move(Pion c, Point new_coord) {
-        Point coord = new Point(c.coordonnees.getL(),c.coordonnees.getC());
+        Point coord = new Point(c.getCoordonnees().getL(),c.getCoordonnees().getC());
         Pion voisin = getPion(new_coord,c.epoque);
-        c.coordonnees = new_coord;
+        c.SetCoordonnees(new_coord);
         Point tmp = new Point(new_coord.getL()+(new_coord.getL()-coord.getL()),new_coord.getC()+(new_coord.getC()-coord.getC()));
         if (voisin != null) {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
+                MemoryManager.UpdateLog(c,null);
                 pions.remove(c);
             } else {
-                if(voisin.joueur == c.joueur) {
+                if(voisin.getJoueur() == c.getJoueur()) {
+                    MemoryManager.UpdateLog(c,null);
+                    MemoryManager.UpdateLog(voisin,null);
                     pions.remove(c);
                     pions.remove(voisin);
                 }
@@ -480,10 +513,13 @@ public class Jeu extends Observable implements Comparable {
         }
         else {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
+                MemoryManager.UpdateLog(c,null);
                 pions.remove(c);
             }
             else {
-                c.coordonnees = new_coord;
+                Pion tmp2 = c.copy(c.getJoueur());
+                c.SetCoordonnees(new_coord);
+                MemoryManager.UpdateLog(tmp2,c);
             }
         }
     }
