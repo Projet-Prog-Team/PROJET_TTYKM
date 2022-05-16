@@ -23,9 +23,12 @@ public class PlateauSwing extends JComponent implements Plateau {
     private int yOffset = 50;
     private int focusRadius = 40;
     private int epoque;
+    private IHMState state;
 
-    PlateauSwing(int epoque, Jeu j){
+    PlateauSwing(int epoque, Jeu j, IHMState state){
         this.epoque = epoque;
+        this.state = state;
+
         vue = new VuePlateau(j,this);
 
         InputStream in = null;
@@ -201,4 +204,7 @@ public class PlateauSwing extends JComponent implements Plateau {
         }
     }
 
+    public IHMState getState() {
+        return state;
+    }
 }

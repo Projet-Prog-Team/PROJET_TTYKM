@@ -3,9 +3,7 @@ package Controleur;
 import Modele.Jeu;
 import Modele.Pion;
 import Structures.Point;
-import Vue.AdaptateurTemps;
-import Vue.CollecteurEvenements;
-import Vue.Commande;
+import Vue.*;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -17,11 +15,12 @@ public class ControleurMediateur implements CollecteurEvenements {
     int [] joueurs;
     String difficulty1 = "facile", difficulty2 = "facile";
     Timer t;
-
+    IHMState state;
     int speed;
 
-    public ControleurMediateur (Jeu j, int temps) {
+    public ControleurMediateur (Jeu j, int temps, IHMState state) {
         jeu = j;
+        this.state = state;
         suggestion = IA.nouvelle(j, "difficile", "Heuristique3");
         speed = temps;
         init();
@@ -34,6 +33,11 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs[0] = 0;
         joueurs[1] = 0;
         jeu.init();
+        state.initPreview();
+        state.setIA1(joueurs[0]==1);
+        state.setIA2(joueurs[1]==1);
+        state.setDifficultyIA1(difficulty1);
+        state.setDifficultyIA2(difficulty2);
         activerIA(1, difficulty2, "Heuristique3");
     }
 
@@ -48,6 +52,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case 2:
                     jeu.jouerCoup(l, c, epoque);
+                    state.initPreview();
                     break;
                 case 3:
                     break;
@@ -76,6 +81,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case 2:
                     p = j.jouerCoup();
+                    state.initPreview();
                     coord = p.getCoordonnees();
                     jeu.jouerCoup(coord.getL(), coord.getC(), p.getEpoque());
                     break;
@@ -171,15 +177,21 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs[j] = (joueurs[j] + 1) % 2;
         if (j == 0) {
             joueur1 = IA.nouvelle(jeu, type, heuristique);
+            state.setIA1(joueurs[j]==1);
         } else {
             joueur2 = IA.nouvelle(jeu, type, heuristique);
+            state.setIA2(joueurs[j]==1);
         }
-        jeu.miseAJour();
     }
 
     public void desactiverIA(int j) {
         if (joueurs[j] == 1) {
             joueurs[j] = 0;
+        }
+        if(j==0){
+            state.setIA1(false);
+        }else if (j==1){
+            state.setIA2(false);
         }
     }
 
@@ -189,37 +201,19 @@ public class ControleurMediateur implements CollecteurEvenements {
             if (joueurs[0] == 1) {
                 desactiverIA(0); //désactiver
                 activerIA(0, difficulty1, "Heuristique3");
+                state.setDifficultyIA1(difficulty);
             }
         } else {
             difficulty2 = difficulty;
             if (joueurs[1] == 1) {
                 desactiverIA(1); //désactiver
                 activerIA(1, difficulty2, "Heuristique3");
+                state.setDifficultyIA2(difficulty);
             }
         }
     }
 
     public void enablePreview(int l, int c, int epoque){
-        jeu.enablePreview(l,c,epoque);
-    }
-
-    public void setPreviewFocus1(int epoque){ jeu.setPreviewFocus1(epoque); }
-
-    public void setPreviewFocus2(int epoque){ jeu.setPreviewFocus2(epoque); }
-
-    public boolean isEnabledIA1(){
-        return joueurs[0] == 1;
-    }
-
-    public boolean isEnabledIA2(){
-        return joueurs[1] == 1;
-    }
-
-    public String getDifficultyIA1(){
-        return difficulty1;
-    }
-
-    public String getDifficultyIA2(){
-        return difficulty2;
+        state.setPreview(jeu.getPreview(l,c,epoque));
     }
 }

@@ -9,4 +9,5 @@ public interface Plateau {
     void tracerFocusBlanc(double alpha);
     void tracerFocusNoir(double alpha);
     int getEpoque();
+    IHMState getState();
 }

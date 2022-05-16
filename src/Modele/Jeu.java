@@ -15,9 +15,6 @@ public class Jeu extends Observable implements Comparable {
     public Joueur[] joueurs = new Joueur[2];
     Joueur joueurActuel;
     Pion pionActuel;
-    private ArrayList<Pion> preview;
-    int previewFocus1;
-    int previewFocus2;
     int aGagne;
 
     Pion suggestionSource, suggestionDest;
@@ -32,7 +29,6 @@ public class Jeu extends Observable implements Comparable {
         pions = new ArrayList<>();
         joueurs[0] = new Joueur(1);
         joueurs[1] = new Joueur(2);
-        preview = null;
         for(int i = 0; i < 3; i++) {
             Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
             pions.add(p1);
@@ -95,24 +91,11 @@ public class Jeu extends Observable implements Comparable {
         }
     }
 
-    public ArrayList<Pion> getPreview() {
+    public ArrayList<Pion> getPreview(int l, int c, int epoque) {
+        Jeu j = copy();
+        j.jouerCoup(l, c, epoque);
+        ArrayList<Pion>  preview = j.getPions();
         return preview;
-    }
-
-    public int getPreviewFocus1() {
-        return previewFocus1;
-    }
-
-    public void setPreviewFocus1(int previewFocus1) {
-        this.previewFocus1 = previewFocus1;
-    }
-
-    public int getPreviewFocus2() {
-        return previewFocus2;
-    }
-
-    public void setPreviewFocus2(int previewFocus2) {
-        this.previewFocus2 = previewFocus2;
     }
 
     public void setSuggestionPions(Pion s, Pion d) {
@@ -211,12 +194,7 @@ public class Jeu extends Observable implements Comparable {
         }
         return d;
     }
-    public void enablePreview(int l, int c, int epoque) {
-        Jeu j = copy();
-        j.jouerCoup(l, c, epoque);
-        preview = j.getPions();
-        miseAJour();
-    }
+
     public int Heuristique() {
         if (joueurAGagne(joueurActuel)) { // Si on gagne
             return 1000;
@@ -422,7 +400,6 @@ public class Jeu extends Observable implements Comparable {
             } else if (joueurAGagne(joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
                 aGagne = joueurs[(joueurActuel.getID()) % 2].getID();
             }
-            preview = null;
         }
         miseAJour();
     }

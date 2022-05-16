@@ -27,11 +27,14 @@ public class InterfaceGraphique implements Runnable, Observateur {
     private int frameHeight = 700;
     ImageIcon victory;
     JLabel victoryLabel;
+    IHMState state;
 
-    public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
+    public InterfaceGraphique(Jeu j, CollecteurEvenements c, IHMState state) {
         jeu = j;
         jeu.ajouteObservateur(this);
         controle = c;
+        this.state = state;
+        state.ajouteObservateur(this);
         URL in = ClassLoader.getSystemResource("Img/victory.gif");
         victory = new ImageIcon(in);
     }
@@ -48,8 +51,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
         }
     }
 
-    public static void demarrer(Jeu j, CollecteurEvenements c) {
-        SwingUtilities.invokeLater(new InterfaceGraphique(j, c));
+    public static void demarrer(Jeu j, CollecteurEvenements c, IHMState state) {
+        SwingUtilities.invokeLater(new InterfaceGraphique(j, c, state));
     }
 
     public JMenuItem createMenuItem(String s, String c){
@@ -114,16 +117,16 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // Config Menu
         JMenu ConfigMenu = new JMenu("Configuration");
 
-        IAMenu IA1DifficultyMenu = new IAMenu(1, controle);
+        IAMenu IA1DifficultyMenu = new IAMenu(1, controle, state);
         ConfigMenu.add(IA1DifficultyMenu.getMenu());
 
-        IAMenu IA2DifficultyMenu = new IAMenu(2, controle);
+        IAMenu IA2DifficultyMenu = new IAMenu(2, controle, state);
         ConfigMenu.add(IA2DifficultyMenu.getMenu());
 
-        ActiverIA toggleIA1 = new ActiverIA(jeu, controle,1,"toggleIA1");
+        ActiverIA toggleIA1 = new ActiverIA(controle,1,"toggleIA1", state);
         ConfigMenu.add(toggleIA1.getMenuItem());
 
-        ActiverIA toggleIA2 = new ActiverIA(jeu, controle,2,"toggleIA2");
+        ActiverIA toggleIA2 = new ActiverIA(controle,2,"toggleIA2", state);
         ConfigMenu.add(toggleIA2.getMenuItem());
 
         JLabel IASpeedLabel = new JLabel("Vitesse IA : 1000ms");
@@ -153,7 +156,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         // Historique
         //TODO: avoir le vrai historique
-        String categories[] = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
+        String[] categories = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
@@ -219,19 +222,19 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
 
-        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu);
+        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu, state);
         AdaptateurSouris a1 = new AdaptateurSouris(plateauPasse, controle);
         plateauPasse.addMouseMotionListener(a1);
         plateauPasse.addMouseListener(a1);
         plateauBox.add(plateauPasse);
 
-        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu);
+        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu, state);
         AdaptateurSouris a2 = new AdaptateurSouris(plateauPresent, controle);
         plateauPresent.addMouseMotionListener(a2);
         plateauPresent.addMouseListener(a2);
         plateauBox.add(plateauPresent);
 
-        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu);
+        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
         AdaptateurSouris a3 = new AdaptateurSouris(plateauFuture, controle);
         plateauFuture.addMouseMotionListener(a3);
         plateauFuture.addMouseListener(a3);
