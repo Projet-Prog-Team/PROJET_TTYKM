@@ -38,6 +38,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         state.setIA2(joueurs[1]==1);
         state.setDifficultyIA1(difficulty1);
         state.setDifficultyIA2(difficulty2);
+        state.setPauseIA(false);
         activerIA(1, difficulty2, "Heuristique3");
     }
 
@@ -140,11 +141,19 @@ public class ControleurMediateur implements CollecteurEvenements {
                 System.out.println(c.getSaveName());
                 break;
             case "annuler":
+                state.setPauseIA(true);
+                break;
+            case "annulerTour":
+                state.setPauseIA(true);
                 break;
             case "refaire":
+                state.setPauseIA(true);
                 break;
             case "suggestion":
                 suggestion();
+                break;
+            case "reprendre":
+                state.setPauseIA(false);
                 break;
             case "IASpeed":
                 t.stop();

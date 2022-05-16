@@ -183,28 +183,41 @@ public class InterfaceGraphique implements Runnable, Observateur {
         c.ipady = 0;
 
         // Boutons annuler/refaire
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        BoutonAnnulerTour boutonAnnulerTour = new BoutonAnnulerTour("Annuler le tour");
+        boutonAnnulerTour.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annulerTour")));
+        buttonPanel1.add(boutonAnnulerTour.getButton());
 
         BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
         boutonAnnuler.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annuler")));
-        buttonPanel.add(boutonAnnuler.getButton());
+        buttonPanel1.add(boutonAnnuler.getButton());
 
         BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire", jeu);
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
-        buttonPanel.add(boutonRefaire.getButton());
+        buttonPanel1.add(boutonRefaire.getButton());
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
-        lateralPane.add(buttonPanel, c);
+        lateralPane.add(buttonPanel1, c);
+
+        // Bouton suggestion/reprendre
+        JPanel buttonPanel2 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        BoutonReprendre boutonReprendre = new BoutonReprendre("Relancer IA", state);
+        boutonReprendre.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("reprendre")));
+        buttonPanel2.add(boutonReprendre.getButton());
 
         JButton boutonSuggestion = new JButton("Suggestion");
         boutonSuggestion.addActionListener(new AdaptateurCommande(controle, new Commande("suggestion")));
         boutonSuggestion.setFocusable(false);
+        buttonPanel2.add(boutonSuggestion);
+
         c.fill = GridBagConstraints.NONE;
         c.gridx = 0;
         c.gridy = 2;
-        lateralPane.add(boutonSuggestion, c);
+        lateralPane.add(buttonPanel2, c);
 
         // Label etat du jeu
         LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);

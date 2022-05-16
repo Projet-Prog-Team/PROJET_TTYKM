@@ -15,6 +15,7 @@ public class IHMState extends Observable {
     private boolean IA2;
     private String difficultyIA1;
     private String difficultyIA2;
+    private boolean pauseIA;
 
     public IHMState(){
     }
@@ -92,6 +93,15 @@ public class IHMState extends Observable {
 
     public void setDifficultyIA2(String difficultyIA2) {
         this.difficultyIA2 = difficultyIA2;
+        miseAJour();
+    }
+
+    public boolean getPauseIA() {
+        return pauseIA;
+    }
+
+    public void setPauseIA(boolean pauseIA) {
+        this.pauseIA = pauseIA;
         miseAJour();
     }
 }
