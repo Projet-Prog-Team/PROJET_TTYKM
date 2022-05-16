@@ -113,7 +113,6 @@ public class VuePlateau {
         Pion source = state.getSuggestionSource();
         Pion dest = state.getSuggestionDestination();
         if(source!=null && dest!=null){
-            System.out.println(dest.toString());
             if(plateau.getEpoque()==source.getEpoque()){
                 plateau.tracerBrillancePion(source.getCoordonnees().getL(), source.getCoordonnees().getC());
             }
