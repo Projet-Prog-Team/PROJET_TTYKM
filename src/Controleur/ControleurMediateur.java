@@ -104,7 +104,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 jeu.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
                 break;
             case 2:
-                jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
+                //jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
+                state.setSuggestionSource(jeu.getPionActuel());
+                state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case 3:
                 jeu.setSuggestionFocus(suggestion.choixFocus());

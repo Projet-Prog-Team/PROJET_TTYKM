@@ -16,6 +16,8 @@ public class IHMState extends Observable {
     private String difficultyIA1;
     private String difficultyIA2;
     private boolean pauseIA;
+    private Pion suggestionSource;
+    private Pion suggestionDestination;
 
     public IHMState(){
     }
@@ -24,6 +26,8 @@ public class IHMState extends Observable {
         this.preview = null;
         this.previewFocus1 = 3;
         this.previewFocus2 = 3;
+        this.suggestionSource = null;
+        this.suggestionDestination = null;
         miseAJour();
     }
 
@@ -102,6 +106,24 @@ public class IHMState extends Observable {
 
     public void setPauseIA(boolean pauseIA) {
         this.pauseIA = pauseIA;
+        miseAJour();
+    }
+
+    public Pion getSuggestionSource() {
+        return suggestionSource;
+    }
+
+    public void setSuggestionSource(Pion suggestionSource) {
+        this.suggestionSource = suggestionSource;
+        miseAJour();
+    }
+
+    public Pion getSuggestionDestination() {
+        return suggestionDestination;
+    }
+
+    public void setSuggestionDestination(Pion suggestionDestination) {
+        this.suggestionDestination = suggestionDestination;
         miseAJour();
     }
 }
