@@ -18,6 +18,7 @@ public class IHMState extends Observable {
     private boolean pauseIA;
     private Pion suggestionSource;
     private Pion suggestionDestination;
+    private int suggestionFocus;
 
     public IHMState(){
     }
@@ -28,6 +29,7 @@ public class IHMState extends Observable {
         this.previewFocus2 = 3;
         this.suggestionSource = null;
         this.suggestionDestination = null;
+        this.suggestionFocus = 3;
         miseAJour();
     }
 
@@ -124,6 +126,15 @@ public class IHMState extends Observable {
 
     public void setSuggestionDestination(Pion suggestionDestination) {
         this.suggestionDestination = suggestionDestination;
+        miseAJour();
+    }
+
+    public int getSuggestionFocus() {
+        return suggestionFocus;
+    }
+
+    public void setSuggestionFocus(int suggestionFocus) {
+        this.suggestionFocus = suggestionFocus;
         miseAJour();
     }
 }

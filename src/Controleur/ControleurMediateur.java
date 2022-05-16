@@ -94,6 +94,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     int focus = j.choixFocus();
                     dj.getJoueurActuel().setFocus(focus);
                     dj.switchPlayer();
+                    state.initPreview();
                     break;
                 case 4:
                     break;
@@ -113,7 +114,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case 3:
-                System.out.println(suggestion.choixFocus());
+                state.setSuggestionFocus(suggestion.choixFocus());
                 break;
         }
     }
@@ -131,6 +132,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                         if (dj.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
                             dj.getJoueurActuel().setFocus(c.getEpoque());
                             dj.switchPlayer();
+                            state.initPreview();
                         } else {
                             System.out.println("Modification du focus adverse impossible");
                         }
