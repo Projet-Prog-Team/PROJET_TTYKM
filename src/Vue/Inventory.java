@@ -6,7 +6,6 @@ import Patterns.Observateur;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -61,6 +60,9 @@ public class Inventory implements Observateur {
     public void metAJour() {
         for(int i=jeu.getJoueurs()[joueur-1].getNbPionsRestants(); i<4; i++){
             labels.get(i).setVisible(false);
+        }
+        for(int i=0; i<jeu.getJoueurs()[joueur-1].getNbPionsRestants(); i++){
+            labels.get(i).setVisible(true);
         }
         if(jeu.getJoueurActuel().getID()==joueur){
             panel.setBackground(Color.ORANGE);
