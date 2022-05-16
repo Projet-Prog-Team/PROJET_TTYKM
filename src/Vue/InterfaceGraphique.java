@@ -2,7 +2,6 @@ package Vue;
 
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
-import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;

@@ -13,14 +13,12 @@ public class CalculJeu {
         dj = djeu;
     }
 
+    // -------GETTER & SETTERS-------
     public DeroulementJeu getDj() {
         return dj;
     }
 
-    public void setDj(DeroulementJeu dj) {
-        this.dj = dj;
-    }
-
+    // -------HEURISTIQUES-------
     public int Heuristique() {
         if (dj.getJeu().joueurAGagne(dj.joueurActuel)) { // Si on gagne
             return 1000;
@@ -58,7 +56,6 @@ public class CalculJeu {
          * sinon en général 0..200
          * */
     }
-
     public int Heuristique2() {
         int heuristique = Heuristique();
         int moyennePions = 0;
@@ -80,12 +77,11 @@ public class CalculJeu {
          * Heuristique total : 100..200 - 20..30 ~= 70..170
          */
     }
-
     public int Heuristique3() {
         int heuristique = Heuristique();
         for (Pion pion : dj.getJeu().getPions()) {
             if (pion.getJoueur() == dj.getJoueurActuel()) {
-                heuristique += 10*dj.getJeu().distancePionBord(pion);
+                heuristique += 10*distancePionBord(pion);
             }
         }
         return heuristique;
@@ -97,6 +93,18 @@ public class CalculJeu {
          */
     }
     // Idées pour heuristique 4 > faire en sorte de limiter les pions collés
+
+    public int distancePionBord(Pion p) {
+        int d = 1;
+        int l = p.getCoordonnees().getL();
+        int c = p.getCoordonnees().getC();
+        if (c == 0 || l == 0 || c == 3 || l == 3) { // Si pion au bord
+            d = 0;
+        }
+        return d;
+    }
+
+    // -------CALCUL DES BRANCHEMENTS-------
     public ArrayList<Couple<DeroulementJeu, Tour>> branchementsSelect(DeroulementJeu djeu) {   // On considere que le jeu j est dans l'étape selection
         ArrayList<Couple<DeroulementJeu, Tour>> jeux = new ArrayList<>();
         ArrayList<Pion> pionsToBeSelected = dj.getJeu().pionsFocusJoueur(dj.getJoueurActuel().getFocus(), dj.getJoueurActuel());

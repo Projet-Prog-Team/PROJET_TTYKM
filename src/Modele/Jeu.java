@@ -1,40 +1,56 @@
 package Modele;
 
-import Patterns.Observable;
-import Structures.Couple;
 import Structures.Point;
-import Structures.Tour;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 
 public class Jeu implements Comparable {
     // Contenu du jeu
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
-    Joueur joueurActuel;
-    Pion pionActuel;
-    int aGagne;
 
     public Jeu() {
         init();
     }
 
-    // Reste
+    public void init() {
+        pions = new ArrayList<>();
+        joueurs[0] = new Joueur(1);
+        joueurs[1] = new Joueur(2);
+        for(int i = 0; i < 3; i++) {
+            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
+            pions.add(p1);
+            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
+            pions.add(p2);
+        }
+        joueurs[0].setFocus(0);
+        joueurs[1].setFocus(2);
+    }
+
+    // -------GETTER & SETTERS-------
     public Joueur getJoueur(int id) {
         return joueurs[id];
     }
-    public int distancePionBord(Pion p) {
-        int d = 1;
-        int l = p.getCoordonnees().getL();
-        int c = p.getCoordonnees().getC();
-        if (c == 0 || l == 0 || c == 3 || l == 3) { // Si pion au bord
-            d = 0;
-        }
-        return d;
+    public ArrayList<Pion> getPions() {
+        return pions;
     }
+    public Joueur[] getJoueurs() {
+        return joueurs;
+    }
+    public Pion getPion(Point p, int e) {
+        if ((p.getL() <= 3 && p.getL() >= 0) && (p.getC() <= 3 && p.getC() >= 0)) {
+            for (Pion pion : pions) {
+                if (p.equals(pion.getCoordonnees()) && e == pion.getEpoque()) {
+                    return pion;
+                }
+            }
+        }
+        return null;
+    }
+
+    // -------INFOS JEU-------
     public ArrayList<Pion> casesDispo(Joueur j, Pion p) {   // Retourne une liste des pions jouables pour le joueur cou
         ArrayList<Pion> casesDisponibles = new ArrayList<>();
         Point coo = p.getCoordonnees();
@@ -61,35 +77,6 @@ public class Jeu implements Comparable {
         }
 
         return casesDisponibles;
-    }
-    public void init() {
-        pions = new ArrayList<>();
-        joueurs[0] = new Joueur(1);
-        joueurs[1] = new Joueur(2);
-        for(int i = 0; i < 3; i++) {
-            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
-            pions.add(p1);
-            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
-            pions.add(p2);
-        }
-        joueurs[0].setFocus(0);
-        joueurs[1].setFocus(2);
-    }
-    public ArrayList<Pion> getPions() {
-        return pions;
-    }
-    public Joueur[] getJoueurs() {
-        return joueurs;
-    }
-    public Pion getPion(Point p, int e) {
-        if ((p.getL() <= 3 && p.getL() >= 0) && (p.getC() <= 3 && p.getC() >= 0)) {
-            for (Pion pion : pions) {
-                if (p.equals(pion.getCoordonnees()) && e == pion.getEpoque()) {
-                    return pion;
-                }
-            }
-        }
-        return null;
     }
     public boolean joueurAGagne(Joueur joueur) {
         Joueur adversaire = joueurs[(joueur.getID()) % 2];

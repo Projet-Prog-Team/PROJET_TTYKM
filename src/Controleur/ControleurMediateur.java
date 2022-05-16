@@ -2,7 +2,6 @@ package Controleur;
 
 import Modele.CalculJeu;
 import Modele.DeroulementJeu;
-import Modele.Jeu;
 import Modele.Pion;
 import Structures.Point;
 import Vue.AdaptateurTemps;
@@ -11,7 +10,6 @@ import Vue.Commande;
 import Vue.IHMState;
 
 import javax.swing.*;
-import java.util.ArrayList;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
@@ -104,20 +102,18 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void suggestion () {
-        ArrayList<Pion> l = new ArrayList<>();
+        suggestion.calculCoup(dj, 10, true);
         switch(dj.getEtape()) {
             case 1:
-                dj.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
+                state.setSuggestionSource(suggestion.selectPion());
+                state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case 2:
-                //jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
                 state.setSuggestionSource(dj.getPionActuel());
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case 3:
-                dj.setSuggestionFocus(suggestion.choixFocus());
-                break;
-            case 4:
+                System.out.println(suggestion.choixFocus());
                 break;
         }
     }

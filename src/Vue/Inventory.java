@@ -1,13 +1,10 @@
 package Vue;
 
 import Modele.DeroulementJeu;
-import Modele.Jeu;
 import Patterns.Observateur;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

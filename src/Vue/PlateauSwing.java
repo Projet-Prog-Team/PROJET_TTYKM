@@ -2,7 +2,6 @@ package Vue;
 
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
-import Modele.Jeu;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
