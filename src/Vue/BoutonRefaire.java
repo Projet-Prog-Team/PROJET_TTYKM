@@ -11,12 +11,13 @@ public class BoutonRefaire implements Observateur {
     private Jeu jeu;
     private JButton button;
 
-    BoutonRefaire(String s, Jeu j) {
+    BoutonRefaire(String s) {
         button = new JButton(s);
-        jeu = j;
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFocusable(false);
-        jeu.ajouteObservateur(this);
+
+//        jeu = j;
+//        jeu.ajouteObservateur(this);
     }
 
     @Override

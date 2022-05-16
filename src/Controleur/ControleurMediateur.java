@@ -1,27 +1,33 @@
 package Controleur;
 
+import Modele.CalculJeu;
+import Modele.DeroulementJeu;
 import Modele.Jeu;
 import Modele.Pion;
 import Structures.Point;
-import Vue.*;
+import Vue.AdaptateurTemps;
+import Vue.CollecteurEvenements;
+import Vue.Commande;
+import Vue.IHMState;
 
 import javax.swing.*;
 import java.util.ArrayList;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
-    Jeu jeu;
+    DeroulementJeu dj;
     IA joueur1, joueur2, suggestion;
     int [] joueurs;
     String difficulty1 = "facile", difficulty2 = "facile";
-    Timer t;
     IHMState state;
+    Timer t;
+
     int speed;
 
-    public ControleurMediateur (Jeu j, int temps, IHMState state) {
-        jeu = j;
+    public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
+        dj = djeu;
         this.state = state;
-        suggestion = IA.nouvelle(j, "difficile", "Heuristique3");
+        suggestion = IA.nouvelle(new CalculJeu(dj), "difficile", "Heuristique3");
         speed = temps;
         init();
     }
@@ -32,7 +38,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
-        jeu.init();
+        dj.init();
         state.initPreview();
         state.setIA1(joueurs[0]==1);
         state.setIA2(joueurs[1]==1);
@@ -45,14 +51,14 @@ public class ControleurMediateur implements CollecteurEvenements {
     // Clique sur une case
     @Override
     public void clicSouris(int l, int c, int epoque) {
-        int id = jeu.getJoueurActuel().getID()-1;
+        int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
-            switch (jeu.getEtape()) {
+            switch (dj.getEtape()) {
                 case 1:
-                    jeu.selectPion(l, c, epoque);
+                    dj.selectPion(l, c, epoque);
                     break;
                 case 2:
-                    jeu.jouerCoup(l, c, epoque);
+                    dj.jouerCoup(l, c, epoque);
                     state.initPreview();
                     break;
                 case 3:
@@ -66,7 +72,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     // Tic du timer (toutes les 1 sec)
     @Override
     public void tic() {
-        int id = jeu.getJoueurActuel().getID()-1;
+        int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 1) {
             IA j;
             if (id == 0) {
@@ -74,22 +80,22 @@ public class ControleurMediateur implements CollecteurEvenements {
             } else {
                 j = joueur2;
             }
-            switch(jeu.getEtape()) {
+            switch(dj.getEtape()) {
                 case 1:
                     Pion p = j.selectPion();
                     Point coord = p.getCoordonnees();
-                    jeu.selectPion(coord.getL(), coord.getC(), p.getEpoque());
+                    dj.selectPion(coord.getL(), coord.getC(), p.getEpoque());
                     break;
                 case 2:
                     p = j.jouerCoup();
-                    state.initPreview();
                     coord = p.getCoordonnees();
-                    jeu.jouerCoup(coord.getL(), coord.getC(), p.getEpoque());
+                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque());
+                    state.initPreview();
                     break;
                 case 3:
                     int focus = j.choixFocus();
-                    jeu.getJoueurActuel().setFocus(focus);
-                    jeu.switchPlayer();
+                    dj.getJoueurActuel().setFocus(focus);
+                    dj.switchPlayer();
                     break;
                 case 4:
                     break;
@@ -99,17 +105,17 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     public void suggestion () {
         ArrayList<Pion> l = new ArrayList<>();
-        switch(jeu.getEtape()) {
+        switch(dj.getEtape()) {
             case 1:
-                jeu.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
+                dj.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
                 break;
             case 2:
                 //jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
-                state.setSuggestionSource(jeu.getPionActuel());
+                state.setSuggestionSource(dj.getPionActuel());
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case 3:
-                jeu.setSuggestionFocus(suggestion.choixFocus());
+                dj.setSuggestionFocus(suggestion.choixFocus());
                 break;
             case 4:
                 break;
@@ -122,18 +128,18 @@ public class ControleurMediateur implements CollecteurEvenements {
         System.out.println(c.getCommande());
         switch(c.getCommande()){
             case "clicFocus":
-                if(jeu.getEtape()==3){
-                    int id = jeu.getJoueurActuel().getID()-1;
+                if(dj.getEtape()==3){
+                    int id = dj.getJoueurActuel().getID()-1;
                     if (joueurs[id] == 0) {
                         //choix focus
-                        if (jeu.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
-                            jeu.getJoueurActuel().setFocus(c.getEpoque());
-                            jeu.switchPlayer();
+                        if (dj.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
+                            dj.getJoueurActuel().setFocus(c.getEpoque());
+                            dj.switchPlayer();
                         } else {
                             System.out.println("Modification du focus adverse impossible");
                         }
                     }
-                } else if (jeu.getEtape() == 4){
+                } else if (dj.getEtape() == 4){
                 }
                 break;
             case "save":
@@ -187,12 +193,13 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void activerIA(int j, String type, String heuristique) {
         joueurs[j] = (joueurs[j] + 1) % 2;
         if (j == 0) {
-            joueur1 = IA.nouvelle(jeu, type, heuristique);
+            joueur1 = IA.nouvelle(new CalculJeu(dj), type, heuristique);
             state.setIA1(joueurs[j]==1);
         } else {
-            joueur2 = IA.nouvelle(jeu, type, heuristique);
+            joueur2 = IA.nouvelle(new CalculJeu(dj), type, heuristique);
             state.setIA2(joueurs[j]==1);
         }
+        dj.miseAJour();
     }
 
     public void desactiverIA(int j) {
@@ -225,6 +232,8 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void enablePreview(int l, int c, int epoque){
-        state.setPreview(jeu.getPreview(l,c,epoque));
+        if(dj.getEtape()==2){
+            state.setPreview(dj.getPreview(l,c,epoque));
+        }
     }
 }

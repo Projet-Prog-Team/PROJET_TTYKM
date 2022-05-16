@@ -11,12 +11,13 @@ public class BoutonAnnuler implements Observateur {
     private Jeu jeu;
     private JButton button;
 
-    BoutonAnnuler(String s, Jeu j) {
+    BoutonAnnuler(String s) {
         button = new JButton(s);
-        jeu = j;
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFocusable(false);
-        jeu.ajouteObservateur(this);
+
+//        jeu = j;
+//        jeu.ajouteObservateur(this);
     }
 
     @Override

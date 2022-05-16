@@ -1,6 +1,6 @@
 package Vue;
 
-import Modele.Jeu;
+import Modele.DeroulementJeu;
 import Modele.Joueur;
 import Modele.Pion;
 
@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public class VuePlateau {
 
-    Jeu jeu;
+    DeroulementJeu jeu;
     Plateau plateau;
 
-    public VuePlateau(Jeu jeu, Plateau p) {
+    public VuePlateau(DeroulementJeu jeu, Plateau p) {
         this.jeu = jeu;
         this.plateau = p;
     }
@@ -24,7 +24,7 @@ public class VuePlateau {
 
         // Affiche les cases disponibles pour le déplacement
         if (jeu.getEtape() == 2) {
-            pions = jeu.casesDispo();
+            pions = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
             for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerBrillanceCase(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
@@ -34,7 +34,7 @@ public class VuePlateau {
 
         // Affiche les pions selectionnables
         if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
-            pions = jeu.pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
+            pions = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
             for (Pion pion : pions) {
                 plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
             }
@@ -53,7 +53,7 @@ public class VuePlateau {
                 plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
             }
         }else{
-            pions = jeu.getPions();
+            pions = jeu.getJeu().getPions();
             for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
@@ -73,7 +73,7 @@ public class VuePlateau {
         }
 
         // Affiche les focus en mode preview ou non
-        Joueur[] joueurs = jeu.getJoueurs();
+        Joueur[] joueurs = jeu.getJeu().getJoueurs();
 
         if(jeu.getJoueurActuel().getID()==1){
             if (joueurs[1].getFocus() == plateau.getEpoque()) {

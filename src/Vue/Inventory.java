@@ -1,11 +1,13 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,13 +16,13 @@ public class Inventory implements Observateur {
 
     private Image pionBasique;
     private ArrayList<JLabel> labels;
-    private Jeu jeu;
+    private DeroulementJeu jeu;
     private int joueur;
     private JPanel panel;
     JLabel labelPlayer;
     IHMState state;
 
-    Inventory(int joueur, Jeu jeu, IHMState state){
+    Inventory(int joueur, DeroulementJeu jeu, IHMState state){
 
         this.jeu = jeu;
         jeu.ajouteObservateur(this);
@@ -68,10 +70,10 @@ public class Inventory implements Observateur {
     @Override
     public void metAJour() {
         // Affiche les pions
-        for(int i=jeu.getJoueurs()[joueur-1].getNbPionsRestants(); i<4; i++){
+        for(int i=jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i<4; i++){
             labels.get(i).setVisible(false);
         }
-        for(int i=0; i<jeu.getJoueurs()[joueur-1].getNbPionsRestants(); i++){
+        for(int i=0; i<jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i++){
             labels.get(i).setVisible(true);
         }
         // Affiche le joueur courant

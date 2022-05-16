@@ -1,5 +1,6 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.EPOQUE;
 import Modele.Jeu;
 import Patterns.Observateur;
@@ -19,7 +20,7 @@ import java.util.Vector;
 
 public class InterfaceGraphique implements Runnable, Observateur {
 
-    private Jeu jeu;
+    private DeroulementJeu jeu;
     private CollecteurEvenements controle;
     private JFrame frame;
     private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
@@ -29,12 +30,12 @@ public class InterfaceGraphique implements Runnable, Observateur {
     JLabel victoryLabel;
     IHMState state;
 
-    public InterfaceGraphique(Jeu j, CollecteurEvenements c, IHMState state) {
-        jeu = j;
+    public InterfaceGraphique(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
+        this.jeu = jeu;
         jeu.ajouteObservateur(this);
-        controle = c;
         this.state = state;
         state.ajouteObservateur(this);
+        controle = c;
         URL in = ClassLoader.getSystemResource("Img/victory.gif");
         victory = new ImageIcon(in);
     }
@@ -51,8 +52,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
         }
     }
 
-    public static void demarrer(Jeu j, CollecteurEvenements c, IHMState state) {
-        SwingUtilities.invokeLater(new InterfaceGraphique(j, c, state));
+    public static void demarrer(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
+        SwingUtilities.invokeLater(new InterfaceGraphique(jeu, c, state));
     }
 
     public JMenuItem createMenuItem(String s, String c){
@@ -189,11 +190,11 @@ public class InterfaceGraphique implements Runnable, Observateur {
         boutonAnnulerTour.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annulerTour")));
         buttonPanel1.add(boutonAnnulerTour.getButton());
 
-        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
+        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler");
         boutonAnnuler.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annuler")));
         buttonPanel1.add(boutonAnnuler.getButton());
 
-        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire", jeu);
+        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire");
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
         buttonPanel1.add(boutonRefaire.getButton());
 

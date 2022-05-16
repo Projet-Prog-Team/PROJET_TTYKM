@@ -1,5 +1,6 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.EPOQUE;
 import Modele.Jeu;
 
@@ -25,7 +26,7 @@ public class PlateauSwing extends JComponent implements Plateau {
     private int epoque;
     private IHMState state;
 
-    PlateauSwing(int epoque, Jeu j, IHMState state){
+    PlateauSwing(int epoque, DeroulementJeu j, IHMState state){
         this.epoque = epoque;
         this.state = state;
 

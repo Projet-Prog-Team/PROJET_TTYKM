@@ -1,5 +1,6 @@
 package Controleur;
 
+import Modele.DeroulementJeu;
 import Modele.Jeu;
 import Modele.Pion;
 
@@ -25,7 +26,7 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public int calculCoup(Jeu j, int horizon, boolean joueur) {
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {
         return 0;
     }
 }
