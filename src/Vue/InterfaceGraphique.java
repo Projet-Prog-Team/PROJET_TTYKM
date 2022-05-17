@@ -1,6 +1,7 @@
 package Vue;
 
 import Modele.EPOQUE;
+import Modele.ETAT;
 import Modele.Jeu;
 import Patterns.Observateur;
 
@@ -41,7 +42,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         plateauPasse.repaint();
         plateauPresent.repaint();
         plateauFuture.repaint();
-        if(jeu.getEtape()!=4){
+        if(jeu.getEtape()!= ETAT.END){
             victoryLabel.setVisible(false);
         }else{
             victoryLabel.setVisible(true);

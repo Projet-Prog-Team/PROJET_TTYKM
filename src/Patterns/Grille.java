@@ -1,19 +1,24 @@
 package Patterns;
 
 import Modele.Pion;
+import Modele.ETAT;
 import java.util.Arrays;
 
 public class Grille {
     private Pion [] cases;
-
+    public ETAT etat;
+    public int PionFocus;
+    public int Focus;
     public Pion [] GetCases()
     {
         return cases;
     }
 
-    public Grille(Pion [] t_cases)
+    public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus)
     {
         cases = t_cases;
+        etat=t_etat;
+        PionFocus = t_pionfocus;
     }
 
     public static Pion[] Clone(Pion[]original)

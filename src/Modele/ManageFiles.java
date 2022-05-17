@@ -16,8 +16,8 @@ public class ManageFiles   {
     private ArrayList<Grille> temp;
     private Jeu game;
     private String path;
-    private Pion[] pions; 
-    private boolean move=true;
+    private Pion[] pions;
+    public boolean move=true;
     private int addetat=1;
     public boolean init = false;
     public int Actual_pos=0;
@@ -37,7 +37,7 @@ public class ManageFiles   {
         {
             pions[tmp[i].ID]=tmp[i].copy(tmp[i].getJoueur());
         }
-        temp.add(new Grille(Grille.Clone(pions)));
+        temp.add(new Grille(Grille.Clone(pions),ETAT.IDLE,0));
         path=absolutepath;
 
     }
@@ -187,7 +187,21 @@ public class ManageFiles   {
     {
         if(Actual_pos>0)
         {
-            Actual_pos--;
+                Actual_pos--;
+
+            ETAT t_etat = temp.get(Actual_pos).etat;
+            switch(temp.get(Actual_pos+1).etat)
+            {
+                /*case FOCUS:
+                    t_etat=ETAT.FOCUS;
+                    System.out.println("hey");
+                    break;*/
+                case MOVE1:
+                    if(game.pionsFocusJoueur(game.getPionActuel().getEpoque(),game.getJoueurActuel()).size()!=1)
+                    {
+                        t_etat=ETAT.SELECT;
+                    }break;
+            }
             int pred = -2;
             if(Actual_pos-1>=0)
                 pred = temp.get(Actual_pos).Compare(temp.get(Actual_pos-1).GetCases()); // si pred et actual reçoivent -1 alors on est sur la selection d'un focus sinon sur un pions
@@ -195,23 +209,89 @@ public class ManageFiles   {
             int actual = temp.get(Actual_pos).Compare(temp.get(Actual_pos+1).GetCases());
             int pred_focus=-1;
             int red=(NBPIONS/2-game.joueurs[0].getNbPionsRestants())+1;
-            if(pred != -1 && pred != -2)
+            int pos=temp.get(Actual_pos).PionFocus;
+            System.out.println("New ETAT: "+temp.get(Actual_pos).etat);
+            System.out.println("Next ETAT: "+temp.get(Actual_pos+1).etat);
+            Pion[] temp0=temp.get(Actual_pos).GetCases();
+            /*for(pos=0;pos<temp0.length;pos++)
             {
-                if(pred<NBPIONS/2 || red==1)
-                    red=0;
-                pred_focus=game.getPions().get(pred-red).getEpoque();
-                
+                if(temp0[pos]!=null && temp0[pos].focused)
+                    break;
+            }*/
+            int j1=0;
+            int i=0;
+            for(Pion t_pion : temp0)
+            {
+                if(t_pion != null && i<=NBPIONS/2)
+                {
+                    j1++;
+                }
+                i++;
+            }
+            int oldpos = pos;
+            if(pos>=NBPIONS/2)
+            {
+                pos = pos-(NBPIONS/2-(NBPIONS/2-j1));
+            }
+
+            if(Actual_pos-1>0 && t_etat!=ETAT.IDLE)
+            {
+                pred_focus=temp.get(Actual_pos-1).GetCases()[oldpos].getEpoque();
             }
             else
-            { 
-                if(actual != -1)
-                {
-                    if(actual<NBPIONS/2 || red==1)
-                    red=0;
-                    pred_focus=game.getPions().get(actual-red).getEpoque();
-                }
+            {
+
+                if(t_etat==ETAT.IDLE)
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                pred_focus=game.getPions().get(pos).getEpoque();
             }
-           
+
+            switch(t_etat)
+            {
+                case IDLE:
+                    System.out.println("IDLE");
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.setPionActuel(game.pionsFocusJoueur(pred_focus,game.getJoueurActuel()).get(0));
+                    game.joueurActuel.nbActionsRestantes=2;
+                    break;
+                case SELECT:
+                    System.out.println("SELECT");
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.joueurActuel.nbActionsRestantes=2;
+
+                    game.setPionActuel(null);
+                    break;
+
+                case MOVE1:
+                    System.out.println("MOVE1");
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.setPionActuel(game.getPions().get(pos));
+                    game.joueurActuel.nbActionsRestantes=1;
+                    break;
+
+                /*case MOVE2:
+                    System.out.println("MOVE2");
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.pionActuel=game.getPions().get(pos);
+                    game.joueurActuel.nbActionsRestantes=0;
+                    break;*/
+
+                case MOVE2:
+                    System.out.println("FOCUS");
+                    game.setPionActuel(game.getPions().get(0));
+                    game.joueurActuel.nbActionsRestantes=0;
+                    if( game.joueurActuel== game.joueurs[0])
+                    {
+                        game.joueurActuel=game.joueurs[1];
+                    }
+                    else
+                    {
+                        game.joueurActuel=game.joueurs[0];
+                    }
+                    game.getJoueurActuel().setFocus(pred_focus);
+                    break;
+            }
+           /*
                 float nbtour = (float)(Actual_pos+1)/4;
                 //int etat = (int)((Actual_pos/4-(float)(Actual_pos/4))*4); 
                 int etat;
@@ -278,7 +358,7 @@ public class ManageFiles   {
                         game.getJoueurActuel().setFocus(pred_focus);
                         //game.switchPlayer();
                         break;
-                }
+                }*/
                 
                 move=true;
                 pions=new Pion[NBPIONS];
@@ -287,7 +367,7 @@ public class ManageFiles   {
                     pions[t_pion.ID]=t_pion;
                 }
                 game.miseAJour();
-            
+
         }
     }
 
@@ -308,11 +388,108 @@ public class ManageFiles   {
         if(Actual_pos<Max_pos)
         {
             Actual_pos++;
-            //game.SetPions(Grille.Clone(temp.get(Actual_pos).GetCases()));
+            ETAT t_etat = temp.get(Actual_pos).etat;
+            /*switch(temp.get(Actual_pos-1).etat)
+            {
+            /*case FOCUS:
+                t_etat=ETAT.FOCUS;
+                System.out.println("hey");
+                break;
+                case MOVE1:
+                    if(game.pionsFocusJoueur(game.getPionActuel().getEpoque(),game.getJoueurActuel()).size()!=1)
+                    {
+                        t_etat=ETAT.SELECT;
+                    }break;
+            }*/
+            int pred = -2;
+            if(Actual_pos-2>=0)
+                pred = temp.get(Actual_pos).Compare(temp.get(Actual_pos-2).GetCases()); // si pred et actual reçoivent -1 alors on est sur la selection d'un focus sinon sur un pions
+
+            int actual = temp.get(Actual_pos).Compare(temp.get(Actual_pos-1).GetCases());
+            int pred_focus=-1;
+            int red=(NBPIONS/2-game.joueurs[0].getNbPionsRestants())+1;
+            int pos=temp.get(Actual_pos).PionFocus;
+            System.out.println("New ETAT: "+temp.get(Actual_pos-1).etat);
+            System.out.println("Next ETAT: "+temp.get(Actual_pos).etat);
+            Pion[] temp0=temp.get(Actual_pos).GetCases();
+        /*for(pos=0;pos<temp0.length;pos++)
+        {
+            if(temp0[pos]!=null && temp0[pos].focused)
+                break;
+        }*/
+            int j1=0;
+            int i=0;
+            for(Pion t_pion : temp0)
+            {
+                if(t_pion != null && i<=NBPIONS/2)
+                {
+                    j1++;
+                }
+                i++;
+            }
+            int oldpos = pos;
+            if(pos>=NBPIONS/2)
+            {
+                pos = pos-(NBPIONS/2-(NBPIONS/2-j1));
+            }
+
+            if(Actual_pos-2>0 && t_etat!=ETAT.IDLE)
+            {
+                pred_focus=temp.get(Actual_pos-2).GetCases()[oldpos].getEpoque();
+            }
+            else
+            {
+
+                if(t_etat==ETAT.IDLE)
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                pred_focus=game.getPions().get(pos).getEpoque();
+            }
+
+            switch(t_etat)
+            {
+                case IDLE:
+                    System.out.println("IDLE");
+                    System.out.println("AP: "+Actual_pos);
+                    game.getJoueurActuel().setFocus(temp.get(Actual_pos).Focus);
+                    game.switchPlayer();
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.setPionActuel(game.pionsFocusJoueur(pred_focus,game.getJoueurActuel()).get(0));
+                    game.joueurActuel.nbActionsRestantes=2;
+                    break;
+                case SELECT:
+                    System.out.println("SELECT");
+                    game.getJoueurActuel().setFocus(temp.get(Actual_pos).Focus);
+                    game.switchPlayer();
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.joueurActuel.nbActionsRestantes=2;
+
+                    game.setPionActuel(null);
+                    break;
+
+                case MOVE1:
+                    System.out.println("MOVE1");
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.setPionActuel(game.getPions().get(pos));
+                    game.joueurActuel.nbActionsRestantes=1;
+                    break;
+
+                case MOVE2:
+                    System.out.println("FOCUS");
+                    game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
+                    game.setPionActuel(game.getPions().get(0));
+                    game.joueurActuel.nbActionsRestantes=0;
+                    break;
+            }
             move=true;
-            game.switchPlayer();
+            pions=new Pion[NBPIONS];
+            for(Pion t_pion : game.getPions())
+            {
+                pions[t_pion.ID]=t_pion;
+            }
             game.miseAJour();
+
         }
+
     }
 
     public boolean CanCTRLY()
@@ -351,24 +528,52 @@ public class ManageFiles   {
         move=false;
     }
 
-    public void AddLog()
+    public void AddLog(ETAT t_etat)
     {
-        temp.add(new Grille(Grille.Clone(pions)));
+        if(t_etat != null)
+        {
+            temp.add(new Grille(Grille.Clone(pions),t_etat,game.getPionActuel().ID));
+        }
+        else
+        {
+            temp.add(new Grille(Grille.Clone(pions),game.getEtape(),game.getPionActuel().ID));
+        }
+
+
         Max_pos=temp.size();
+        //System.out.println("add "+game.getEtape());
         Actual_pos++;
         move=false;
+       /* for (Grille t_pion : temp)
+        {
+                /*Pion[] t_pions=t_pion.GetCases();
+                for(int i=0;i<NBPIONS;i++)
+                {
+                    if(t_pions[i]!=null)
+                    {
+                        System.out.println("i :"+i+" "+t_pions[i].getCoordonnees());
+                    }
+                    else
+                    {
+                        System.out.println("i :"+i+" null");
+                    }
+                }
+                System.out.println("__________");
+            System.out.println("al: "+t_pion.etat);
+        }
+        System.out.println("________________________");*/
     }
 
     public void UpdateLog(Pion be, Pion af)
     {
         
-        if(Actual_pos!=(Max_pos-1) && !move && !init )
+        if(Actual_pos<(Max_pos-1) && !move && !init )
         {
             System.out.println("changement");
             ArrayList<Grille> tmp = new ArrayList<>();
             for(int i=0;i<=Actual_pos;i++)
             {
-                tmp.add(new Grille(Grille.Clone(temp.get(i).GetCases())));
+                tmp.add(new Grille(Grille.Clone(temp.get(i).GetCases()),temp.get(i).etat,temp.get(i).PionFocus));
             }
             temp = tmp;
             Max_pos=temp.size();
@@ -382,8 +587,6 @@ public class ManageFiles   {
             int etat = (int)((nbtour-(float)(Max_pos/4))*4); 
             if(nbpions == 1 && etat == 1)
                 addetat++;
-            System.out.println("etat:"+etat);
-            System.out.println("addetat:"+addetat);
             if(af != null)
             {
                 temp.get(Actual_pos).GetCases()[af.ID]=af.copy(af.getJoueur());
@@ -391,13 +594,19 @@ public class ManageFiles   {
             }
             else
             {
-                temp.get(Actual_pos).GetCases()[be.ID]=null;
-                pions[be.ID]=null;
+                if(be!=null)
+                {
+                    temp.get(Actual_pos).GetCases()[be.ID]=null;
+                    pions[be.ID]=null;
+                }
+                System.out.println("F: "+game.getJoueurActuel().getFocus());
+                temp.get(Actual_pos).Focus=game.getJoueurActuel().getFocus();
+
             }      
             Max_pos=temp.size();
         
         //----------------
-            /*for (Grille t_pion : temp) 
+            /*for (Grille t_pion : temp)
             {
                 Pion[] t_pions=t_pion.GetCases();
                 for(int i=0;i<NBPIONS;i++)
@@ -411,9 +620,10 @@ public class ManageFiles   {
                         System.out.println("i :"+i+" null");
                     }
                 }
-                System.out.println("__________");  
-            }    
-            System.out.println("________________________"); */
+                System.out.println("__________");
+            }
+            System.out.println("________________________");*/
+
         }
         move=true;
         init=false;

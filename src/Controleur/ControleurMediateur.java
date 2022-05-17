@@ -1,6 +1,8 @@
 package Controleur;
 
 import Modele.Jeu;
+import Modele.ETAT;
+import Modele.ManageFiles;
 import Modele.Pion;
 import Structures.Point;
 import Vue.AdaptateurTemps;
@@ -33,7 +35,9 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
-        jeu.init();
+
+        //jeu.init();
+
         activerIA(1, difficulty2, "Heuristique3");
     }
 
@@ -43,15 +47,16 @@ public class ControleurMediateur implements CollecteurEvenements {
         int id = jeu.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
             switch (jeu.getEtape()) {
-                case 1:
+                case SELECT:
                     jeu.selectPion(l, c, epoque);
                     break;
-                case 2:
+                case MOVE2:
+                case MOVE1:
                     jeu.jouerCoup(l, c, epoque,true);
                     break;
-                case 3:
+                case FOCUS:
                     break;
-                case 4:
+                case END:
                     break;
             }
         }
@@ -69,24 +74,25 @@ public class ControleurMediateur implements CollecteurEvenements {
                 j = joueur2;
             }
             switch(jeu.getEtape()) {
-                case 1:
+                case SELECT:
                     Pion p = j.selectPion();
                     Point coord = p.getCoordonnees();
                     jeu.selectPion(coord.getL(), coord.getC(), p.getEpoque());
-                    jeu.MemoryManager.AddLog();
+                    jeu.MemoryManager.AddLog(ETAT.SELECT);
                     break;
-                case 2:
+                case MOVE1:
+                case MOVE2:
                     p = j.jouerCoup();
                     coord = p.getCoordonnees();
                     jeu.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),false);
                     break;
-                case 3:
+                case FOCUS:
                     jeu.getPionActuel().focused=false;
                     int focus = j.choixFocus();
                     jeu.getJoueurActuel().setFocus(focus);
                     jeu.switchPlayer();
                     break;
-                case 4:
+                case END:
                     break;
             }
         }
@@ -95,16 +101,17 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void suggestion () {
         ArrayList<Pion> l = new ArrayList<>();
         switch(jeu.getEtape()) {
-            case 1:
+            case SELECT:
                 jeu.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
                 break;
-            case 2:
+            case MOVE1:
+            case MOVE2:
                 jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
                 break;
-            case 3:
+            case FOCUS:
                 jeu.setSuggestionFocus(suggestion.choixFocus());
                 break;
-            case 4:
+            case END:
                 break;
         }
     }
@@ -115,19 +122,21 @@ public class ControleurMediateur implements CollecteurEvenements {
         System.out.println(c.getCommande());
         switch(c.getCommande()){
             case "clicFocus":
-                if(jeu.getEtape()==3){
+                if(jeu.getEtape()==ETAT.FOCUS){
                     int id = jeu.getJoueurActuel().getID()-1;
                     if (joueurs[id] == 0) {
                         //choix focus
                         if (jeu.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
                             jeu.getJoueurActuel().setFocus(c.getEpoque());
-                            jeu.MemoryManager.AddLog();
+                            jeu.MemoryManager.move =false;
+                            System.out.println("hey");
+                            jeu.MemoryManager.UpdateLog(null,null);
                             jeu.switchPlayer();
                         } else {
                             System.out.println("Modification du focus adverse impossible");
                         }
                     }
-                } else if (jeu.getEtape() == 4){
+                } else if (jeu.getEtape() == ETAT.END){
                 }
                 break;
             case "save":
@@ -140,6 +149,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 jeu.MemoryManager.CTRLZ();
                 break;
             case "refaire":
+                jeu.MemoryManager.CTRLY();
                 break;
             case "suggestion":
                 suggestion();

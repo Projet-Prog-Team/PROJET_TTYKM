@@ -10,12 +10,6 @@ public class Point {
         this.c = c;
     }
 
-    public Point( Point tmp)
-    {
-        x= tmp.x;
-        y = tmp.y;
-    }
-
     @Override
     public String toString() {
         return "Point{" +

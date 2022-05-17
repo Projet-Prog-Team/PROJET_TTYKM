@@ -17,11 +17,12 @@ public class Pion {
         joueur = j;
     }
 
-    public Pion(Point c, int e, Joueur j,int t_ID) {
+    public Pion(Point c, int e, Joueur j,int t_ID,boolean t_focused) {
         coordonnees =  c;
         epoque = e;
         joueur = j;
         ID=t_ID;
+        focused=t_focused;
     }
 
 
@@ -38,7 +39,7 @@ public class Pion {
     public Joueur getJoueur() { return joueur; }
 
     public Pion copy(Joueur joueur) {
-        return new Pion(getCoordonnees().copy(), getEpoque(), joueur,ID);
+        return new Pion(getCoordonnees().copy(), getEpoque(), joueur,ID,focused);
     }
 
     public int distance(Pion p) {
