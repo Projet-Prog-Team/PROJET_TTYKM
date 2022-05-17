@@ -20,7 +20,7 @@ public class IADifficile extends IA{
     Method method;
     public IADifficile(Method method) {
         tour = new Tour();
-        this.horizon = 10;
+        this.horizon = 15;
         this.method = method;
     }
 

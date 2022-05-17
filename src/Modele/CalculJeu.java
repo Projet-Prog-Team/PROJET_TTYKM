@@ -21,10 +21,12 @@ public class CalculJeu {
     // -------HEURISTIQUES-------
     public int Heuristique() {
         if (dj.getJeu().joueurAGagne(dj.joueurActuel)) { // Si on gagne
-            return 1000;
+            return 10000;
         } else if (!dj.getJeu().joueurAGagne(dj.getJeu().getJoueur(dj.joueurActuel.getID() % 2))) { // Si on ne perd pas
-            int pionsJoueur1 = dj.getJeu().getJoueur(0).nbPionsRestants;
-            int pionsJoueur2 = dj.getJeu().getJoueur(1).nbPionsRestants;
+            //int pionsJoueur1 = dj.getJeu().getJoueur(0).nbPionsRestants;
+            //int pionsJoueur2 = dj.getJeu().getJoueur(1).nbPionsRestants;
+            int pionsJoueur1 = 0;
+            int pionsJoueur2 = 0;
 
             for (int i = 0; i < 3; i++) {
                 pionsJoueur1 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(0)).size();
@@ -34,20 +36,12 @@ public class CalculJeu {
             }
 
             if (dj.joueurActuel.getID() == 1) {
-                if (pionsJoueur1 - pionsJoueur2 < 0) {
-                    return (pionsJoueur1 - pionsJoueur2) * 100;
-                } else {
-                    return (pionsJoueur1 - pionsJoueur2) * 50;
-                }
+                return (pionsJoueur1 - pionsJoueur2) * 70;
             } else {
-                if (pionsJoueur2 - pionsJoueur1 < 0) {
-                    return (pionsJoueur2 - pionsJoueur1) * 100;
-                } else {
-                    return (pionsJoueur2 - pionsJoueur1) * 50;
-                }
+                return (pionsJoueur2 - pionsJoueur1) * 70;
             }
         } else { // Si on perd
-            return -1000;
+            return -10000;
         }
         /* Objectif : permettre à l'IA de tuer des pions
          * Renvoie
@@ -56,32 +50,12 @@ public class CalculJeu {
          * sinon en général 0..200
          * */
     }
+
     public int Heuristique2() {
-        int heuristique = Heuristique();
-        int moyennePions = 0;
-        int maxPionsPlateau = 0;
-        int pionsPlateau;
-        for (int i = 0; i < 3; i++) {
-            pionsPlateau = dj.getJeu().pionsFocusJoueur(i, dj.getJoueurActuel()).size();
-            moyennePions += pionsPlateau;
-            if (pionsPlateau > maxPionsPlateau) {
-                maxPionsPlateau = pionsPlateau;
-            }
-        }
-        moyennePions = (moyennePions*10)/3;
-        return heuristique + (((maxPionsPlateau*10) - moyennePions));
-        /* Objectif : favoriser un équilibre sur le plateau (idéalement ~2 - 2 - 2)
-         * Moyenne des pions 10..30
-         * MaxPions 10..60
-         * MaxPions - Moyenne des pions ~= 20..30
-         * Heuristique total : 100..200 - 20..30 ~= 70..170
-         */
-    }
-    public int Heuristique3() {
         int heuristique = Heuristique();
         for (Pion pion : dj.getJeu().getPions()) {
             if (pion.getJoueur() == dj.getJoueurActuel()) {
-                heuristique += 10*distancePionBord(pion);
+                heuristique += 30*distancePionBord(pion);
             }
         }
         return heuristique;
@@ -91,6 +65,27 @@ public class CalculJeu {
          * 10..30 en général
          * Heuristique total 40..140
          */
+    }
+
+    public int Heuristique3() {
+        int heuristique = Heuristique2();
+        for (int i = 0; i < 3; i++) {
+            ArrayList<Pion> pions = getDj().getJeu().pionsFocusJoueur(i, getDj().getJoueurActuel());
+            ArrayList<Pion> pionsVisites = new ArrayList<>();
+            if (pions.size() >= 2) {
+                for (Pion pion1 : pions) {
+                    pionsVisites.add(pion1);
+                    for (Pion pion2 : pions) {
+                        if (!pionsVisites.contains(pion2)) {
+                            if (pion1.colle(pion2)) {
+                                heuristique -= 30;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return heuristique;
     }
     // Idées pour heuristique 4 > faire en sorte de limiter les pions collés
 
