@@ -3,6 +3,7 @@ package Controleur;
 import Modele.CalculJeu;
 import Modele.DeroulementJeu;
 import Modele.Pion;
+import Modele.ETAT;
 import Structures.Point;
 import Vue.AdaptateurTemps;
 import Vue.CollecteurEvenements;
@@ -51,13 +52,13 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void clicSouris(int l, int c, int epoque) {
         int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
-            switch (jeu.getEtape()) {
+            switch (dj.getEtape()) {
                 case SELECT:
-                    jeu.selectPion(l, c, epoque);
+                    dj.selectPion(l, c, epoque);
                     break;
                 case MOVE2:
                 case MOVE1:
-                    jeu.jouerCoup(l, c, epoque,true);
+                    dj.jouerCoup(l, c, epoque,true);
                     break;
                 case FOCUS:
                     break;
@@ -78,11 +79,11 @@ public class ControleurMediateur implements CollecteurEvenements {
             } else {
                 j = joueur2;
             }
-            switch(jeu.getEtape()) {
+            switch(dj.getEtape()) {
                 case SELECT:
                     Pion p = j.selectPion();
                     Point coord = p.getCoordonnees();
-                    jeu.selectPion(coord.getL(), coord.getC(), p.getEpoque());
+                    dj.selectPion(coord.getL(), coord.getC(), p.getEpoque());
 
                     break;
                 case MOVE1:
@@ -93,7 +94,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     state.initPreview();
                     break;
                 case FOCUS:
-                    jeu.getPionActuel().focused=false;
+                    dj.getPionActuel().focused=false;
                     int focus = j.choixFocus();
                     dj.getJoueurActuel().setFocus(focus);
                     dj.switchPlayer();
@@ -132,7 +133,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         switch(c.getCommande()){
             case "clicFocus":
                 if(dj.getEtape()==ETAT.FOCUS){
-                    int id = jeu.getJoueurActuel().getID()-1;
+                    int id = dj.getJoueurActuel().getID()-1;
                     if (joueurs[id] == 0) {
                         //choix focus
                         if (dj.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
@@ -155,13 +156,14 @@ public class ControleurMediateur implements CollecteurEvenements {
                 System.out.println(c.getSaveName());
                 break;
             case "annuler":
-                jeu.MemoryManager.CTRLZ();
+                dj.MemoryManager.CTRLZ();
                 break;
             case "refaire":
-                jeu.MemoryManager.CTRLY();
+                dj.MemoryManager.CTRLY();
                 state.setPauseIA(true);
                 break;
             case "annulerTour":
+                dj.MemoryManager.CTRLTZ();
                 state.setPauseIA(true);
                 break;
             case "suggestion":
@@ -239,7 +241,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void enablePreview(int l, int c, int epoque){
-        if(dj.getEtape()==2){
+        if(dj.getEtape()==ETAT.MOVE1 || dj.getEtape()==ETAT.MOVE2){
             state.setPreview(dj.getPreview(l,c,epoque));
         }
     }

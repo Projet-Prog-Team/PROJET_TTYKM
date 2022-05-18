@@ -19,6 +19,15 @@ public class Grille {
         cases = t_cases;
         etat=t_etat;
         PionFocus = t_pionfocus;
+
+    }
+
+    public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus)
+    {
+        cases = t_cases;
+        etat=t_etat;
+        PionFocus = t_pionfocus;
+        Focus = t_focus;
     }
 
     public static Pion[] Clone(Pion[]original)

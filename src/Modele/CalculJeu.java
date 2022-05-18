@@ -120,7 +120,7 @@ public class CalculJeu {
         for (Pion caseDispo : casesDispo) {
             DeroulementJeu jeuCoup = djeu.copy();
             Point cooCase = caseDispo.getCoordonnees();
-            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque());
+            jeuCoup.jouerCoup(cooCase.getL(), cooCase.getC(), caseDispo.getEpoque(),false);
             Tour t = new Tour();
             if (djeu.getJoueurActuel().getNbActionsRestantes() == 2) {
                 t.setCoup1(caseDispo);
@@ -153,39 +153,42 @@ public class CalculJeu {
         ArrayList<Couple<DeroulementJeu, Tour>> jeuxFocus = new ArrayList<>();
 
         switch(dj.getEtape()) {
-            case 1:
+            case SELECT:
                 jeuxSelect = branchementsSelect(dj);
-            case 2:
+            case MOVE1:
                 if (jeuxSelect.size() == 0) {                           // Si pion deja selectionné
                     jeuxSelect.add(new Couple(dj, new Tour()));
                 }
-
-                if (dj.getJoueurActuel().getNbActionsRestantes() == 2) {   // Si etape du jeu : coup 1
-                    for (Couple<DeroulementJeu, Tour> j : jeuxSelect) {
-                        ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
-                        for (Couple<DeroulementJeu, Tour> c : coups) {             // Ajout de la selection aux tours de jeuxCoup1
-                            c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
-                        }
-                        jeuxCoup1.addAll(coups);
-
+                for (Couple<DeroulementJeu, Tour> j : jeuxSelect) {
+                    ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
+                    for (Couple<DeroulementJeu, Tour> c : coups) {             // Ajout de la selection aux tours de jeuxCoup1
+                        c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
                     }
-                } else {                                                // Si etape du jeu : coup 2
-                    jeuxCoup1.add(new Couple(dj, new Tour()));
+                    jeuxCoup1.addAll(coups);
+
                 }
+                for (Couple<DeroulementJeu, Tour> j : jeuxCoup1) {
+                        jeuxCoup2.add(j);
+
+                }
+            case MOVE2:
+                if (jeuxSelect.size() == 0) {                           // Si pion deja selectionné
+                    jeuxSelect.add(new Couple(dj, new Tour()));
+                }
+                // Si etape du jeu : coup 2
+                    jeuxCoup1.add(new Couple(dj, new Tour()));
+
 
                 for (Couple<DeroulementJeu, Tour> j : jeuxCoup1) {
-                    if (j.getFirst().getJoueurActuel().getNbActionsRestantes() == 1) {
                         ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
                         for (Couple<DeroulementJeu, Tour> c : coups) {
                             c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
                             c.getSecond().setCoup1(j.getSecond().getCoup1());
                         }
                         jeuxCoup2.addAll(coups);
-                    } else {
-                         jeuxCoup2.add(j);
-                    }
+
                 }
-            case 3:
+            case FOCUS:
                 if (jeuxCoup2.size() == 0) {                            // Si etape du jeu : choix focus
                     jeuxCoup2.add(new Couple(dj, new Tour()));
                 }
@@ -199,7 +202,7 @@ public class CalculJeu {
                     jeuxFocus.addAll(focus);
                 }
                 break;
-            case 4:
+            case END:
                 break;
         }
 

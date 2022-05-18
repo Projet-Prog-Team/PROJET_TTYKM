@@ -1,5 +1,6 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.Jeu;
 import Patterns.Observateur;
 
@@ -8,22 +9,22 @@ import java.awt.*;
 
 public class BoutonAnnuler implements Observateur {
 
-    private Jeu jeu;
+    private DeroulementJeu dj;
     private JButton button;
 
-    BoutonAnnuler(String s, Jeu j) {
+    BoutonAnnuler(String s, DeroulementJeu t_dj) {
         button = new JButton(s);
-        jeu = j;
+        dj = t_dj;
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFocusable(false);
         button.setEnabled(false);
-        jeu.ajouteObservateur(this);
+        dj.ajouteObservateur(this);
     }
 
     @Override
     public void metAJour() {
         // TODO: Fonction du jeu permettant de savoir si un coup peut être refait
-        if(jeu.MemoryManager.CanCTRLZ())
+        if(dj.MemoryManager.CanCTRLZ())
         {
             button.setEnabled(true);
         }

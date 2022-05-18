@@ -11,12 +11,13 @@ public class Jeu implements Comparable {
     // Contenu du jeu
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
+    public final int NBPIONS =14;
+
     /*private boolean real =false;
     Joueur joueurActuel;
     private Pion pionActuel;
     private ArrayList<Pion> preview;
-    public ManageFiles MemoryManager;
-    public final int NBPIONS = 14;
+
     int previewFocus1;
     int previewFocus2;
     int aGagne;
@@ -25,7 +26,6 @@ public class Jeu implements Comparable {
     int suggestionFocus;*/
 
     public Jeu() {
-        real=true;
         init();
     }
     public Jeu(boolean real) {
@@ -37,7 +37,6 @@ public class Jeu implements Comparable {
         pions = new ArrayList<>();
         joueurs[0] = new Joueur(1,NBPIONS/2);
         joueurs[1] = new Joueur(2,NBPIONS/2);
-        preview = null;
         for(int i = 0; i < 3; i++) {
             Pion p1 = new Pion(new Point(0, 0), i, joueurs[0],NBPIONS/2-joueurs[0].getNbPionsRestants(),false);
             pions.add(p1);
