@@ -107,7 +107,7 @@ public class CalculJeu {
 
 
     J1 : Heuristique3 vs J2 : Heuristique4  -> 61% victoire pour J2
-    J1 : Heuristique4 vs J2 : Heuristique3  -> 78% victoire pour J2
+    J1 : Heuristique4 vs J2 : Heuristique3  -> 22% victoire pour J2
 
 
     Heuristique 4 semble être meilleur que 3 !
