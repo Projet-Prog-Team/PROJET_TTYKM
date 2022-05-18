@@ -19,13 +19,14 @@ public class ControleurMediateur implements CollecteurEvenements {
     String difficulty1 = "facile", difficulty2 = "facile";
     IHMState state;
     Timer t;
-
     int speed;
+
+    String heuristique = "Heuristique4";
 
     public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
         dj = djeu;
         this.state = state;
-        suggestion = IA.nouvelle(new CalculJeu(dj), "difficile", "Heuristique3");
+        suggestion = IA.nouvelle(new CalculJeu(dj), "difficile", heuristique);
         speed = temps;
         init();
     }
@@ -43,7 +44,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         state.setDifficultyIA1(difficulty1);
         state.setDifficultyIA2(difficulty2);
         state.setPauseIA(false);
-        activerIA(1, difficulty2, "Heuristique3");
+        activerIA(1, difficulty2, heuristique);
     }
 
     // Clique sur une case
@@ -172,10 +173,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                 init();
                 break;
             case "toggleIA1":
-                activerIA(0, difficulty1, "Heuristique3");
+                activerIA(0, difficulty1, heuristique);
                 break;
             case "toggleIA2":
-                activerIA(1, difficulty2, "Heuristique3");
+                activerIA(1, difficulty2, heuristique);
                 break;
             case "setDifficulty":
                 System.out.println(c.getDifficulty());
@@ -216,16 +217,16 @@ public class ControleurMediateur implements CollecteurEvenements {
             difficulty1 = difficulty;
             if (joueurs[0] == 1) {
                 desactiverIA(0); //désactiver
-                activerIA(0, difficulty1, "Heuristique3");
-                state.setDifficultyIA1(difficulty);
+                activerIA(0, difficulty1, heuristique);
             }
+            state.setDifficultyIA1(difficulty);
         } else {
             difficulty2 = difficulty;
             if (joueurs[1] == 1) {
                 desactiverIA(1); //désactiver
-                activerIA(1, difficulty2, "Heuristique3");
-                state.setDifficultyIA2(difficulty);
+                activerIA(1, difficulty2, heuristique);
             }
+            state.setDifficultyIA2(difficulty);
         }
     }
 

@@ -36,21 +36,17 @@ public class CalculJeu {
             }
 
             if (dj.joueurActuel.getID() == 1) {
-                return (pionsJoueur1 - pionsJoueur2) * 70;
+                return (pionsJoueur1 - pionsJoueur2) * 100;
             } else {
-                return (pionsJoueur2 - pionsJoueur1) * 70;
+                return (pionsJoueur2 - pionsJoueur1) * 100;
             }
         } else { // Si on perd
             return -10000;
         }
         /* Objectif : permettre à l'IA de tuer des pions
-         * Renvoie
-         * 500 si on gagne
-         * -500 si on perd
-         * sinon en général 0..200
+            sinon se démultiplier
          * */
     }
-
     public int Heuristique2() {
         int heuristique = Heuristique();
         for (Pion pion : dj.getJeu().getPions()) {
@@ -62,11 +58,8 @@ public class CalculJeu {
         /*
          * Objectif : favoriser les pions au milieu (4 cases au milieu)
          * distancePionBord = soit 0 soit 1
-         * 10..30 en général
-         * Heuristique total 40..140
          */
     }
-
     public int Heuristique3() {
         int heuristique = Heuristique2();
         for (int i = 0; i < 3; i++) {
@@ -86,8 +79,39 @@ public class CalculJeu {
             }
         }
         return heuristique;
+        /*
+         * Objectif : éviter les pions collés
+         */
     }
-    // Idées pour heuristique 4 > faire en sorte de limiter les pions collés
+    public int Heuristique4() {
+        int heuristique = Heuristique3();
+        int pionsJoueur1 = dj.getJeu().getJoueur(0).nbPionsRestants;
+        int pionsJoueur2 = dj.getJeu().getJoueur(1).nbPionsRestants;
+        for (int i = 0; i < 3; i++) {
+            pionsJoueur1 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(0)).size();
+        }
+        for (int i = 0; i < 3; i++) {
+            pionsJoueur2 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(1)).size();
+        }
+
+        if (dj.joueurActuel.getID() == 1) {
+            return heuristique + (pionsJoueur1 - pionsJoueur2) * 61;
+        } else {
+            return heuristique + (pionsJoueur2 - pionsJoueur1) * 61;
+        }
+        // Privilégie de tuer un pion plutôt que de se dédoubler si c'est possible
+    }
+    /*
+    J1 : Heuristique3 vs J2 : Heuristique3  -> 30% victoire pour J2
+    J1 : Heuristique4 vs J2 : Heuristique4  -> 58% victoire pour J2
+
+
+    J1 : Heuristique3 vs J2 : Heuristique4  -> 61% victoire pour J2
+    J1 : Heuristique4 vs J2 : Heuristique3  -> 78% victoire pour J2
+
+
+    Heuristique 4 semble être meilleur que 3 !
+     */
 
     public int distancePionBord(Pion p) {
         int d = 1;
