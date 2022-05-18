@@ -5,6 +5,7 @@ import Structures.Couple;
 import Structures.Point;
 import Modele.ManageFiles;
 import Structures.Tour;
+//import com.sun.source.doctree.SystemPropertyTree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -490,11 +491,25 @@ public class Jeu extends Observable implements Comparable {
             if (getPion(pionActuel.getCoordonnees(), epoque) == null) {
                 Pion tmp0 = pionActuel.copy(pionActuel.getJoueur());
                 pionActuel.epoque = epoque;
+                if(real)
+                    MemoryManager.UpdateLog(tmp0, pionActuel.copy(pionActuel.getJoueur()));
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
-                    Pion tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel);    
+                    Pion tmp;
+                    if(joueurActuel.getID()==1)
+                    {
+                        tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel,NBPIONS/2-joueurActuel.getNbPionsRestants(),false);
+                    }
+                    else
+                    {
+                        tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel,NBPIONS-joueurActuel.getNbPionsRestants(),false);
+                    }
                     pions.add(tmp);
-                    if(real)
-                        MemoryManager.UpdateLog(null,tmp);
+                    if(real) {
+                        System.out.println("hey "+(NBPIONS/2-joueurActuel.getNbPionsRestants())+" "+(NBPIONS-joueurActuel.getNbPionsRestants()));
+                        MemoryManager.move=false;
+                        MemoryManager.UpdateLog(null, tmp);
+
+                    }
                     //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
                     joueurActuel.supprimerPion();
                 }
@@ -503,6 +518,7 @@ public class Jeu extends Observable implements Comparable {
                     if(real)
                         MemoryManager.UpdateLog(tmp0,pionActuel.copy(pionActuel.getJoueur()));
                 }
+
             }
         }
     }
@@ -524,6 +540,7 @@ public class Jeu extends Observable implements Comparable {
             joueurActuel.nbActionsRestantes=0;
         } else {
             setPionActuel(null);
+            MemoryManager.AddLog(ETAT.SELECT);
         }
         miseAJour();
     }

@@ -78,7 +78,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     Pion p = j.selectPion();
                     Point coord = p.getCoordonnees();
                     jeu.selectPion(coord.getL(), coord.getC(), p.getEpoque());
-                    jeu.MemoryManager.AddLog(ETAT.SELECT);
+
                     break;
                 case MOVE1:
                 case MOVE2:
@@ -129,7 +129,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                         if (jeu.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
                             jeu.getJoueurActuel().setFocus(c.getEpoque());
                             jeu.MemoryManager.move =false;
-                            System.out.println("hey");
                             jeu.MemoryManager.UpdateLog(null,null);
                             jeu.switchPlayer();
                         } else {
