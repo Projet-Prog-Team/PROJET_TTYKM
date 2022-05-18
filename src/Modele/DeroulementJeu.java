@@ -8,12 +8,15 @@ import java.util.ArrayList;
 public class DeroulementJeu extends Observable implements Comparable  {
     Joueur joueurActuel;
     Pion pionActuel;
+    private boolean real=false;
     int aGagne;
+    public ManageFiles MemoryManager;
     Jeu j;
 
-    public DeroulementJeu(Jeu jeu) {
+    public DeroulementJeu(Jeu jeu,boolean t_real) {
         j = jeu;
         init();
+        real=t_real;
     }
 
     public void init() {
@@ -23,7 +26,9 @@ public class DeroulementJeu extends Observable implements Comparable  {
             setPionActuel(pionInFocus.get(0));
         }
         aGagne = 0;
+        MemoryManager= new ManageFiles(this,"/Saves/");
         miseAJour();
+
     }
 
     // ------------------Getters & setters------------------
@@ -50,42 +55,46 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 && epoque != joueurActuel.getFocus()
                 && j.pionsFocusJoueur(epoque, joueurActuel).size() != 0;
     }
-    public int getEtape() {
+    public ETAT getEtape() {
         if (aGagne != 0) {
-            return 4;
+            return ETAT.END;
         } else {
             if (getPionActuel() == null) {
-                return 1;
+                return ETAT.SELECT;
             } else {
-                if (joueurActuel.getNbActionsRestantes() == 0) {
-                    return 3;
-                } else {
-                    return 2;
+                switch(joueurActuel.getNbActionsRestantes())
+                {
+                    case 0 :
+                        return ETAT.FOCUS;
+                    case 1 :
+                        return ETAT.MOVE2;
+                    case 2:
+                        return ETAT.MOVE1;
                 }
             }
         }
+        return ETAT.UNDEFINED;
     }
     public String getState(){
-        String state = "";
-        if(getEtape()==1){
-            state="selection";
-        }else if(getEtape()==2){
-            if(joueurActuel.getNbActionsRestantes()==2){
-                state="action1";
-            }else{
-                state="action2";
-            }
-        }else if(getEtape()==3){
-            state = "focus";
-        }else if(getEtape()==4){
-            if(aGagne==1){
-                state = "j1gagne";
-            }else{
-                state = "j2gagne";
-            }
+        switch(getEtape())
+        {
+            case SELECT:
+                return "selection";
+            case MOVE1 :
+                return "action2";
+            case MOVE2 :
+                return "action1";
+            case FOCUS:
+                return "focus";
+            case END:
+                if(aGagne==1){
+                    return "j1gagne";
+                }else{
+                    return "j2gagne";
+                }
+            default :
+                return "";
         }
-
-        return state;
     }
 
     // ------------------Actions sur le jeu------------------
@@ -96,7 +105,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
         miseAJour();
     }
-    public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
+    /*public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
         int PionEpoque = getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
             Pion pionActuel = getPionActuel();
@@ -109,8 +118,46 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 }
             }
         }
+    }*/
+    public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
+        int PionEpoque = getPionActuel().getEpoque();
+        if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
+            Pion pionActuel = getPionActuel();
+            if (j.getPion(pionActuel.getCoordonnees(), epoque) == null) {
+                Pion tmp0 = pionActuel.copy(pionActuel.getJoueur());
+                pionActuel.epoque = epoque;
+                if(real)
+                    MemoryManager.UpdateLog(tmp0, pionActuel.copy(pionActuel.getJoueur()));
+                if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
+                    Pion tmp;
+                    if(joueurActuel.getID()==1)
+                    {
+                        tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel, getJeu().NBPIONS/2-joueurActuel.getNbPionsRestants(),false);
+                    }
+                    else
+                    {
+                        tmp=new Pion(pionActuel.getCoordonnees(), PionEpoque, joueurActuel,getJeu().NBPIONS-joueurActuel.getNbPionsRestants(),false);
+                    }
+                    j.getPions().add(tmp);
+                    if(real) {
+                        System.out.println("hey "+(getJeu().NBPIONS/2-joueurActuel.getNbPionsRestants())+" "+(getJeu().NBPIONS-joueurActuel.getNbPionsRestants()));
+                        MemoryManager.move=false;
+                        MemoryManager.UpdateLog(null, tmp);
+
+                    }
+                    //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
+                    joueurActuel.supprimerPion();
+                }
+                else
+                {
+                    if(real)
+                        MemoryManager.UpdateLog(tmp0,pionActuel.copy(pionActuel.getJoueur()));
+                }
+
+            }
+        }
     }
-    public void jouerCoup(int l, int c, int epoque) {
+   /* public void jouerCoup(int l, int c, int epoque) {
         Pion clic = new Pion(new Point(l, c), epoque, joueurActuel);
         ArrayList<Pion> cases = j.casesDispo(joueurActuel, pionActuel);
 
@@ -132,8 +179,49 @@ public class DeroulementJeu extends Observable implements Comparable  {
             }
         }
         miseAJour();
+    }*/
+
+    public void jouerCoup(int l, int c, int epoque,boolean real) {
+        Pion clic;
+        if(joueurActuel.getID()==1)
+        {
+            clic = new Pion(new Point(l, c), epoque, joueurActuel,getJeu().NBPIONS/2-joueurActuel.getNbActionsRestantes(),false);
+        }
+        else
+        {
+            clic = new Pion(new Point(l, c), epoque, joueurActuel,getJeu().NBPIONS-joueurActuel.getNbActionsRestantes(),false);
+        }
+
+
+        ArrayList<Pion> cases = getJeu().casesDispo(joueurActuel,pionActuel);
+
+        if (cases.contains(clic)) {    // Si coup jouable
+
+            if(real)
+            {
+                MemoryManager.AddLog(null);
+            }
+
+            if (epoque != getPionActuel().getEpoque()) {
+                joueurActuel.nbActionsRestantes--;
+                changerEpoque(epoque);
+            } else {
+                move(getPionActuel(), new Point(l, c));
+                joueurActuel.nbActionsRestantes--;
+                if (getJeu().getPion(getPionActuel().getCoordonnees(), joueurActuel.getFocus()) == null) {   // Si le joueur a tué son propre pion
+                    joueurActuel.nbActionsRestantes = 0;
+                }
+            }
+            if (getJeu().joueurAGagne(joueurActuel)) {
+                aGagne = joueurActuel.getID();
+            } else if (getJeu().joueurAGagne(getJeu().joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
+                aGagne = j.joueurs[(joueurActuel.getID()) % 2].getID();
+            }
+        }
+        miseAJour();
     }
-    public void move(Pion c, Point new_coord) {
+
+   /* public void move(Pion c, Point new_coord) {
         Point coord = new Point(c.coordonnees.getL(),c.coordonnees.getC());
         Pion voisin = j.getPion(new_coord,c.epoque);
         c.coordonnees = new_coord;
@@ -159,8 +247,49 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 c.coordonnees = new_coord;
             }
         }
+    }*/
+
+    public void move(Pion c, Point new_coord) {
+        Point coord = new Point(c.getCoordonnees().getL(),c.getCoordonnees().getC());
+        Pion voisin = j.getPion(new_coord,c.epoque);
+        c.SetCoordonnees(new_coord);
+        Point tmp = new Point(new_coord.getL()+(new_coord.getL()-coord.getL()),new_coord.getC()+(new_coord.getC()-coord.getC()));
+        if (voisin != null) {
+            if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
+                if(real)
+                    MemoryManager.UpdateLog(c,null);
+                j.getPions().remove(c);
+            } else {
+                if(voisin.getJoueur() == c.getJoueur()) {
+                    if(real)
+                    {
+                        MemoryManager.UpdateLog(c, null);
+                        MemoryManager.UpdateLog(voisin, null);
+                    }
+                    j.getPions().remove(c);
+                    j.getPions().remove(voisin);
+                }
+                else {
+                    move(voisin, tmp);
+                }
+            }
+        }
+        else {
+            if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
+                if(real)
+                    MemoryManager.UpdateLog(c,null);
+                j.getPions().remove(c);
+            }
+            else {
+                Pion tmp2 = c.copy(c.getJoueur());
+                c.SetCoordonnees(new_coord);
+                if(real)
+                    MemoryManager.UpdateLog(tmp2,c);
+            }
+        }
     }
-    public void switchPlayer() {
+
+    /*public void switchPlayer() {
         if(joueurActuel == j.getJoueur(0)) {
             joueurActuel = j.getJoueur(1);
         }
@@ -179,12 +308,35 @@ public class DeroulementJeu extends Observable implements Comparable  {
             setPionActuel(null);
         }
         miseAJour();
+    }*/
+
+    public void switchPlayer() {
+        if(joueurActuel == getJeu().joueurs[0]) {
+            joueurActuel=getJeu().joueurs[1];
+        }
+        else {
+            joueurActuel=getJeu().joueurs[0];
+        }
+        ArrayList<Pion> pionInFocus = getJeu().pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
+        joueurActuel.nbActionsRestantes=2;
+        if (pionInFocus.size() == 1) {
+            // forcer la sélection
+            setPionActuel(pionInFocus.get(0));
+            MemoryManager.AddLog(ETAT.IDLE);
+        } else if (pionInFocus.size() == 0){
+            setPionActuel(new Pion(new Point(-1, -1), joueurActuel.getFocus(), joueurActuel));
+            joueurActuel.nbActionsRestantes=0;
+        } else {
+            setPionActuel(null);
+            MemoryManager.AddLog(ETAT.SELECT);
+        }
+        miseAJour();
     }
 
     //------------------------------------
     public ArrayList<Pion> getPreview(int l, int c, int epoque) {
         DeroulementJeu djeu = copy();
-        djeu.jouerCoup(l, c, epoque);
+        djeu.jouerCoup(l, c, epoque,real);
         ArrayList<Pion> preview = djeu.getJeu().getPions();
         return preview;
     }
@@ -193,7 +345,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
 
     public DeroulementJeu copy() {
         Jeu jCopy = getJeu().copy();
-        DeroulementJeu djeu = new DeroulementJeu(jCopy);
+        DeroulementJeu djeu = new DeroulementJeu(jCopy,false);
         djeu.joueurActuel = jCopy.getJoueur(getJoueurActuel().getID() - 1);
         djeu.aGagne = aGagne;
         for (Pion pion : jCopy.getPions()) {

@@ -2,6 +2,7 @@ package Vue;
 
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
+import Modele.ETAT;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -44,7 +45,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         plateauPasse.repaint();
         plateauPresent.repaint();
         plateauFuture.repaint();
-        if(jeu.getEtape()!=4){
+        if(jeu.getEtape()!= ETAT.END){
             victoryLabel.setVisible(false);
         }else{
             victoryLabel.setVisible(true);
@@ -185,15 +186,15 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // Boutons annuler/refaire
         JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        BoutonAnnulerTour boutonAnnulerTour = new BoutonAnnulerTour("Annuler le tour");
+        BoutonAnnulerTour boutonAnnulerTour = new BoutonAnnulerTour("Annuler le tour",jeu);
         boutonAnnulerTour.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annulerTour")));
         buttonPanel1.add(boutonAnnulerTour.getButton());
 
-        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler");
+        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler",jeu);
         boutonAnnuler.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annuler")));
         buttonPanel1.add(boutonAnnuler.getButton());
 
-        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire");
+        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire",jeu);
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
         buttonPanel1.add(boutonRefaire.getButton());
 

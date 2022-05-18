@@ -5,9 +5,11 @@ import Structures.Point;
 import java.util.Objects;
 
 public class Pion {
-    Point coordonnees;
+    private Point coordonnees;
     int epoque;
-    Joueur joueur;
+    public int ID;
+    public boolean focused = false;
+    private Joueur joueur;
 
     public Pion(Point c, int e, Joueur j) {
         coordonnees =  c;
@@ -15,16 +17,29 @@ public class Pion {
         joueur = j;
     }
 
+    public Pion(Point c, int e, Joueur j,int t_ID,boolean t_focused) {
+        coordonnees =  c;
+        epoque = e;
+        joueur = j;
+        ID=t_ID;
+        focused=t_focused;
+    }
+
+
     public int getEpoque() {
         return epoque;
     }
 
     public Point getCoordonnees() { return coordonnees; }
+    public void SetCoordonnees(Point t_coordonnees)
+    {
+        coordonnees = t_coordonnees;
+    }
 
     public Joueur getJoueur() { return joueur; }
 
     public Pion copy(Joueur joueur) {
-        return new Pion(getCoordonnees().copy(), getEpoque(), joueur);
+        return new Pion(getCoordonnees().copy(), getEpoque(), joueur,ID,focused);
     }
 
     public int distance(Pion p) {

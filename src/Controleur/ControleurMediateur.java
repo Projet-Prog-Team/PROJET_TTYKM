@@ -3,6 +3,7 @@ package Controleur;
 import Modele.CalculJeu;
 import Modele.DeroulementJeu;
 import Modele.Pion;
+import Modele.ETAT;
 import Structures.Point;
 import Vue.AdaptateurTemps;
 import Vue.CollecteurEvenements;
@@ -53,16 +54,16 @@ public class ControleurMediateur implements CollecteurEvenements {
         int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
             switch (dj.getEtape()) {
-                case 1:
+                case SELECT:
                     dj.selectPion(l, c, epoque);
                     break;
-                case 2:
-                    dj.jouerCoup(l, c, epoque);
-                    state.initPreview();
+                case MOVE2:
+                case MOVE1:
+                    dj.jouerCoup(l, c, epoque,true);
                     break;
-                case 3:
+                case FOCUS:
                     break;
-                case 4:
+                case END:
                     break;
             }
         }
@@ -80,24 +81,27 @@ public class ControleurMediateur implements CollecteurEvenements {
                 j = joueur2;
             }
             switch(dj.getEtape()) {
-                case 1:
+                case SELECT:
                     Pion p = j.selectPion();
                     Point coord = p.getCoordonnees();
                     dj.selectPion(coord.getL(), coord.getC(), p.getEpoque());
+
                     break;
-                case 2:
+                case MOVE1:
+                case MOVE2:
                     p = j.jouerCoup();
                     coord = p.getCoordonnees();
-                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque());
+                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),false);
                     state.initPreview();
                     break;
-                case 3:
+                case FOCUS:
+                    dj.getPionActuel().focused=false;
                     int focus = j.choixFocus();
                     dj.getJoueurActuel().setFocus(focus);
                     dj.switchPlayer();
                     state.initPreview();
                     break;
-                case 4:
+                case END:
                     break;
             }
         }
@@ -106,16 +110,19 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void suggestion () {
         suggestion.calculCoup(dj, 10, true);
         switch(dj.getEtape()) {
-            case 1:
+            case SELECT:
                 state.setSuggestionSource(suggestion.selectPion());
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
-            case 2:
+            case MOVE1:
+            case MOVE2:
                 state.setSuggestionSource(dj.getPionActuel());
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
-            case 3:
+            case FOCUS:
                 state.setSuggestionFocus(suggestion.choixFocus());
+                break;
+            case END:
                 break;
         }
     }
@@ -126,19 +133,21 @@ public class ControleurMediateur implements CollecteurEvenements {
         System.out.println(c.getCommande());
         switch(c.getCommande()){
             case "clicFocus":
-                if(dj.getEtape()==3){
+                if(dj.getEtape()==ETAT.FOCUS){
                     int id = dj.getJoueurActuel().getID()-1;
                     if (joueurs[id] == 0) {
                         //choix focus
                         if (dj.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
                             dj.getJoueurActuel().setFocus(c.getEpoque());
+                            dj.MemoryManager.move =false;
+                            dj.MemoryManager.UpdateLog(null,null);
                             dj.switchPlayer();
                             state.initPreview();
                         } else {
                             System.out.println("Modification du focus adverse impossible");
                         }
                     }
-                } else if (dj.getEtape() == 4){
+                } else if (dj.getEtape() == ETAT.END){
                 }
                 break;
             case "save":
@@ -148,12 +157,14 @@ public class ControleurMediateur implements CollecteurEvenements {
                 System.out.println(c.getSaveName());
                 break;
             case "annuler":
+                dj.MemoryManager.CTRLZ();
+                break;
+            case "refaire":
+                dj.MemoryManager.CTRLY();
                 state.setPauseIA(true);
                 break;
             case "annulerTour":
-                state.setPauseIA(true);
-                break;
-            case "refaire":
+                dj.MemoryManager.CTRLTZ();
                 state.setPauseIA(true);
                 break;
             case "suggestion":
@@ -231,7 +242,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void enablePreview(int l, int c, int epoque){
-        if(dj.getEtape()==2){
+        if(dj.getEtape()==ETAT.MOVE1 || dj.getEtape()==ETAT.MOVE2){
             state.setPreview(dj.getPreview(l,c,epoque));
         }
     }

@@ -3,6 +3,7 @@ package Modele;
 import Structures.Point;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Arrays;
 
 
@@ -10,20 +11,39 @@ public class Jeu implements Comparable {
     // Contenu du jeu
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
+    public final int NBPIONS =14;
+
+    /*private boolean real =false;
+    Joueur joueurActuel;
+    private Pion pionActuel;
+    private ArrayList<Pion> preview;
+
+    int previewFocus1;
+    int previewFocus2;
+    int aGagne;
+
+    Pion suggestionSource, suggestionDest;
+    int suggestionFocus;*/
 
     public Jeu() {
         init();
     }
+    public Jeu(boolean real) {
+        init();
+        real=real;
+    }
 
     public void init() {
         pions = new ArrayList<>();
-        joueurs[0] = new Joueur(1);
-        joueurs[1] = new Joueur(2);
+        joueurs[0] = new Joueur(1,NBPIONS/2);
+        joueurs[1] = new Joueur(2,NBPIONS/2);
         for(int i = 0; i < 3; i++) {
-            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0]);
+            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0],NBPIONS/2-joueurs[0].getNbPionsRestants(),false);
             pions.add(p1);
-            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1]);
+            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1],NBPIONS-joueurs[1].getNbPionsRestants(),false);
             pions.add(p2);
+            joueurs[0].supprimerPion();
+            joueurs[1].supprimerPion();
         }
         joueurs[0].setFocus(0);
         joueurs[1].setFocus(2);
@@ -36,6 +56,15 @@ public class Jeu implements Comparable {
     public ArrayList<Pion> getPions() {
         return pions;
     }
+
+    public void SetPions(Pion[] t_pion)
+    {
+        pions.clear();
+        for (Pion tt_pion : t_pion) {
+            pions.add(tt_pion);
+        }
+    }
+
     public Joueur[] getJoueurs() {
         return joueurs;
     }
@@ -98,7 +127,7 @@ public class Jeu implements Comparable {
         return liste;
     }
     public Jeu copy() {
-        Jeu j = new Jeu();
+        Jeu j = new Jeu(false);
         j.joueurs[0] = joueurs[0].copy();
         j.joueurs[1] = joueurs[1].copy();
         j.pions.clear();

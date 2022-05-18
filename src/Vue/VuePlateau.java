@@ -1,6 +1,7 @@
 package Vue;
 
 import Modele.DeroulementJeu;
+import Modele.ETAT;
 import Modele.Joueur;
 import Modele.Pion;
 
@@ -35,9 +36,10 @@ public class VuePlateau {
         }
 
         // Affiche les cases disponibles pour le déplacement
-        if (jeu.getEtape() == 2) {
+        if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) {
             pions = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
-            for (Pion pion : pions) {
+            for (int i = 0; i < pions.size(); i++) {
+                Pion pion = pions.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerBrillanceCase(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
                 }
@@ -45,18 +47,18 @@ public class VuePlateau {
         }
 
         // Affiche les pions selectionnables
-        if (jeu.getEtape() == 1 && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
+        if (jeu.getEtape() == ETAT.SELECT && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
             pions = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
-            for (Pion pion : pions) {
-                if(!pion.equals(source))
-                plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+            for (int i = 0; i < pions.size(); i++) {
+                plateau.tracerBrillancePion(pions.get(i).getCoordonnees().getL(), pions.get(i).getCoordonnees().getC());
             }
         }
 
         // Affiche les pions en mode preview ou non
-        if(state.getPreview()!=null && jeu.getEtape()==2){
+        if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
             pions = state.getPreview();
-            for (Pion pion : pions) {
+            for (int i = 0; i < pions.size(); i++) {
+                Pion pion = pions.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
                 }
@@ -81,7 +83,7 @@ public class VuePlateau {
         }
 
         // Affiche les brillances de focus
-        if (jeu.getEtape() == 3) {
+        if (jeu.getEtape() == ETAT.FOCUS) {
             Joueur joueur = jeu.getJoueurActuel();
             if (joueur.getID() == 1 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 1) && suggestionFocus!= plateau.getEpoque()) {
                 plateau.tracerBrillanceFocus(1);
@@ -97,7 +99,7 @@ public class VuePlateau {
             if (joueurs[1].getFocus() == plateau.getEpoque()) {
                 plateau.tracerFocusNoir(1);
             }
-            if(state.getPreviewFocus1()==3 || jeu.getEtape()!=3){
+            if(state.getPreviewFocus1()==3 || jeu.getEtape()!=ETAT.FOCUS){
                 if (joueurs[0].getFocus() == plateau.getEpoque()) {
                     plateau.tracerFocusBlanc(1);
                 }
@@ -113,7 +115,7 @@ public class VuePlateau {
             if (joueurs[0].getFocus() == plateau.getEpoque()) {
                 plateau.tracerFocusBlanc(1);
             }
-            if(state.getPreviewFocus2()==3 || jeu.getEtape()!=3){
+            if(state.getPreviewFocus2()==3 || jeu.getEtape()!=ETAT.FOCUS){
                 if (joueurs[1].getFocus() == plateau.getEpoque()) {
                     plateau.tracerFocusNoir(1);
                 }
