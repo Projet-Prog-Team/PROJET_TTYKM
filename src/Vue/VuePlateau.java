@@ -1,7 +1,7 @@
 package Vue;
 
-import Modele.ETAT;
-import Modele.Jeu;
+import Modele.DeroulementJeu;
+improt Modele.ETAT;
 import Modele.Joueur;
 import Modele.Pion;
 
@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 public class VuePlateau {
 
-    Jeu jeu;
+    DeroulementJeu jeu;
     Plateau plateau;
 
-    public VuePlateau(Jeu jeu, Plateau p) {
+    public VuePlateau(DeroulementJeu jeu, Plateau p) {
         this.jeu = jeu;
         this.plateau = p;
     }
@@ -21,6 +21,19 @@ public class VuePlateau {
     public void dessinerPlateau() {
 
         ArrayList<Pion> pions;
+        IHMState state = plateau.getState();
+
+        // Affiche les suggestions de pions
+        Pion source = state.getSuggestionSource();
+        Pion dest = state.getSuggestionDestination();
+        if(source!=null && dest!=null){
+            if(plateau.getEpoque()==source.getEpoque()){
+                plateau.tracerSuggestionCase(source.getCoordonnees().getL(), source.getCoordonnees().getC());
+            }
+            if(plateau.getEpoque()==dest.getEpoque()){
+                plateau.tracerSuggestionCase(dest.getCoordonnees().getL(), dest.getCoordonnees().getC());
+            }
+        }
 
         // Affiche les cases disponibles pour le déplacement
         if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) {
@@ -47,7 +60,7 @@ public class VuePlateau {
             for (int i = 0; i < pions.size(); i++) {
                 Pion pion = pions.get(i);
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(),1, pion.getJoueur().getID());
+                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
                 }
             }
             Pion pionActuel =  jeu.getPionActuel();
@@ -55,28 +68,32 @@ public class VuePlateau {
                 plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
             }
         }else{
-            pions = jeu.getPions();
-            for (int i = 0; i < pions.size(); i++) {
-                Pion pion = pions.get(i);
+            pions = jeu.getJeu().getPions();
+            for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
                 }
             }
         }
 
+        // Affiche les suggestion de focus
+        int suggestionFocus = state.getSuggestionFocus();
+        if(suggestionFocus!=3 && plateau.getEpoque()==suggestionFocus){
+            plateau.tracerSuggestionFocus(jeu.getJoueurActuel().getID());
+        }
+
         // Affiche les brillances de focus
         if (jeu.getEtape() == ETAT.FOCUS) {
             Joueur joueur = jeu.getJoueurActuel();
-            if (joueur.getID() == 1 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 1)) {
-                plateau.tracerBrillanceFocusBlanc();
-            } else if (joueur.getID() == 2 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 2)) {
-                plateau.tracerBrillanceFocusNoir();
+            if (joueur.getID() == 1 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 1) && suggestionFocus!= plateau.getEpoque()) {
+                plateau.tracerBrillanceFocus(1);
+            } else if (joueur.getID() == 2 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 2) && suggestionFocus!= plateau.getEpoque()) {
+                plateau.tracerBrillanceFocus(0);
             }
-
         }
 
         // Affiche les focus en mode preview ou non
-        Joueur[] joueurs = jeu.getJoueurs();
+        Joueur[] joueurs = jeu.getJeu().getJoueurs();
 
         if(jeu.getJoueurActuel().getID()==1){
             if (joueurs[1].getFocus() == plateau.getEpoque()) {
@@ -87,7 +104,7 @@ public class VuePlateau {
                     plateau.tracerFocusBlanc(1);
                 }
             }else{
-                if (jeu.getPreviewFocus1() == plateau.getEpoque()) {
+                if (state.getPreviewFocus1() == plateau.getEpoque()) {
                     plateau.tracerFocusBlanc(1);
                 }
                 if (joueurs[0].getFocus() == plateau.getEpoque()) {
@@ -103,7 +120,7 @@ public class VuePlateau {
                     plateau.tracerFocusNoir(1);
                 }
             }else{
-                if (jeu.getPreviewFocus2() == plateau.getEpoque()) {
+                if (state.getPreviewFocus2() == plateau.getEpoque()) {
                     plateau.tracerFocusNoir(1);
                 }
                 if (joueurs[1].getFocus() == plateau.getEpoque()) {
@@ -111,5 +128,6 @@ public class VuePlateau {
                 }
             }
         }
+
     }
 }

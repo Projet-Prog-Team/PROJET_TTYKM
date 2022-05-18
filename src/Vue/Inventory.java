@@ -1,12 +1,10 @@
 package Vue;
 
-import Modele.Jeu;
+import Modele.DeroulementJeu;
 import Patterns.Observateur;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,14 +13,19 @@ public class Inventory implements Observateur {
 
     private Image pionBasique;
     private ArrayList<JLabel> labels;
-    private Jeu jeu;
+    private DeroulementJeu jeu;
     private int joueur;
     private JPanel panel;
+    JLabel labelPlayer;
+    IHMState state;
 
-    Inventory(int joueur, Jeu jeu){
+    Inventory(int joueur, DeroulementJeu jeu, IHMState state){
 
         this.jeu = jeu;
         jeu.ajouteObservateur(this);
+
+        this.state = state;
+        state.ajouteObservateur(this);
 
         this.joueur = joueur;
 
@@ -43,6 +46,10 @@ public class Inventory implements Observateur {
         panel.setMaximumSize(new Dimension((int) panel.getMaximumSize().getWidth(), 60));
         panel.setPreferredSize(new Dimension((int) panel.getMaximumSize().getWidth(), 60));
 
+        labelPlayer = new JLabel("Joueur "+joueur+" : ");
+        labelPlayer.setFont(new Font(Font.MONOSPACED, Font.BOLD, 30));
+        panel.add(labelPlayer);
+
         labels = new ArrayList<>();
         for(int i=0; i<jeu.getJoueurActuel().getNbPionsRestants(); i++){
             JLabel label = new JLabel(new ImageIcon(pionBasique));
@@ -62,11 +69,30 @@ public class Inventory implements Observateur {
         for(int i=jeu.getJoueurs()[joueur-1].getNbPionsRestants(); i<jeu.NBPIONS/2-3; i++){
             labels.get(i).setVisible(false);
         }
+        for(int i=0; i<jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i++){
+            labels.get(i).setVisible(true);
+        }
+        // Affiche le joueur courant
         if(jeu.getJoueurActuel().getID()==joueur){
             panel.setBackground(Color.ORANGE);
+            labelPlayer.setForeground(Color.BLACK);
         }else{
             panel.setBackground(Color.DARK_GRAY);
-
+            labelPlayer.setForeground(Color.WHITE);
+        }
+        // Affiche si joueur ou IA
+        if(joueur==1){
+            if(state.getIA1()){
+                labelPlayer.setText("IA "+joueur+" : ");
+            }else{
+                labelPlayer.setText("Joueur "+joueur+" : ");
+            }
+        }else{
+            if(state.getIA2()){
+                labelPlayer.setText("IA "+joueur+" : ");
+            }else{
+                labelPlayer.setText("Joueur "+joueur+" : ");
+            }
         }
     }
 }

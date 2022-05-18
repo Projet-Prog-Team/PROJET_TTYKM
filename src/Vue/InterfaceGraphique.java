@@ -1,8 +1,8 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.EPOQUE;
 import Modele.ETAT;
-import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -20,7 +20,7 @@ import java.util.Vector;
 
 public class InterfaceGraphique implements Runnable, Observateur {
 
-    private Jeu jeu;
+    private DeroulementJeu jeu;
     private CollecteurEvenements controle;
     private JFrame frame;
     private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
@@ -28,10 +28,13 @@ public class InterfaceGraphique implements Runnable, Observateur {
     private int frameHeight = 700;
     ImageIcon victory;
     JLabel victoryLabel;
+    IHMState state;
 
-    public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
-        jeu = j;
+    public InterfaceGraphique(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
+        this.jeu = jeu;
         jeu.ajouteObservateur(this);
+        this.state = state;
+        state.ajouteObservateur(this);
         controle = c;
         URL in = ClassLoader.getSystemResource("Img/victory.gif");
         victory = new ImageIcon(in);
@@ -49,8 +52,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
         }
     }
 
-    public static void demarrer(Jeu j, CollecteurEvenements c) {
-        SwingUtilities.invokeLater(new InterfaceGraphique(j, c));
+    public static void demarrer(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
+        SwingUtilities.invokeLater(new InterfaceGraphique(jeu, c, state));
     }
 
     public JMenuItem createMenuItem(String s, String c){
@@ -115,16 +118,16 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // Config Menu
         JMenu ConfigMenu = new JMenu("Configuration");
 
-        IAMenu IA1DifficultyMenu = new IAMenu(1, controle);
+        IAMenu IA1DifficultyMenu = new IAMenu(1, controle, state);
         ConfigMenu.add(IA1DifficultyMenu.getMenu());
 
-        IAMenu IA2DifficultyMenu = new IAMenu(2, controle);
+        IAMenu IA2DifficultyMenu = new IAMenu(2, controle, state);
         ConfigMenu.add(IA2DifficultyMenu.getMenu());
 
-        ActiverIA toggleIA1 = new ActiverIA(jeu, controle,1,"toggleIA1");
+        ActiverIA toggleIA1 = new ActiverIA(controle,1,"toggleIA1", state);
         ConfigMenu.add(toggleIA1.getMenuItem());
 
-        ActiverIA toggleIA2 = new ActiverIA(jeu, controle,2,"toggleIA2");
+        ActiverIA toggleIA2 = new ActiverIA(controle,2,"toggleIA2", state);
         ConfigMenu.add(toggleIA2.getMenuItem());
 
         JLabel IASpeedLabel = new JLabel("Vitesse IA : 1000ms");
@@ -154,7 +157,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         // Historique
         //TODO: avoir le vrai historique
-        String categories[] = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
+        String[] categories = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
@@ -181,28 +184,41 @@ public class InterfaceGraphique implements Runnable, Observateur {
         c.ipady = 0;
 
         // Boutons annuler/refaire
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
+        BoutonAnnulerTour boutonAnnulerTour = new BoutonAnnulerTour("Annuler le tour");
+        boutonAnnulerTour.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annulerTour")));
+        buttonPanel1.add(boutonAnnulerTour.getButton());
+
+        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler");
         boutonAnnuler.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annuler")));
-        buttonPanel.add(boutonAnnuler.getButton());
+        buttonPanel1.add(boutonAnnuler.getButton());
 
-        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire", jeu);
+        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire");
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
-        buttonPanel.add(boutonRefaire.getButton());
+        buttonPanel1.add(boutonRefaire.getButton());
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
-        lateralPane.add(buttonPanel, c);
+        lateralPane.add(buttonPanel1, c);
+
+        // Bouton suggestion/reprendre
+        JPanel buttonPanel2 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        BoutonReprendre boutonReprendre = new BoutonReprendre("Relancer IA", state);
+        boutonReprendre.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("reprendre")));
+        buttonPanel2.add(boutonReprendre.getButton());
 
         JButton boutonSuggestion = new JButton("Suggestion");
         boutonSuggestion.addActionListener(new AdaptateurCommande(controle, new Commande("suggestion")));
         boutonSuggestion.setFocusable(false);
+        buttonPanel2.add(boutonSuggestion);
+
         c.fill = GridBagConstraints.NONE;
         c.gridx = 0;
         c.gridy = 2;
-        lateralPane.add(boutonSuggestion, c);
+        lateralPane.add(buttonPanel2, c);
 
         // Label etat du jeu
         LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
@@ -214,25 +230,25 @@ public class InterfaceGraphique implements Runnable, Observateur {
         mainPanel.add(lateralPane, BorderLayout.EAST);
 
         // Inventaire joueur 1
-        Inventory inv1 = new Inventory(1, jeu);
+        Inventory inv1 = new Inventory(1, jeu, state);
         mainPanel.add(inv1.getPanel(), BorderLayout.NORTH);
 
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
 
-        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu);
+        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu, state);
         AdaptateurSouris a1 = new AdaptateurSouris(plateauPasse, controle);
         plateauPasse.addMouseMotionListener(a1);
         plateauPasse.addMouseListener(a1);
         plateauBox.add(plateauPasse);
 
-        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu);
+        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu, state);
         AdaptateurSouris a2 = new AdaptateurSouris(plateauPresent, controle);
         plateauPresent.addMouseMotionListener(a2);
         plateauPresent.addMouseListener(a2);
         plateauBox.add(plateauPresent);
 
-        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu);
+        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
         AdaptateurSouris a3 = new AdaptateurSouris(plateauFuture, controle);
         plateauFuture.addMouseMotionListener(a3);
         plateauFuture.addMouseListener(a3);
@@ -241,7 +257,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         mainPanel.add(plateauBox, BorderLayout.CENTER);
 
         // Inventaire joueur 2
-        Inventory inv2 = new Inventory(2, jeu);
+        Inventory inv2 = new Inventory(2, jeu, state);
         mainPanel.add(inv2.getPanel(), BorderLayout.SOUTH);
 
         frame.addComponentListener(new ComponentAdapter() {

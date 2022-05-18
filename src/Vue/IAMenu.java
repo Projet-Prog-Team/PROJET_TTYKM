@@ -8,15 +8,18 @@ import javax.swing.event.ListSelectionListener;
 public class IAMenu  {
 
     private JMenu menu;
+    IHMState state;
 
-    IAMenu(int IA, CollecteurEvenements controle){
+    IAMenu(int IA, CollecteurEvenements controle, IHMState state){
+
+        this.state = state;
 
         menu = new JMenu("Difficulté IA "+IA);
 
-        String difficultees[] = {"  Facile  ","  Moyenne  ","  Difficile  "};
+        String[] difficultees = {"  Facile  ","  Moyenne  ","  Difficile  "};
         JList list = new JList<>(difficultees);
         if(IA==1){
-            switch(controle.getDifficultyIA1()){
+            switch(state.getDifficultyIA1()){
                 case "facile":
                     list.setSelectedIndex(0);
                     break;
@@ -28,7 +31,7 @@ public class IAMenu  {
                     break;
             }
         }else{
-            switch(controle.getDifficultyIA2()){
+            switch(state.getDifficultyIA2()){
                 case "facile":
                     list.setSelectedIndex(0);
                     break;

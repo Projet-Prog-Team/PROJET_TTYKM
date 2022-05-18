@@ -1,30 +1,31 @@
 package Controleur;
 
-import Modele.Jeu;
-import Modele.ETAT;
-import Modele.ManageFiles;
+import Modele.CalculJeu;
+import Modele.DeroulementJeu;
 import Modele.Pion;
 import Structures.Point;
 import Vue.AdaptateurTemps;
 import Vue.CollecteurEvenements;
 import Vue.Commande;
+import Vue.IHMState;
 
 import javax.swing.*;
-import java.util.ArrayList;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
-    Jeu jeu;
+    DeroulementJeu dj;
     IA joueur1, joueur2, suggestion;
     int [] joueurs;
     String difficulty1 = "facile", difficulty2 = "facile";
+    IHMState state;
     Timer t;
 
     int speed;
 
-    public ControleurMediateur (Jeu j, int temps) {
-        jeu = j;
-        suggestion = IA.nouvelle(j, "difficile", "Heuristique3");
+    public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
+        dj = djeu;
+        this.state = state;
+        suggestion = IA.nouvelle(new CalculJeu(dj), "difficile", "Heuristique3");
         speed = temps;
         init();
     }
@@ -35,16 +36,20 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
-
-        //jeu.init();
-
+        dj.init();
+        state.initPreview();
+        state.setIA1(joueurs[0]==1);
+        state.setIA2(joueurs[1]==1);
+        state.setDifficultyIA1(difficulty1);
+        state.setDifficultyIA2(difficulty2);
+        state.setPauseIA(false);
         activerIA(1, difficulty2, "Heuristique3");
     }
 
     // Clique sur une case
     @Override
     public void clicSouris(int l, int c, int epoque) {
-        int id = jeu.getJoueurActuel().getID()-1;
+        int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
             switch (jeu.getEtape()) {
                 case SELECT:
@@ -65,7 +70,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     // Tic du timer (toutes les 1 sec)
     @Override
     public void tic() {
-        int id = jeu.getJoueurActuel().getID()-1;
+        int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 1) {
             IA j;
             if (id == 0) {
@@ -84,13 +89,15 @@ public class ControleurMediateur implements CollecteurEvenements {
                 case MOVE2:
                     p = j.jouerCoup();
                     coord = p.getCoordonnees();
-                    jeu.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),false);
+                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),false);
+                    state.initPreview();
                     break;
                 case FOCUS:
                     jeu.getPionActuel().focused=false;
                     int focus = j.choixFocus();
-                    jeu.getJoueurActuel().setFocus(focus);
-                    jeu.switchPlayer();
+                    dj.getJoueurActuel().setFocus(focus);
+                    dj.switchPlayer();
+                    state.initPreview();
                     break;
                 case END:
                     break;
@@ -99,17 +106,19 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void suggestion () {
-        ArrayList<Pion> l = new ArrayList<>();
-        switch(jeu.getEtape()) {
+        suggestion.calculCoup(dj, 10, true);
+        switch(dj.getEtape()) {
             case SELECT:
-                jeu.setSuggestionPions(suggestion.selectPion(), suggestion.jouerCoup());
+                state.setSuggestionSource(suggestion.selectPion());
+                state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case MOVE1:
             case MOVE2:
-                jeu.setSuggestionPions(jeu.getPionActuel(), suggestion.jouerCoup());
+                state.setSuggestionSource(dj.getPionActuel());
+                state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case FOCUS:
-                jeu.setSuggestionFocus(suggestion.choixFocus());
+                state.setSuggestionFocus(suggestion.choixFocus());
                 break;
             case END:
                 break;
@@ -122,20 +131,21 @@ public class ControleurMediateur implements CollecteurEvenements {
         System.out.println(c.getCommande());
         switch(c.getCommande()){
             case "clicFocus":
-                if(jeu.getEtape()==ETAT.FOCUS){
+                if(dj.getEtape()==ETAT.FOCUS){
                     int id = jeu.getJoueurActuel().getID()-1;
                     if (joueurs[id] == 0) {
                         //choix focus
-                        if (jeu.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
-                            jeu.getJoueurActuel().setFocus(c.getEpoque());
-                            jeu.MemoryManager.move =false;
-                            jeu.MemoryManager.UpdateLog(null,null);
-                            jeu.switchPlayer();
+                        if (dj.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
+                            dj.getJoueurActuel().setFocus(c.getEpoque());
+                            dj.MemoryManager.move =false;
+                            dj.MemoryManager.UpdateLog(null,null);
+                            dj.switchPlayer();
+                            state.initPreview();
                         } else {
                             System.out.println("Modification du focus adverse impossible");
                         }
                     }
-                } else if (jeu.getEtape() == ETAT.END){
+                } else if (dj.getEtape() == ETAT.END){
                 }
                 break;
             case "save":
@@ -149,9 +159,16 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "refaire":
                 jeu.MemoryManager.CTRLY();
+                state.setPauseIA(true);
+                break;
+            case "annulerTour":
+                state.setPauseIA(true);
                 break;
             case "suggestion":
                 suggestion();
+                break;
+            case "reprendre":
+                state.setPauseIA(false);
                 break;
             case "IASpeed":
                 t.stop();
@@ -183,16 +200,23 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void activerIA(int j, String type, String heuristique) {
         joueurs[j] = (joueurs[j] + 1) % 2;
         if (j == 0) {
-            joueur1 = IA.nouvelle(jeu, type, heuristique);
+            joueur1 = IA.nouvelle(new CalculJeu(dj), type, heuristique);
+            state.setIA1(joueurs[j]==1);
         } else {
-            joueur2 = IA.nouvelle(jeu, type, heuristique);
+            joueur2 = IA.nouvelle(new CalculJeu(dj), type, heuristique);
+            state.setIA2(joueurs[j]==1);
         }
-        jeu.miseAJour();
+        dj.miseAJour();
     }
 
     public void desactiverIA(int j) {
         if (joueurs[j] == 1) {
             joueurs[j] = 0;
+        }
+        if(j==0){
+            state.setIA1(false);
+        }else if (j==1){
+            state.setIA2(false);
         }
     }
 
@@ -202,37 +226,21 @@ public class ControleurMediateur implements CollecteurEvenements {
             if (joueurs[0] == 1) {
                 desactiverIA(0); //désactiver
                 activerIA(0, difficulty1, "Heuristique3");
+                state.setDifficultyIA1(difficulty);
             }
         } else {
             difficulty2 = difficulty;
             if (joueurs[1] == 1) {
                 desactiverIA(1); //désactiver
                 activerIA(1, difficulty2, "Heuristique3");
+                state.setDifficultyIA2(difficulty);
             }
         }
     }
 
     public void enablePreview(int l, int c, int epoque){
-        jeu.enablePreview(l,c,epoque);
-    }
-
-    public void setPreviewFocus1(int epoque){ jeu.setPreviewFocus1(epoque); }
-
-    public void setPreviewFocus2(int epoque){ jeu.setPreviewFocus2(epoque); }
-
-    public boolean isEnabledIA1(){
-        return joueurs[0] == 1;
-    }
-
-    public boolean isEnabledIA2(){
-        return joueurs[1] == 1;
-    }
-
-    public String getDifficultyIA1(){
-        return difficulty1;
-    }
-
-    public String getDifficultyIA2(){
-        return difficulty2;
+        if(dj.getEtape()==2){
+            state.setPreview(dj.getPreview(l,c,epoque));
+        }
     }
 }

@@ -1,7 +1,7 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.EPOQUE;
-import Modele.Jeu;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -23,9 +23,12 @@ public class PlateauSwing extends JComponent implements Plateau {
     private int yOffset = 50;
     private int focusRadius = 40;
     private int epoque;
+    private IHMState state;
 
-    PlateauSwing(int epoque, Jeu j){
+    PlateauSwing(int epoque, DeroulementJeu j, IHMState state){
         this.epoque = epoque;
+        this.state = state;
+
         vue = new VuePlateau(j,this);
 
         InputStream in = null;
@@ -130,22 +133,29 @@ public class PlateauSwing extends JComponent implements Plateau {
         drawable.fillOval(x+getLargeurCase()/3,y+getHauteurCase()/3,width,height);
     }
 
-    public void tracerBrillanceFocusBlanc(){
+    public void tracerSuggestionCase(int l, int c){
+        int x = getXoffset()+c*getLargeurCase();
+        int y = getYoffset()+l* getHauteurCase();
+        Color myColour = new Color(18, 255, 0,125 );
+        drawable.setColor(myColour);
+        drawable.fillRect(x,y,getLargeurCase()+3,getHauteurCase());
+    }
+
+    public void tracerSuggestionFocus(int focus){
         int xFocus = getWidth()/2;
-        int yFocus = yOffset;
+        int yFocus = focus==1 ? yOffset:getHeight()-yOffset;
+        Color myColour = new Color(18, 255, 0,175 );
+        drawable.setColor(myColour);
+        drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
+    }
+
+    public void tracerBrillanceFocus(int focus){
+        int xFocus = getWidth()/2;
+        int yFocus = focus==1 ? yOffset:getHeight()-yOffset;
         Color myColour = new Color(255, 200,0, 175);
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
     }
-
-    public void tracerBrillanceFocusNoir(){
-        int xFocus = getWidth()/2;
-        int yFocus = getHeight()-yOffset;
-        Color myColour = new Color(255, 200,0,175 );
-        drawable.setColor(myColour);
-        drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
-    }
-
 
     public boolean isInFocusBlanc(int clic_x, int clic_y){
         int xFocus = getWidth()/2;
@@ -201,4 +211,7 @@ public class PlateauSwing extends JComponent implements Plateau {
         }
     }
 
+    public IHMState getState() {
+        return state;
+    }
 }

@@ -73,5 +73,10 @@ public class Pion {
                 '}' + "\n";
     }
 
+    public boolean colle(Pion pion2) {
+        int dColonne = Math.abs(pion2.getCoordonnees().getC()-getCoordonnees().getC());
+        int dLigne = Math.abs(pion2.getCoordonnees().getL()-getCoordonnees().getL());
+        return (dColonne == 0 && dLigne == 1) || (dColonne == 1 && dLigne == 0);
+    }
 }
 

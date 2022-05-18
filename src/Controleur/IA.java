@@ -1,13 +1,15 @@
 package Controleur;
 
+import Modele.CalculJeu;
+import Modele.DeroulementJeu;
 import Modele.Jeu;
 import Modele.Pion;
 
 import java.lang.reflect.Method;
 
 public abstract class IA {
-    Jeu jeu;
-    public static IA nouvelle(Jeu j, String type, String heuristique) {
+    CalculJeu calcul;
+    public static IA nouvelle(CalculJeu c, String type, String heuristique) {
         IA resultat = null;
         // Méthode de fabrication pour l'IA, qui crée le bon objet selon la config
         switch (type) {
@@ -20,7 +22,7 @@ public abstract class IA {
             case "difficile":
                 Method method = null;
                 try {
-                    method = Jeu.class.getMethod(heuristique);
+                    method = CalculJeu.class.getMethod(heuristique);
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
@@ -30,7 +32,7 @@ public abstract class IA {
                 System.out.println("IA non reconnue");
         }
         if (resultat != null) {
-            resultat.jeu = j;
+            resultat.calcul = c;
         }
         return resultat;
     }
@@ -40,5 +42,5 @@ public abstract class IA {
 
     public abstract Integer choixFocus();
 
-    public abstract int calculCoup(Jeu j, int horizon, boolean joueur);
+    public abstract int calculCoup(DeroulementJeu dj, int horizon, boolean joueur);
 }

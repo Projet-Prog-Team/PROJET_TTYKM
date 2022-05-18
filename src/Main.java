@@ -1,5 +1,7 @@
 import Controleur.ControleurMediateur;
+import Modele.DeroulementJeu;
 import Modele.Jeu;
+import Vue.IHMState;
 import Vue.InterfaceGraphique;
 
 public class Main {
@@ -9,11 +11,13 @@ public class Main {
         int cpt1 = 0;
         for(int i = 0; i < nbParties; i++) {
             Jeu j = new Jeu();
-            ControleurMediateur c = new ControleurMediateur(j,1);
+            DeroulementJeu dj = new DeroulementJeu(j);
+            IHMState state = new IHMState();
+            ControleurMediateur c = new ControleurMediateur(dj,1, state);
+            c.desactiverIA(1);
             c.activerIA(0, dif1, heuristique1);
             c.activerIA(1, dif2, heuristique2);
-            while(!j.estTermine()) {
-
+            while(!dj.estTermine()) {
             }
             if (j.joueurAGagne(j.joueurs[0])) {
                 cpt0++;
@@ -28,8 +32,10 @@ public class Main {
 
     public static void classique() {
         Jeu j = new Jeu();
-        ControleurMediateur c = new ControleurMediateur(j,1000);
-        InterfaceGraphique.demarrer(j, c);
+        DeroulementJeu dj = new DeroulementJeu(j);
+        IHMState state = new IHMState();
+        ControleurMediateur c = new ControleurMediateur(dj,1000, state);
+        InterfaceGraphique.demarrer(dj, c, state);
     }
 
     public static void main(String[] args) {

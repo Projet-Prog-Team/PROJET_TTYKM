@@ -1,6 +1,7 @@
 package Controleur;
 
-import Modele.Jeu;
+import Modele.CalculJeu;
+import Modele.DeroulementJeu;
 import Modele.Pion;
 import Structures.Couple;
 import Structures.Tour;
@@ -19,15 +20,16 @@ public class IADifficile extends IA{
     Method method;
     public IADifficile(Method method) {
         tour = new Tour();
-        this.horizon = 10;
+        this.horizon = 15;
         this.method = method;
     }
 
-    public int calculCoup(Jeu j, int horizon, boolean joueur) {     // joueur = true <=> calculCoup_Joueur_A
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {     // joueur = true <=> calculCoup_Joueur_A
         cpt++;
-        if (j.estTermine() || horizon == 0) {   // Si hoziron atteint ou jeu terminé, on retourne l'évaluation de jeu
+        CalculJeu c = new CalculJeu(dj);
+        if (dj.estTermine() || horizon == 0) {   // Si horizon atteint ou jeu terminé, on retourne l'évaluation de jeu
             try {
-                return (int) method.invoke(j,null );
+                return (int) method.invoke(c,null);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
@@ -36,8 +38,8 @@ public class IADifficile extends IA{
         } else {                                // Sinon, on descend dans l'arbre
             ArrayList<Couple<Integer, Tour>> fils = new ArrayList<>();
 
-            ArrayList<Couple<Jeu, Tour>> branchements = j.Branchements();
-            for (Couple<Jeu, Tour> couple : branchements) {
+            ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
+            for (Couple<DeroulementJeu, Tour> couple : branchements) {
                 fils.add(new Couple<>(calculCoup(couple.getFirst(), horizon - 1, !joueur), couple.getSecond()));
             }
 
@@ -66,21 +68,21 @@ public class IADifficile extends IA{
     @Override
     public Pion selectPion() {
         if (tour.getPionSelectionne() == null) {
-            calculCoup(jeu, horizon, true);
+            calculCoup(calcul.getDj(), horizon, true);
         }
         return tour.getPionSelectionne();
     }
 
     @Override
     public Pion jouerCoup() {
-        if (jeu.getJoueurActuel().getNbActionsRestantes() == 2) {
+        if (calcul.getDj().getJoueurActuel().getNbActionsRestantes() == 2) {
             if (tour.getCoup1() == null) {
-                calculCoup(jeu, horizon, true);
+                calculCoup(calcul.getDj(), horizon, true);
             }
             return tour.getCoup1();
         } else {
             if (tour.getCoup2() == null) {
-                calculCoup(jeu, horizon, true);
+                calculCoup(calcul.getDj(), horizon, true);
             }
             return tour.getCoup2();
         }
@@ -88,7 +90,7 @@ public class IADifficile extends IA{
     @Override
     public Integer choixFocus() {
         if (tour.getFocus() == null) {
-            calculCoup(jeu, horizon, true);
+            calculCoup(calcul.getDj(), horizon, true);
         }
         Integer res = tour.getFocus();
         tour = new Tour();  // Tour suivant, il faut recalculer

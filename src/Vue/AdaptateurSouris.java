@@ -19,12 +19,12 @@ public class AdaptateurSouris extends MouseAdapter {
         int c = plateau.getCol(e.getX());
         controle.enablePreview(l,c,plateau.getEpoque());
         if(plateau.isInFocusBlanc(e.getX(),e.getY())){
-            controle.setPreviewFocus1(plateau.getEpoque());
+            plateau.getState().setPreviewFocus1(plateau.getEpoque());
         }else if(plateau.isInFocusNoir(e.getX(),e.getY())){
-            controle.setPreviewFocus2(plateau.getEpoque());
+            plateau.getState().setPreviewFocus2(plateau.getEpoque());
         }else{
-            controle.setPreviewFocus1(3);
-            controle.setPreviewFocus2(3);
+            plateau.getState().setPreviewFocus1(3);
+            plateau.getState().setPreviewFocus2(3);
         }
     }
 
