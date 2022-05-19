@@ -1,6 +1,8 @@
 package Vue;
 
+import Modele.Emplacement;
 import Modele.Pion;
+import Modele.PionBasique;
 import Patterns.Observable;
 
 import java.util.ArrayList;
@@ -16,8 +18,8 @@ public class IHMState extends Observable {
     private String difficultyIA1;
     private String difficultyIA2;
     private boolean pauseIA;
-    private Pion suggestionSource;
-    private Pion suggestionDestination;
+    private Emplacement suggestionSource;
+    private Emplacement suggestionDestination;
     private int suggestionFocus;
 
     public IHMState(){
@@ -111,20 +113,20 @@ public class IHMState extends Observable {
         miseAJour();
     }
 
-    public Pion getSuggestionSource() {
+    public Emplacement getSuggestionSource() {
         return suggestionSource;
     }
 
-    public void setSuggestionSource(Pion suggestionSource) {
+    public void setSuggestionSource(Emplacement suggestionSource) {
         this.suggestionSource = suggestionSource;
         miseAJour();
     }
 
-    public Pion getSuggestionDestination() {
+    public Emplacement getSuggestionDestination() {
         return suggestionDestination;
     }
 
-    public void setSuggestionDestination(Pion suggestionDestination) {
+    public void setSuggestionDestination(Emplacement suggestionDestination) {
         this.suggestionDestination = suggestionDestination;
         miseAJour();
     }

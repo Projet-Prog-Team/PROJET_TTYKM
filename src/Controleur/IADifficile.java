@@ -1,9 +1,6 @@
 package Controleur;
 
-import Modele.CalculJeu;
-import Modele.DeroulementJeu;
-import Modele.ETAT;
-import Modele.Pion;
+import Modele.*;
 import Structures.Couple;
 import Structures.Tour;
 
@@ -70,7 +67,7 @@ public class IADifficile extends IA{
     }
 
     @Override
-    public Pion selectPion() {
+    public PionBasique selectPion() {
         if (tour.getPionSelectionne() == null) {
             calculCoup(calcul.getDj(), horizon, true);
         }
@@ -78,7 +75,7 @@ public class IADifficile extends IA{
     }
 
     @Override
-    public Pion jouerCoup() {
+    public Emplacement jouerCoup() {
         if (calcul.getDj().getEtape() == ETAT.MOVE1) {
             if (tour.getCoup1() == null) {
                 calculCoup(calcul.getDj(), horizon, true);

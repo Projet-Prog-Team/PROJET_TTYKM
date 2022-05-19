@@ -1,8 +1,6 @@
 package Controleur;
 
-import Modele.DeroulementJeu;
-import Modele.Jeu;
-import Modele.Pion;
+import Modele.*;
 
 public class IAMoyenne extends IA{
 
@@ -11,12 +9,12 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public Pion selectPion() {
+    public PionBasique selectPion() {
         return null;
     }
 
     @Override
-    public Pion jouerCoup() {
+    public Emplacement jouerCoup() {
         return null;
     }
 

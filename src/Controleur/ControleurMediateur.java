@@ -1,9 +1,6 @@
 package Controleur;
 
-import Modele.CalculJeu;
-import Modele.DeroulementJeu;
-import Modele.Pion;
-import Modele.ETAT;
+import Modele.*;
 import Structures.Point;
 import Vue.AdaptateurTemps;
 import Vue.CollecteurEvenements;
@@ -51,15 +48,16 @@ public class ControleurMediateur implements CollecteurEvenements {
     // Clique sur une case
     @Override
     public void clicSouris(int l, int c, int epoque) {
+        Emplacement e = new Emplacement(new Point(l, c), epoque);
         int id = dj.getJoueurActuel().getID()-1;
         if (joueurs[id] == 0) {
             switch (dj.getEtape()) {
                 case SELECT:
-                    dj.selectPion(l, c, epoque);
+                    dj.selectPion(e);
                     break;
                 case MOVE2:
                 case MOVE1:
-                    dj.jouerCoup(l, c, epoque,true);
+                    dj.jouerCoup(e,true);
                     state.initPreview();
                     break;
                 case FOCUS:
@@ -83,16 +81,11 @@ public class ControleurMediateur implements CollecteurEvenements {
             }
             switch(dj.getEtape()) {
                 case SELECT:
-                    Pion p = j.selectPion();
-                    Point coord = p.getCoordonnees();
-                    dj.selectPion(coord.getL(), coord.getC(), p.getEpoque());
-
+                    dj.selectPion(j.selectPion().getEmplacement());
                     break;
                 case MOVE1:
                 case MOVE2:
-                    p = j.jouerCoup();
-                    coord = p.getCoordonnees();
-                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),true);
+                    dj.jouerCoup(j.jouerCoup(),true);
                     state.initPreview();
                     break;
                 case FOCUS:
@@ -112,12 +105,12 @@ public class ControleurMediateur implements CollecteurEvenements {
         suggestion.calculCoup(dj, 10, true);
         switch(dj.getEtape()) {
             case SELECT:
-                state.setSuggestionSource(suggestion.selectPion());
+                state.setSuggestionSource(suggestion.selectPion().getEmplacement());
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case MOVE1:
             case MOVE2:
-                state.setSuggestionSource(dj.getPionActuel());
+                state.setSuggestionSource(dj.getPionActuel().getEmplacement());
                 state.setSuggestionDestination(suggestion.jouerCoup());
                 break;
             case FOCUS:
@@ -255,8 +248,9 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void enablePreview(int l, int c, int epoque){
+        Emplacement e = new Emplacement(new Point(l, c), epoque);
         if(dj.getEtape()==ETAT.MOVE1 || dj.getEtape()==ETAT.MOVE2){
-            state.setPreview(dj.getPreview(l,c,epoque));
+            state.setPreview(dj.getPreview(e));
         }
     }
 }

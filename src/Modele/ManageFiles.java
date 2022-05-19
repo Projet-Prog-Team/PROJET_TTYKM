@@ -1,15 +1,9 @@
 package Modele;
-import Patterns.Grille;
+import Structures.Grille;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
 import java.util.Vector;
 
-import javax.lang.model.util.SimpleElementVisitor6;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.io.IOException;
 
 public class ManageFiles   {
     
@@ -275,7 +269,10 @@ public class ManageFiles   {
 
 
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                    DJgame.setPionActuel(game.getPions().get(pos));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(pos));
+                    }
                     /*if(game.getJoueurActuel().getID()-1 != (game.getPionActuel().ID>NBPIONS/2 ? 1 :0))
                         game.joueurActuel=game.joueurs[(game.getPionActuel().ID>NBPIONS/2 ? 1 :0)];*/
                     DJgame.joueurActuel.nbActionsRestantes=1;
@@ -290,7 +287,10 @@ public class ManageFiles   {
 
                 case MOVE2:
                     System.out.println("FOCUS");
-                    DJgame.setPionActuel(game.getPions().get(0));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(0));
+                    }
                     DJgame.joueurActuel.nbActionsRestantes=0;
                     if( DJgame.joueurActuel== game.joueurs[0])
                     {
@@ -529,14 +529,20 @@ public class ManageFiles   {
                 case MOVE1:
                     System.out.println("MOVE1");
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                    DJgame.setPionActuel(game.getPions().get(pos));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(pos));
+                    }
                     DJgame.joueurActuel.nbActionsRestantes=1;
                     break;
 
                 case MOVE2:
                     System.out.println("FOCUS");
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                    DJgame.setPionActuel(game.getPions().get(0));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(0));
+                    }
                     DJgame.joueurActuel.nbActionsRestantes=0;
                     break;
             }

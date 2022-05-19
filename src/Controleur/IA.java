@@ -1,9 +1,6 @@
 package Controleur;
 
-import Modele.CalculJeu;
-import Modele.DeroulementJeu;
-import Modele.Jeu;
-import Modele.Pion;
+import Modele.*;
 
 import java.lang.reflect.Method;
 
@@ -36,9 +33,9 @@ public abstract class IA {
         }
         return resultat;
     }
-    public abstract Pion selectPion();
+    public abstract PionBasique selectPion();
 
-    public abstract Pion jouerCoup();
+    public abstract Emplacement jouerCoup();
 
     public abstract Integer choixFocus();
 

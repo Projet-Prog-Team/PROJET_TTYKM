@@ -1,9 +1,6 @@
 package Vue;
 
-import Modele.DeroulementJeu;
-import Modele.ETAT;
-import Modele.Joueur;
-import Modele.Pion;
+import Modele.*;
 
 import java.util.ArrayList;
 
@@ -20,6 +17,8 @@ public class VuePlateau {
 
     public void dessinerPlateau() {
 
+        ArrayList<Emplacement> casesDispoDeplacement;
+        ArrayList<PionBasique> pionsBasiques;
         ArrayList<Pion> pions;
         IHMState state = plateau.getState();
 
@@ -27,8 +26,8 @@ public class VuePlateau {
         if((jeu.getJoueurActuel().getID()==1 && !state.getIA1() || jeu.getJoueurActuel().getID()==2 && !state.getIA2())){
 
             // Affiche les suggestions de pions
-            Pion source = state.getSuggestionSource();
-            Pion dest = state.getSuggestionDestination();
+            Emplacement source = state.getSuggestionSource();
+            Emplacement dest = state.getSuggestionDestination();
             if(source!=null && dest!=null){
                 if(plateau.getEpoque()==source.getEpoque()){
                     plateau.tracerSuggestionCase(source.getCoordonnees().getL(), source.getCoordonnees().getC());
@@ -40,18 +39,18 @@ public class VuePlateau {
 
             // Affiche les cases disponibles pour le déplacement
             if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) {
-                pions = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
-                for (Pion pion : pions) {
-                    if (pion.getEpoque() == plateau.getEpoque()) {
-                        plateau.tracerBrillanceCase(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+                casesDispoDeplacement = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
+                for (Emplacement emplacement : casesDispoDeplacement) {
+                    if (emplacement.getEpoque() == plateau.getEpoque()) {
+                        plateau.tracerBrillanceCase(emplacement.getCoordonnees().getL(), emplacement.getCoordonnees().getC());
                     }
                 }
             }
 
             // Affiche les pions selectionnables
             if (jeu.getEtape() == ETAT.SELECT && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
-                pions = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
-                for (Pion pion : pions) {
+                pionsBasiques = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
+                for (PionBasique pion : pionsBasiques) {
                     if(!pion.equals(source)){
                         plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
                     }

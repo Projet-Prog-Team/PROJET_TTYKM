@@ -24,9 +24,9 @@ public class Jeu implements Comparable {
         joueurs[0] = new Joueur(1,NBPIONS/2);
         joueurs[1] = new Joueur(2,NBPIONS/2);
         for(int i = 0; i < 3; i++) {
-            Pion p1 = new Pion(new Point(0, 0), i, joueurs[0],NBPIONS/2-joueurs[0].getNbPionsRestants(),false);
+            PionBasique p1 = new PionBasique(new Emplacement(new Point(0, 0), i), joueurs[0],NBPIONS/2-joueurs[0].getNbPionsRestants(),false);
             pions.add(p1);
-            Pion p2 = new Pion(new Point(3, 3), i, joueurs[1],NBPIONS-joueurs[1].getNbPionsRestants(),false);
+            PionBasique p2 = new PionBasique(new Emplacement(new Point(3, 3), i), joueurs[1],NBPIONS/2-joueurs[1].getNbPionsRestants(),false);
             pions.add(p2);
             joueurs[0].supprimerPion();
             joueurs[1].supprimerPion();
@@ -54,10 +54,11 @@ public class Jeu implements Comparable {
     public Joueur[] getJoueurs() {
         return joueurs;
     }
-    public Pion getPion(Point p, int e) {
+    public Pion getPion(Emplacement e) {
+        Point p = e.getCoordonnees();
         if ((p.getL() <= 3 && p.getL() >= 0) && (p.getC() <= 3 && p.getC() >= 0)) {
             for (Pion pion : pions) {
-                if (p.equals(pion.getCoordonnees()) && e == pion.getEpoque()) {
+                if (e.equals(pion.getEmplacement())) {
                     return pion;
                 }
             }
@@ -66,18 +67,20 @@ public class Jeu implements Comparable {
     }
 
     // -------INFOS JEU-------
-    public ArrayList<Pion> casesDispo(Joueur j, Pion p) {   // Retourne une liste des pions jouables pour le joueur cou
-        ArrayList<Pion> casesDisponibles = new ArrayList<>();
+    public ArrayList<Emplacement> casesDispo(Joueur j, Pion p) {   // Retourne une liste des pions jouables pour le joueur cou
+        ArrayList<Emplacement> casesDisponibles = new ArrayList<>();
         Point coo = p.getCoordonnees();
         int epoque = p.getEpoque();
         if (epoque - 1 >= EPOQUE.PASSE) {   // Si on peut aller vers le passé
-            if (getPion(coo, epoque-1) == null && j.getNbPionsRestants() > 0) {
-                casesDisponibles.add(new Pion(coo, epoque-1, j));
+            Emplacement e = new Emplacement(coo, epoque-1);
+            if (getPion(e) == null && j.getNbPionsRestants() > 0) {
+                casesDisponibles.add(e);
             }
         }
         if (epoque + 1 <= EPOQUE.FUTUR) {   // Si on peut aller vers le futur
-            if (getPion(coo, epoque+1) == null) {
-                casesDisponibles.add(new Pion(coo, epoque+1, j));
+            Emplacement e = new Emplacement(coo, epoque+1);
+            if (getPion(e) == null) {
+                casesDisponibles.add(e);
             }
         }
 
@@ -87,7 +90,8 @@ public class Jeu implements Comparable {
         for (int i = 0; i < 4; i++) {   // Vérification des cases autour du pion selectionné
             pt = new Point(coo.getL() + dX[i], coo.getC() + dY[i]);
             if (pt.getL() >=0 && pt.getL() <= 3 && pt.getC() >= 0  && pt.getC() <= 3) {
-                casesDisponibles.add(new Pion(pt, epoque, j));
+                Emplacement e = new Emplacement(pt, epoque);
+                casesDisponibles.add(e);
             }
         }
 
@@ -103,11 +107,14 @@ public class Jeu implements Comparable {
         }
         return nbPlateauxVides >= 2;
     }
-    public ArrayList<Pion> pionsFocusJoueur(int focus, Joueur j) {
-        ArrayList<Pion> liste = new ArrayList<>();
+    public ArrayList<PionBasique> pionsFocusJoueur(int focus, Joueur j) {
+        ArrayList<PionBasique> liste = new ArrayList<>();
         for (Pion pion : pions) {
-            if (pion.getJoueur().equals(j) && pion.getEpoque() == focus) {
-                liste.add(pion);
+            if (pion instanceof PionBasique) {
+                PionBasique pb = (PionBasique) pion;
+                if (pb.getJoueur().equals(j) && pb.getEpoque() == focus) {
+                    liste.add(pb);
+                }
             }
         }
         return liste;

@@ -1,4 +1,4 @@
-package Patterns;
+package Structures;
 
 import Modele.Pion;
 import Modele.ETAT;
