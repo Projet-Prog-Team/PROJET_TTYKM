@@ -6,6 +6,7 @@ public class Joueur {
     public int nbActionsRestantes = 2;
     int focus;
 
+
     public Joueur(int id,int nbpions) {
         ID = id;
         nbPionsRestants = nbpions;
