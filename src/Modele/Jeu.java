@@ -3,7 +3,6 @@ package Modele;
 import Structures.Point;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Arrays;
 
 
@@ -13,24 +12,11 @@ public class Jeu implements Comparable {
     public Joueur[] joueurs = new Joueur[2];
     public final int NBPIONS =14;
 
-    /*private boolean real =false;
-    Joueur joueurActuel;
-    private Pion pionActuel;
-    private ArrayList<Pion> preview;
-
-    int previewFocus1;
-    int previewFocus2;
-    int aGagne;
-
-    Pion suggestionSource, suggestionDest;
-    int suggestionFocus;*/
-
     public Jeu() {
         init();
     }
     public Jeu(boolean real) {
         init();
-        real=real;
     }
 
     public void init() {

@@ -12,18 +12,17 @@ public class BoutonAnnuler implements Observateur {
     private DeroulementJeu dj;
     private JButton button;
 
-    BoutonAnnuler(String s, DeroulementJeu t_dj) {
+    BoutonAnnuler(String s, DeroulementJeu dj) {
         button = new JButton(s);
-        dj = t_dj;
+        this.dj = dj;
+        dj.ajouteObservateur(this);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFocusable(false);
-        button.setEnabled(false);
-        dj.ajouteObservateur(this);
+        metAJour();
     }
 
     @Override
     public void metAJour() {
-        // TODO: Fonction du jeu permettant de savoir si un coup peut être refait
         if(dj.MemoryManager.CanCTRLZ())
         {
             button.setEnabled(true);

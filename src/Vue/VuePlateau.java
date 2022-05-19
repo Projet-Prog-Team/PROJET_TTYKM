@@ -38,8 +38,7 @@ public class VuePlateau {
         // Affiche les cases disponibles pour le déplacement
         if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) {
             pions = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
-            for (int i = 0; i < pions.size(); i++) {
-                Pion pion = pions.get(i);
+            for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerBrillanceCase(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
                 }
@@ -49,16 +48,17 @@ public class VuePlateau {
         // Affiche les pions selectionnables
         if (jeu.getEtape() == ETAT.SELECT && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
             pions = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
-            for (int i = 0; i < pions.size(); i++) {
-                plateau.tracerBrillancePion(pions.get(i).getCoordonnees().getL(), pions.get(i).getCoordonnees().getC());
+            for (Pion pion : pions) {
+                if(!pion.equals(source)){
+                    plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+                }
             }
         }
 
         // Affiche les pions en mode preview ou non
         if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
             pions = state.getPreview();
-            for (int i = 0; i < pions.size(); i++) {
-                Pion pion = pions.get(i);
+            for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
                 }

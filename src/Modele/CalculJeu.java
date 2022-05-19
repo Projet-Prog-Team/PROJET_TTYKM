@@ -85,8 +85,8 @@ public class CalculJeu {
     }
     public int Heuristique4() {
         int heuristique = Heuristique3();
-        int pionsJoueur1 = dj.getJeu().getJoueur(0).nbPionsRestants;
-        int pionsJoueur2 = dj.getJeu().getJoueur(1).nbPionsRestants;
+        int pionsJoueur1 = dj.getJeu().getJoueur(0).getNbPionsRestants();
+        int pionsJoueur2 = dj.getJeu().getJoueur(1).getNbPionsRestants();
         for (int i = 0; i < 3; i++) {
             pionsJoueur1 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(0)).size();
         }

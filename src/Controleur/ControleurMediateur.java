@@ -60,6 +60,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 case MOVE2:
                 case MOVE1:
                     dj.jouerCoup(l, c, epoque,true);
+                    state.initPreview();
                     break;
                 case FOCUS:
                     break;
@@ -158,6 +159,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "annuler":
                 dj.MemoryManager.CTRLZ();
+                state.setPauseIA(true);
                 break;
             case "refaire":
                 dj.MemoryManager.CTRLY();

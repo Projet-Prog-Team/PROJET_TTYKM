@@ -11,18 +11,18 @@ public class BoutonRefaire implements Observateur {
     private JButton button;
     private DeroulementJeu dj;
 
-    BoutonRefaire(String s, DeroulementJeu t_dj) {
+    BoutonRefaire(String s, DeroulementJeu dj) {
         button = new JButton(s);
-        dj=t_dj;
+        this.dj=dj;
+        dj.ajouteObservateur(this);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
 		button.setEnabled(false);
         button.setFocusable(false);
-        dj.ajouteObservateur(this);
+        metAJour();
     }
 
     @Override
     public void metAJour() {
-        // TODO: Fonction du jeu permettant de savoir si un coup peut être refait
         if(dj.MemoryManager.CanCTRLY())
         {
             button.setEnabled(true);
