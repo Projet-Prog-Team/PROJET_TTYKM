@@ -1,6 +1,6 @@
 package Modele;
 import Patterns.Grille;
-import java.io.File; 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.util.Vector;
@@ -212,8 +212,6 @@ public class ManageFiles   {
             int pred_focus=-1;
             int red=(NBPIONS/2-game.joueurs[0].getNbPionsRestants())+1;
             int pos=temp.get(Actual_pos).PionFocus;
-            System.out.println("New ETAT: "+temp.get(Actual_pos).etat);
-            System.out.println("Next ETAT: "+temp.get(Actual_pos+1).etat);
             Pion[] temp0=temp.get(Actual_pos).GetCases();
             /*for(pos=0;pos<temp0.length;pos++)
             {
@@ -221,15 +219,23 @@ public class ManageFiles   {
                     break;
             }*/
             int j1=0;
+            int j2=0;
             int i=0;
             for(Pion t_pion : temp0)
             {
-                if(t_pion != null && i<=NBPIONS/2)
-                {
-                    j1++;
-                }
+                if(t_pion!=null)
+                    if(i<=NBPIONS/2)
+                    {
+                        j1++;
+                    }
+                    else
+                    {
+                        j2++;
+                    }
                 i++;
             }
+            game.getJoueur(0).SetNbPionsRestants(NBPIONS/2-(j1-1));
+            game.getJoueur(1).SetNbPionsRestants(NBPIONS/2-(j2+1));
             int oldpos = pos;
             if(pos>=NBPIONS/2)
             {
@@ -270,7 +276,6 @@ public class ManageFiles   {
 
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
                     DJgame.setPionActuel(game.getPions().get(pos));
-                    System.out.println(DJgame.getJoueurActuel().getID()-1+" "+(DJgame.getPionActuel().ID/2)%2);
                     /*if(game.getJoueurActuel().getID()-1 != (game.getPionActuel().ID>NBPIONS/2 ? 1 :0))
                         game.joueurActuel=game.joueurs[(game.getPionActuel().ID>NBPIONS/2 ? 1 :0)];*/
                     DJgame.joueurActuel.nbActionsRestantes=1;
@@ -297,10 +302,6 @@ public class ManageFiles   {
                     }
                     DJgame.getJoueurActuel().setFocus(pred_focus);
                     break;
-            }
-            for(Grille t_grille : temp)
-            {
-                System.out.println(t_grille.etat);
             }
            /*
                 float nbtour = (float)(Actual_pos+1)/4;
@@ -403,7 +404,6 @@ public class ManageFiles   {
             do {
                 CTRLZ();
                 etat = DJgame.getEtape();
-                System.out.println(etat);
             }while(etat != ETAT.MOVE1 && DJgame.getEtape() != ETAT.SELECT);
            /* if(etat == ETAT.IDLE) {
                 DJgame.setPionActuel(game.pionsFocusJoueur(temp.get(Actual_pos).Focus, DJgame.getJoueurActuel()).get(0));
@@ -458,8 +458,6 @@ public class ManageFiles   {
             int pred_focus=-1;
             int red=(NBPIONS/2-game.joueurs[0].getNbPionsRestants())+1;
             int pos=temp.get(Actual_pos).PionFocus;
-            System.out.println("ETAT: "+temp.get(Actual_pos-1).etat);
-            System.out.println("New ETAT: "+temp.get(Actual_pos).etat);
             Pion[] temp0=temp.get(Actual_pos).GetCases();
         /*for(pos=0;pos<temp0.length;pos++)
         {
@@ -467,15 +465,23 @@ public class ManageFiles   {
                 break;
         }*/
             int j1=0;
+            int j2=0;
             int i=0;
             for(Pion t_pion : temp0)
             {
-                if(t_pion != null && i<=NBPIONS/2)
-                {
-                    j1++;
-                }
+                if(t_pion!=null)
+                    if(i<=NBPIONS/2)
+                    {
+                        j1++;
+                    }
+                    else
+                    {
+                        j2++;
+                    }
                 i++;
             }
+            game.getJoueur(0).SetNbPionsRestants(NBPIONS/2-(j1-1));
+            game.getJoueur(1).SetNbPionsRestants(NBPIONS/2-(j2+1));
             int oldpos = pos;
             if(pos>=NBPIONS/2)
             {
@@ -684,7 +690,6 @@ public class ManageFiles   {
                 System.out.println(t_pion.Focus);
             }
             System.out.println("________________________");*/
-            System.out.println(DJgame.getJoueurActuel().nbActionsRestantes);
 
         }
         move=true;
