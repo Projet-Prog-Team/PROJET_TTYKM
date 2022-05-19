@@ -2,6 +2,7 @@ package Controleur;
 
 import Modele.CalculJeu;
 import Modele.DeroulementJeu;
+import Modele.ETAT;
 import Modele.Pion;
 import Structures.Couple;
 import Structures.Tour;
@@ -39,10 +40,12 @@ public class IADifficile extends IA{
             ArrayList<Couple<Integer, Tour>> fils = new ArrayList<>();
 
             ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
+            if(branchements.size() == 0) {
+                System.out.println("FF MAINTENANT REVERT FAST ");
+            }
             for (Couple<DeroulementJeu, Tour> couple : branchements) {
                 fils.add(new Couple<>(calculCoup(couple.getFirst(), horizon - 1, !joueur), couple.getSecond()));
             }
-
             int minMax = joueur ? Math.abs(Collections.min(fils).getFirst())+1 : Math.abs(Collections.max(fils).getFirst())+1;
             int somme = 0;
             for (int i = 0; i < fils.size(); i++) {
@@ -75,17 +78,19 @@ public class IADifficile extends IA{
 
     @Override
     public Pion jouerCoup() {
-        if (calcul.getDj().getJoueurActuel().getNbActionsRestantes() == 2) {
+        if (calcul.getDj().getEtape() == ETAT.MOVE1) {
             if (tour.getCoup1() == null) {
                 calculCoup(calcul.getDj(), horizon, true);
             }
             return tour.getCoup1();
-        } else {
+        }
+        if (calcul.getDj().getEtape() == ETAT.MOVE2) {
             if (tour.getCoup2() == null) {
                 calculCoup(calcul.getDj(), horizon, true);
             }
             return tour.getCoup2();
         }
+        return null;
     }
     @Override
     public Integer choixFocus() {

@@ -5,7 +5,7 @@ import Structures.Point;
 
 import java.util.ArrayList;
 
-public class    DeroulementJeu extends Observable implements Comparable  {
+public class DeroulementJeu extends Observable implements Comparable  {
     Joueur joueurActuel;
     Pion pionActuel;
     private boolean real=false;

@@ -189,6 +189,65 @@ public class CalculJeu {
                         c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
                     }
                     jeuxCoup1.addAll(coups);
+                }
+            case MOVE2:
+                // Si etape du jeu : coup 2
+                if (jeuxCoup1.size() == 0) {
+                    jeuxCoup1.add(new Couple(dj, new Tour()));
+                }
+
+                for (Couple<DeroulementJeu, Tour> j : jeuxCoup1) {
+                    if (j.getFirst().getJoueurActuel().getNbActionsRestantes() == 1) {
+                        ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
+                        for (Couple<DeroulementJeu, Tour> c : coups) {
+                            c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                            c.getSecond().setCoup1(j.getSecond().getCoup1());
+                        }
+                        jeuxCoup2.addAll(coups);
+                    } else {
+                        jeuxCoup2.add(j);
+                    }
+                }
+            case FOCUS:
+                if (jeuxCoup2.size() == 0) {                            // Si etape du jeu : choix focus
+                    jeuxCoup2.add(new Couple(dj, new Tour()));
+                }
+                for (Couple<DeroulementJeu, Tour> j : jeuxCoup2) {
+                    ArrayList<Couple<DeroulementJeu, Tour>> focus = branchementsFocus(j.getFirst());
+                    for (Couple<DeroulementJeu, Tour> f : focus) {
+                        f.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                        f.getSecond().setCoup1(j.getSecond().getCoup1());
+                        f.getSecond().setCoup2(j.getSecond().getCoup2());
+                    }
+                    jeuxFocus.addAll(focus);
+                }
+                break;
+            case END:
+                break;
+        }
+
+        return jeuxFocus;
+    }
+    /*public ArrayList<Couple<DeroulementJeu, Tour>> Branchements() {
+
+        ArrayList<Couple<DeroulementJeu, Tour>> jeuxSelect = new ArrayList<>();
+        ArrayList<Couple<DeroulementJeu, Tour>> jeuxCoup1 = new ArrayList<>();
+        ArrayList<Couple<DeroulementJeu, Tour>> jeuxCoup2 = new ArrayList<>();
+        ArrayList<Couple<DeroulementJeu, Tour>> jeuxFocus = new ArrayList<>();
+
+        switch(dj.getEtape()) {
+            case SELECT:
+                jeuxSelect = branchementsSelect(dj);
+            case MOVE1:
+                if (jeuxSelect.size() == 0) {                           // Si pion deja selectionné
+                    jeuxSelect.add(new Couple(dj, new Tour()));
+                }
+                for (Couple<DeroulementJeu, Tour> j : jeuxSelect) {
+                    ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
+                    for (Couple<DeroulementJeu, Tour> c : coups) {             // Ajout de la selection aux tours de jeuxCoup1
+                        c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                    }
+                    jeuxCoup1.addAll(coups);
 
                 }
                 for (Couple<DeroulementJeu, Tour> j : jeuxCoup1) {
@@ -231,5 +290,5 @@ public class CalculJeu {
         }
 
         return jeuxFocus;
-    }
+    }*/
 }

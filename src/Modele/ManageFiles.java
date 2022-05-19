@@ -35,7 +35,7 @@ public class ManageFiles   {
         temp =  new ArrayList<Grille>();
         pions=new Pion[NBPIONS];
         Pion [] tmp =game.getPions().toArray(new Pion[0]);
-        for(int i =0 ;i < 6;i++)
+        for(int i =0 ;i < tmp.length;i++)
         {
             pions[tmp[i].ID]=tmp[i].copy(tmp[i].getJoueur());
         }
