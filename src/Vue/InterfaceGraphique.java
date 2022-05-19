@@ -157,7 +157,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // Historique
         //TODO: avoir le vrai historique
         String[] categories = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
+                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5 ",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
