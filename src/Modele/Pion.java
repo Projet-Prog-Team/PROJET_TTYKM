@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Pion {
     private Point coordonnees;
-    int epoque;
+    private int epoque;
     public int ID;
     public boolean focused = false;
     private Joueur joueur;
@@ -29,7 +29,10 @@ public class Pion {
     public int getEpoque() {
         return epoque;
     }
-
+    public void SetEpoque(int t_epoque)
+    {
+        epoque=t_epoque;
+    }
     public Point getCoordonnees() { return coordonnees; }
     public void SetCoordonnees(Point t_coordonnees)
     {

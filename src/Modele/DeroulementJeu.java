@@ -1,5 +1,6 @@
 package Modele;
 
+import Controleur.ControleurMediateur;
 import Patterns.Observable;
 import Structures.Point;
 
@@ -13,20 +14,21 @@ public class DeroulementJeu extends Observable implements Comparable  {
     public ManageFiles MemoryManager;
     Jeu j;
 
-    public DeroulementJeu(Jeu jeu,boolean t_real) {
+    public DeroulementJeu(Jeu jeu,boolean t_real,ControleurMediateur controleur) {
         j = jeu;
-        init();
+        init(controleur);
         real=t_real;
     }
 
-    public void init() {
+    public void init(ControleurMediateur controleur) {
         setJoueurActuel(j.getJoueur(0)); // joueur 1 commence
         ArrayList<Pion> pionInFocus = j.pionsFocusJoueur(joueurActuel.getFocus(), joueurActuel);
         if (pionInFocus.size() == 1) {
             setPionActuel(pionInFocus.get(0));
         }
         aGagne = 0;
-        MemoryManager= new ManageFiles(this,"/Saves/");
+        if(controleur!=null)
+            MemoryManager= new ManageFiles(controleur,"Saves/");
         miseAJour();
 
     }
@@ -111,7 +113,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
             Pion pionActuel = getPionActuel();
             if (j.getPion(pionActuel.getCoordonnees(), epoque) == null) {
                 Pion tmp0 = pionActuel.copy(pionActuel.getJoueur());
-                pionActuel.epoque = epoque;
+                pionActuel.SetEpoque(epoque);
                 if(real)
                     MemoryManager.UpdateLog(tmp0, pionActuel.copy(pionActuel.getJoueur()));
                 if (epoque < PionEpoque) { // Si l'époque visée est plus loin (dans le futur) que l'époque du pion.
@@ -185,7 +187,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
 
     public void move(Pion c, Point new_coord) {
         Point coord = new Point(c.getCoordonnees().getL(),c.getCoordonnees().getC());
-        Pion voisin = j.getPion(new_coord,c.epoque);
+        Pion voisin = j.getPion(new_coord,c.getEpoque());
         c.SetCoordonnees(new_coord);
         Point tmp = new Point(new_coord.getL()+(new_coord.getL()-coord.getL()),new_coord.getC()+(new_coord.getC()-coord.getC()));
         if (voisin != null) {
@@ -258,7 +260,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
 
     public DeroulementJeu copy() {
         Jeu jCopy = getJeu().copy();
-        DeroulementJeu djeu = new DeroulementJeu(jCopy,false);
+        DeroulementJeu djeu = new DeroulementJeu(jCopy,false,MemoryManager.getControlleur());
         djeu.joueurActuel = jCopy.getJoueur(getJoueurActuel().getID() - 1);
         djeu.aGagne = aGagne;
         for (Pion pion : jCopy.getPions()) {

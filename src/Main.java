@@ -11,9 +11,10 @@ public class Main {
         int cpt1 = 0;
         for(int i = 0; i < nbParties; i++) {
             Jeu j = new Jeu();
-            DeroulementJeu dj = new DeroulementJeu(j,false);
+            DeroulementJeu dj = new DeroulementJeu(j,false,null);
             IHMState state = new IHMState();
             ControleurMediateur c = new ControleurMediateur(dj,1, state);
+            dj.init(c);
             c.desactiverIA(1);
             c.activerIA(0, dif1, heuristique1);
             c.activerIA(1, dif2, heuristique2);
@@ -32,9 +33,10 @@ public class Main {
 
     public static void classique() {
         Jeu j = new Jeu();
-        DeroulementJeu dj = new DeroulementJeu(j,true);
+        DeroulementJeu dj = new DeroulementJeu(j,true,null);
         IHMState state = new IHMState();
         ControleurMediateur c = new ControleurMediateur(dj,1000, state);
+        dj.init(c);
         InterfaceGraphique.demarrer(dj, c, state);
     }
 

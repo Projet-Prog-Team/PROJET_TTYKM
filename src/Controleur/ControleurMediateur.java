@@ -14,11 +14,11 @@ import javax.swing.*;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
-    DeroulementJeu dj;
+    public DeroulementJeu dj;
     IA joueur1, joueur2, suggestion;
-    int [] joueurs;
+    public int [] joueurs;
     String difficulty1 = "facile", difficulty2 = "facile";
-    IHMState state;
+    public IHMState state;
     Timer t;
     int speed;
 
@@ -38,7 +38,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
-        dj.init();
+        dj.init(this);
         state.initPreview();
         state.setIA1(joueurs[0]==1);
         state.setIA2(joueurs[1]==1);
@@ -153,9 +153,11 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "save":
                 System.out.println(c.getSaveName());
+                dj.MemoryManager.Save(c.getSaveName());
                 break;
             case "load":
                 System.out.println(c.getSaveName());
+                dj.MemoryManager.Load(c.getSaveName());
                 break;
             case "annuler":
                 dj.MemoryManager.CTRLZ();
