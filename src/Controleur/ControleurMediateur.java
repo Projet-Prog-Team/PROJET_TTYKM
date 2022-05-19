@@ -160,19 +160,24 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "annuler":
                 dj.MemoryManager.CTRLZ();
                 state.setPauseIA(true);
+                t.stop();
                 break;
             case "refaire":
                 dj.MemoryManager.CTRLY();
                 state.setPauseIA(true);
+                t.stop();
                 break;
             case "annulerTour":
                 dj.MemoryManager.CTRLTZ();
                 state.setPauseIA(true);
+                t.stop();
                 break;
             case "suggestion":
                 suggestion();
                 break;
             case "reprendre":
+                t = new Timer(speed, new AdaptateurTemps(this));
+                t.start();
                 state.setPauseIA(false);
                 break;
             case "IASpeed":
