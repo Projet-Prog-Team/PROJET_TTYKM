@@ -11,10 +11,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.net.URL;
 import java.util.Vector;
 
@@ -264,6 +261,17 @@ public class InterfaceGraphique implements Runnable, Observateur {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
+                frameWidth = frame.getWidth();
+                frameHeight = frame.getHeight();
+                mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
+                victoryLabel.setBounds((frameWidth-800)/2,(frameHeight-300)/2,800,300);
+            }
+        });
+
+        frame.addWindowStateListener(new WindowAdapter() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                super.windowStateChanged(e);
                 frameWidth = frame.getWidth();
                 frameHeight = frame.getHeight();
                 mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
