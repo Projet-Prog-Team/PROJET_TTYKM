@@ -230,7 +230,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         mainPanel.add(lateralPane, BorderLayout.EAST);
 
         // Inventaire joueur 1
-        Inventory inv1 = new Inventory(1, jeu, state);
+        Inventory inv1 = new Inventory(1, jeu, state, controle);
         mainPanel.add(inv1.getPanel(), BorderLayout.NORTH);
 
         // Plateaux
@@ -257,7 +257,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         mainPanel.add(plateauBox, BorderLayout.CENTER);
 
         // Inventaire joueur 2
-        Inventory inv2 = new Inventory(2, jeu, state);
+        Inventory inv2 = new Inventory(2, jeu, state, controle);
         mainPanel.add(inv2.getPanel(), BorderLayout.SOUTH);
 
         frame.addComponentListener(new ComponentAdapter() {

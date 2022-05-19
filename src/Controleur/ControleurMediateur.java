@@ -151,6 +151,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 } else if (dj.getEtape() == ETAT.END){
                 }
                 break;
+            case "clicStatue":
+                System.out.println(c.getJoueur());
+                break;
             case "save":
                 System.out.println(c.getSaveName());
                 break;

@@ -16,9 +16,12 @@ public class PlateauSwing extends JComponent implements Plateau {
     Image focusNoir;
     Image pionBlanc;
     Image pionNoir;
+    Image statueBlanche;
+    Image statueNoire;
+    Image statueOrange;
     VuePlateau vue;
     Graphics2D drawable;
-    private final double pionSize = 0.6;
+    private final double pionSize = 0.8;
     private int xOffset = 0;
     private int yOffset = 50;
     private int focusRadius = 40;
@@ -53,11 +56,21 @@ public class PlateauSwing extends JComponent implements Plateau {
             in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusNoir.png");
             focusNoir = ImageIO.read(in);
 
-            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc.png");
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc2.png");
             pionBlanc = ImageIO.read(in);
 
-            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir.png");
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir2.png");
             pionNoir = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueBlanche.png");
+            statueBlanche = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueNoire.png");
+            statueNoire = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueOrange.png");
+            statueOrange = ImageIO.read(in);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -86,6 +99,23 @@ public class PlateauSwing extends JComponent implements Plateau {
         }else{
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
             drawable.drawImage(pionNoir,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+        }
+        drawable.setComposite(compo);
+    }
+
+    @Override
+    public void tracerStatue(int l, int c, double alpha, int joueur) {
+        Composite compo = drawable.getComposite();
+        //TODO: comment reconnaitre les pions entre les joueurs
+        if(joueur==1){
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(statueBlanche,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+        }else if(joueur==2){
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(statueNoire,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+        }else{
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(statueOrange,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
         }
         drawable.setComposite(compo);
     }

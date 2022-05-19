@@ -97,6 +97,9 @@ public class VuePlateau {
             }
         }
 
+        //TODO: connaitre l'emplacement des statues
+        plateau.tracerStatue(1,2, 1, 3);
+
         // Affiche les focus en mode preview ou non
         Joueur[] joueurs = jeu.getJeu().getJoueurs();
 
