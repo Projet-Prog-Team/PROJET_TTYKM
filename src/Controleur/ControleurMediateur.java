@@ -92,7 +92,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 case MOVE2:
                     p = j.jouerCoup();
                     coord = p.getCoordonnees();
-                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),false);
+                    dj.jouerCoup(coord.getL(), coord.getC(), p.getEpoque(),true);
                     state.initPreview();
                     break;
                 case FOCUS:

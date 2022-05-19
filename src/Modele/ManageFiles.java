@@ -501,6 +501,8 @@ public class ManageFiles   {
                     Actual_pos--;
                     DJgame.getJoueurActuel().setFocus(temp.get(Actual_pos).Focus);
                     DJgame.switchPlayer();
+                    Max_pos--;
+                    temp.remove(temp.size()-1);
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
                     DJgame.setPionActuel(game.pionsFocusJoueur(pred_focus,DJgame.getJoueurActuel()).get(0));
                     DJgame.joueurActuel.nbActionsRestantes=2;
@@ -510,6 +512,8 @@ public class ManageFiles   {
                     Actual_pos--;
                     DJgame.getJoueurActuel().setFocus(temp.get(Actual_pos).Focus);
                     DJgame.switchPlayer();
+                    Max_pos--;
+                    temp.remove(temp.size()-1);
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
                     DJgame.joueurActuel.nbActionsRestantes=2;
 

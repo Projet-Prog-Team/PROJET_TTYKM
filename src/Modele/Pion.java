@@ -56,12 +56,12 @@ public class Pion {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pion pion = (Pion) o;
-        return epoque == pion.epoque && Objects.equals(coordonnees, pion.coordonnees) && Objects.equals(joueur, pion.joueur);
+        return epoque == pion.epoque && coordonnees.equals(pion.coordonnees) && joueur.equals(pion.joueur);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(coordonnees, epoque, joueur);
+        return Objects.hash(coordonnees, epoque, ID, joueur);
     }
 
     @Override

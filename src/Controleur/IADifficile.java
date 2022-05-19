@@ -28,7 +28,7 @@ public class IADifficile extends IA{
     public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {     // joueur = true <=> calculCoup_Joueur_A
         cpt++;
         CalculJeu c = new CalculJeu(dj);
-        if (dj.estTermine() || horizon == 0) {   // Si horizon atteint ou jeu terminé, on retourne l'évaluation de jeu
+        if (dj.getEtape() == ETAT.END || horizon == 0) {   // Si horizon atteint ou jeu terminé, on retourne l'évaluation de jeu
             try {
                 return (int) method.invoke(c,null);
             } catch (IllegalAccessException e) {
@@ -41,6 +41,7 @@ public class IADifficile extends IA{
 
             ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
             if(branchements.size() == 0) {
+                System.out.println(c.getDj().getJeu());
                 System.out.println("FF MAINTENANT REVERT FAST ");
             }
             for (Couple<DeroulementJeu, Tour> couple : branchements) {

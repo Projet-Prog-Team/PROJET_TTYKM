@@ -180,19 +180,21 @@ public class CalculJeu {
             case SELECT:
                 jeuxSelect = branchementsSelect(dj);
             case MOVE1:
+            case MOVE2:
                 if (jeuxSelect.size() == 0) {                           // Si pion deja selectionné
                     jeuxSelect.add(new Couple(dj, new Tour()));
                 }
-                for (Couple<DeroulementJeu, Tour> j : jeuxSelect) {
-                    ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
-                    for (Couple<DeroulementJeu, Tour> c : coups) {             // Ajout de la selection aux tours de jeuxCoup1
-                        c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+
+                if (dj.getJoueurActuel().getNbActionsRestantes() == 2) {   // Si etape du jeu : coup 1
+                    for (Couple<DeroulementJeu, Tour> j : jeuxSelect) {
+                        ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
+                        for (Couple<DeroulementJeu, Tour> c : coups) {             // Ajout de la selection aux tours de jeuxCoup1
+                            c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                        }
+                        jeuxCoup1.addAll(coups);
+
                     }
-                    jeuxCoup1.addAll(coups);
-                }
-            case MOVE2:
-                // Si etape du jeu : coup 2
-                if (jeuxCoup1.size() == 0) {
+                } else {                                                // Si etape du jeu : coup 2
                     jeuxCoup1.add(new Couple(dj, new Tour()));
                 }
 
