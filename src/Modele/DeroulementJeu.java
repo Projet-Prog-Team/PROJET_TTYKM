@@ -27,8 +27,9 @@ public class DeroulementJeu extends Observable implements Comparable  {
             setPionActuel(pionInFocus.get(0));
         }
         aGagne = 0;
+        //C:/Users/Theo/Desktop/Code/PROJET_TTYKM/res/Saves
         if(controleur!=null)
-            MemoryManager= new ManageFiles(controleur,"/Saves/");
+            MemoryManager= new ManageFiles(controleur,"Saves");
         miseAJour();
 
     }
@@ -193,19 +194,26 @@ public class DeroulementJeu extends Observable implements Comparable  {
         if (voisin != null) {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
                 if(real)
+                {
+                    MemoryManager.move=false;
                     MemoryManager.UpdateLog(c,null);
+                }
                 j.getPions().remove(c);
             } else {
                 if(voisin.getJoueur() == c.getJoueur()) {
                     if(real)
                     {
+                        MemoryManager.move=false;
                         MemoryManager.UpdateLog(c, null);
+                        MemoryManager.move=false;
                         MemoryManager.UpdateLog(voisin, null);
                     }
                     j.getPions().remove(c);
                     j.getPions().remove(voisin);
                 }
                 else {
+                    MemoryManager.move=false;
+                    MemoryManager.UpdateLog(null,c.copy(c.getJoueur()));
                     move(voisin, tmp);
                 }
             }
@@ -213,7 +221,11 @@ public class DeroulementJeu extends Observable implements Comparable  {
         else {
             if (new_coord.getL() >= 4 || new_coord.getC() >= 4 || new_coord.getL()<0 || new_coord.getC()<0) {
                 if(real)
+                {
+                    MemoryManager.move=false;
                     MemoryManager.UpdateLog(c,null);
+                }
+
                 j.getPions().remove(c);
             }
             else {
