@@ -38,11 +38,21 @@ public class VuePlateau {
             }
 
             // Affiche les cases disponibles pour le déplacement
-            if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) {
+            if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2 && !jeu.getConstructionStatue()) {
                 casesDispoDeplacement = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
                 for (Emplacement emplacement : casesDispoDeplacement) {
                     if (emplacement.getEpoque() == plateau.getEpoque()) {
                         plateau.tracerBrillanceCase(emplacement.getCoordonnees().getL(), emplacement.getCoordonnees().getC());
+                    }
+                }
+            }
+
+            // Affiche les cases disponibles pour la construction d'un statue
+            if((jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) && jeu.getConstructionStatue()){
+                casesDispoDeplacement = jeu.getJeu().casesDispoStatue(jeu.getPionActuel());
+                for (Emplacement emplacement : casesDispoDeplacement) {
+                    if (emplacement.getEpoque() == plateau.getEpoque()) {
+                        plateau.tracerBrillancePion(emplacement.getCoordonnees().getL(), emplacement.getCoordonnees().getC());
                     }
                 }
             }
@@ -80,7 +90,11 @@ public class VuePlateau {
             pions = state.getPreview();
             for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+                    if (pion instanceof PionBasique) {
+                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+                    } else {
+                        plateau.tracerStatue(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, ((Statue) pion).getID());
+                    }
                 }
             }
             Pion pionActuel =  jeu.getPionActuel();
@@ -91,13 +105,17 @@ public class VuePlateau {
             pions = jeu.getJeu().getPions();
             for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+                    if (pion instanceof PionBasique) {
+                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+                    } else {
+                        plateau.tracerStatue(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, ((Statue) pion).getID());
+                    }
                 }
             }
         }
 
         //TODO: connaitre l'emplacement des statues
-        plateau.tracerStatue(1,2, 1, 3);
+        //plateau.tracerStatue(1,2, 1, 3);
 
         // Affiche les focus en mode preview ou non
         Joueur[] joueurs = jeu.getJeu().getJoueurs();

@@ -51,7 +51,7 @@ public class CalculJeu {
         int heuristique = Heuristique();
         for (Pion pion : dj.getJeu().getPions()) {
             if (pion.getJoueur() == dj.getJoueurActuel()) {
-                heuristique += 30*distancePionBord(pion);
+                heuristique += 30*pion.distancePionBord();
             }
         }
         return heuristique;
@@ -112,16 +112,6 @@ public class CalculJeu {
 
     Heuristique 4 semble être meilleur que 3 !
      */
-
-    public int distancePionBord(Pion p) {
-        int d = 1;
-        int l = p.getCoordonnees().getL();
-        int c = p.getCoordonnees().getC();
-        if (c == 0 || l == 0 || c == 3 || l == 3) { // Si pion au bord
-            d = 0;
-        }
-        return d;
-    }
 
     // -------CALCUL DES BRANCHEMENTS-------
     public ArrayList<Couple<DeroulementJeu, Tour>> branchementsSelect(DeroulementJeu djeu) {   // On considere que le jeu j est dans l'étape selection

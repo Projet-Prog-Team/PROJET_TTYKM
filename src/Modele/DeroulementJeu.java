@@ -11,6 +11,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
     private boolean real;
     int aGagne;
     public ManageFiles MemoryManager;
+    private boolean constructionStatue;
     Jeu j;
 
     public DeroulementJeu(Jeu jeu,boolean t_real) {
@@ -27,8 +28,8 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
         aGagne = 0;
         MemoryManager= new ManageFiles(this,"/Saves/");
+        constructionStatue = false;
         miseAJour();
-
     }
 
     // ------------------Getters & setters------------------
@@ -45,6 +46,8 @@ public class DeroulementJeu extends Observable implements Comparable  {
         this.pionActuel = pionActuel;
     }
     public Jeu getJeu(){ return j; }
+    public Boolean getConstructionStatue(){return constructionStatue; }
+    public void setStatue(boolean b){constructionStatue = b; }
 
     // ------------------Etat du jeu------------------
     public boolean estTermine() {
@@ -96,6 +99,10 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 return "";
         }
     }
+    public void switchStatue(){
+        this.constructionStatue = !this.constructionStatue;
+        miseAJour();
+    }
 
     // ------------------Actions sur le jeu------------------
     public void selectPion(Emplacement e) {
@@ -140,16 +147,45 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
     }
 
+    public void creerStatue(Emplacement e) {
+        ArrayList<Emplacement> cases = getJeu().casesDispoStatue(pionActuel);
+            if (cases.contains(e)) {
+                // On crée le pion statue sur la case
+                getJeu().getPions().add(new Statue(e, joueurActuel.getID()));
+
+                for (int i = pionActuel.getEpoque(); i < 2; i++) {
+                    Emplacement eSuivant = new Emplacement(e.getCoordonnees(), i+1);
+                    Pion p = getJeu().getPion(eSuivant);
+                    if (p == null) { // Si case vide dans l'époque suivante
+                        getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
+                    } else {    // Si il y a un pion p
+                        Point cActuel = pionActuel.getEmplacement().getCoordonnees();
+                        int dL = eSuivant.getCoordonnees().getL() - cActuel.getL(); // Distance entre la case cliquée et le pion actuel
+                        int dC = eSuivant.getCoordonnees().getC() - cActuel.getC();
+                        Point dest;
+                        if (p instanceof Statue && p.distancePionBord() == 0) { // Il faut inverser la direction
+                            // Bouger les pions dans direction inverse
+                            eSuivant = new Emplacement(pionActuel.getCoordonnees(), i+1); // Emplacement devant la statue
+                            dest = new Point(eSuivant.getCoordonnees().getL() - dL, eSuivant.getCoordonnees().getC() - dC);
+                            p = getJeu().getPion(eSuivant);
+                        } else {                  // On bouge tout puis on place
+                            dest = new Point(eSuivant.getCoordonnees().getL() + dL, eSuivant.getCoordonnees().getC() + dC);
+                        }
+                        if (p != null) {
+                            move(p, dest);
+                        }
+                        getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
+                    }
+                }
+                switchStatue();
+                joueurActuel.nbActionsRestantes--;
+                joueurActuel.setStatuePlaced(true);
+            }
+    }
+
     public void jouerCoup(Emplacement e, boolean real) {
-        PionBasique clic;
-        if(joueurActuel.getID()==1) {
-            clic = new PionBasique(e, joueurActuel,getJeu().NBPIONS/2-joueurActuel.getNbActionsRestantes(),false);
-        }
-        else {
-            clic = new PionBasique(e, joueurActuel,getJeu().NBPIONS-joueurActuel.getNbActionsRestantes(),false);
-        }
         ArrayList<Emplacement> cases = getJeu().casesDispo(joueurActuel,pionActuel);
-        if (cases.contains(clic.getEmplacement())) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup
+        if (cases.contains(e)) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup
             if(real) {
                 MemoryManager.AddLog(null);
             }
@@ -183,9 +219,8 @@ public class DeroulementJeu extends Observable implements Comparable  {
                     MemoryManager.UpdateLog(pion,null);
                 j.getPions().remove(pion);
             } else {
-                if(voisin.getJoueur() == pion.getJoueur()) {
-                    if(real)
-                    {
+                if(pion instanceof PionBasique && voisin.getJoueur() == pion.getJoueur()) {
+                    if(real) {
                         MemoryManager.UpdateLog(pion, null);
                         MemoryManager.UpdateLog(voisin, null);
                     }
@@ -241,7 +276,11 @@ public class DeroulementJeu extends Observable implements Comparable  {
     //------------------------------------
     public ArrayList<Pion> getPreview(Emplacement e) {
         DeroulementJeu djeu = copy();
-        djeu.jouerCoup(e, real);
+        if(constructionStatue){
+            djeu.creerStatue(e);
+        }else{
+            djeu.jouerCoup(e, real);
+        }
         ArrayList<Pion> preview = djeu.getJeu().getPions();
         return preview;
     }
@@ -253,6 +292,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         DeroulementJeu djeu = new DeroulementJeu(jCopy,false);
         djeu.joueurActuel = jCopy.getJoueur(getJoueurActuel().getID() - 1);
         djeu.aGagne = aGagne;
+        djeu.setStatue(constructionStatue);
         for (Pion pion : jCopy.getPions()) {
             if (pion instanceof PionBasique) {
                 PionBasique pb = (PionBasique) pion;

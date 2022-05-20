@@ -2,6 +2,7 @@ package Modele;
 
 public class Joueur {
     int ID;
+    private boolean statuePlaced;
     private int nbPionsRestants;
     public int nbActionsRestantes = 2;
     int focus;
@@ -10,6 +11,15 @@ public class Joueur {
     public Joueur(int id,int nbpions) {
         ID = id;
         nbPionsRestants = nbpions;
+        statuePlaced = false;
+    }
+
+    public boolean isStatuePlaced() {
+        return statuePlaced;
+    }
+
+    public void setStatuePlaced(boolean statuePlaced) {
+        this.statuePlaced = statuePlaced;
     }
 
     public int getID() {

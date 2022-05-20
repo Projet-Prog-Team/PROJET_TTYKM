@@ -28,6 +28,11 @@ public class PionBasique extends Pion{
     }
 
     @Override
+    public Pion copy() {
+        return null;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

@@ -57,7 +57,11 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case MOVE2:
                 case MOVE1:
-                    dj.jouerCoup(e,true);
+                    if (dj.getConstructionStatue()) {
+                        dj.creerStatue(e);
+                    } else {
+                        dj.jouerCoup(e, true);
+                    }
                     state.initPreview();
                     break;
                 case FOCUS:
@@ -146,6 +150,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "clicStatue":
                 System.out.println(c.getJoueur());
+                if(c.getJoueur()==dj.getJoueurActuel().getID()){
+                    dj.switchStatue();
+                }
                 break;
             case "save":
                 System.out.println(c.getSaveName());

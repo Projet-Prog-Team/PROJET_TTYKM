@@ -97,7 +97,11 @@ public class Inventory implements Observateur {
         }
 
         // TODO: voir si le joueur a encore son pion statue
-        labelStatue.setVisible(true);
+        if(jeu.getJeu().getJoueur(joueur-1).isStatuePlaced()){
+            labelStatue.setVisible(false);
+        }else{
+            labelStatue.setVisible(true);
+        }
 
         // Affiche le joueur courant
         if(jeu.getJoueurActuel().getID()==joueur){

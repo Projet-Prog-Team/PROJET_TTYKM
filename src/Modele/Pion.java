@@ -34,15 +34,25 @@ public abstract class Pion {
         e.setCoordonnees(coord);
     }
 
-    public abstract Joueur getJoueur();
-
     public boolean colle(Pion pion2) {
         int dColonne = Math.abs(pion2.getCoordonnees().getC()-getCoordonnees().getC());
         int dLigne = Math.abs(pion2.getCoordonnees().getL()-getCoordonnees().getL());
         return (dColonne == 0 && dLigne == 1) || (dColonne == 1 && dLigne == 0);
     }
-    public abstract Pion copy(Joueur joueur);
 
+    public int distancePionBord() {
+        int d = 1;
+        int l = getCoordonnees().getL();
+        int c = getCoordonnees().getC();
+        if (c == 0 || l == 0 || c == 3 || l == 3) { // Si pion au bord
+            d = 0;
+        }
+        return d;
+    }
+
+    public abstract Joueur getJoueur();
+    public abstract Pion copy(Joueur joueur);
+    public abstract Pion copy();
     @Override
     public String toString() {
         return "Pion{" +
