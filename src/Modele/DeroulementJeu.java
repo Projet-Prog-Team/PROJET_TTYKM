@@ -28,7 +28,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
         aGagne = 0;
         if(controleur!=null)
-            MemoryManager= new ManageFiles(controleur,"Saves/");
+            MemoryManager= new ManageFiles(controleur,"/Saves/");
         miseAJour();
 
     }

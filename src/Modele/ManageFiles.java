@@ -269,14 +269,16 @@ public class ManageFiles   {
 
             if(Actual_pos-1>0 && t_etat!=ETAT.IDLE)
             {
-                pred_focus=temp.get(Actual_pos-1).GetCases()[oldpos].getEpoque();
+                //pred_focus=temp.get(Actual_pos-1).GetCases()[oldpos].getEpoque();
+                pred_focus=temp.get(Actual_pos-1).Focus;
             }
             else
             {
 
                 if(t_etat==ETAT.IDLE)
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                pred_focus=game.getPions().get(pos).getEpoque();
+                //pred_focus=game.getPions().get(pos).getEpoque();
+                pred_focus=temp.get(Actual_pos).Focus;
             }
 
             switch(t_etat)
@@ -414,22 +416,25 @@ public class ManageFiles   {
             System.out.println(pos);
             if(Actual_pos-2>0 && t_etat!=ETAT.IDLE)
             {
-                pred_focus=temp.get(Actual_pos-2).GetCases()[oldpos].getEpoque();
+                //pred_focus=temp.get(Actual_pos-2).GetCases()[oldpos].getEpoque();
+                pred_focus=temp.get(Actual_pos-1).Focus;
             }
             else
             {
 
                 if(t_etat==ETAT.IDLE)
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                pred_focus=game.getPions().get(pos).getEpoque();
-            }
+                //pred_focus=game.getPions().get(pos).getEpoque();
+                pred_focus=temp.get(Actual_pos).Focus;
 
+            }
+            System.out.println("pred_focus: "+pred_focus);
             switch(t_etat)
             {
                 case IDLE:
                     System.out.println("IDLE");
-                    Actual_pos--;
                     DJgame.getJoueurActuel().setFocus(temp.get(Actual_pos).Focus);
+                    Actual_pos--;
                     DJgame.switchPlayer();
                     Max_pos--;
                     temp.remove(temp.size()-1);
@@ -439,8 +444,8 @@ public class ManageFiles   {
                     break;
                 case SELECT:
                     System.out.println("SELECT");
-                    Actual_pos--;
                     DJgame.getJoueurActuel().setFocus(temp.get(Actual_pos).Focus);
+                    Actual_pos--;
                     DJgame.switchPlayer();
                     Max_pos--;
                     temp.remove(temp.size()-1);
