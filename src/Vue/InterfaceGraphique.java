@@ -23,7 +23,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
     private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
     private int frameWidth = 1600;
     private int frameHeight = 700;
-    ImageIcon victory;
+    ImageIcon victoryIcon;
+    JLabel victoryImage;
     JLabel victoryLabel;
     IHMState state;
 
@@ -33,8 +34,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
         this.state = state;
         state.ajouteObservateur(this);
         controle = c;
-        URL in = ClassLoader.getSystemResource("Img/victory.gif");
-        victory = new ImageIcon(in);
+        URL in = ClassLoader.getSystemResource("Img/confetti3.gif");
+        victoryIcon = new ImageIcon(in);
     }
 
     @Override
@@ -43,8 +44,25 @@ public class InterfaceGraphique implements Runnable, Observateur {
         plateauPresent.repaint();
         plateauFuture.repaint();
         if(jeu.getEtape()!= ETAT.END){
+            victoryImage.setVisible(false);
             victoryLabel.setVisible(false);
         }else{
+            victoryIcon.setImage(victoryIcon.getImage().getScaledInstance(frameWidth,frameHeight,Image.SCALE_DEFAULT));
+            victoryImage.setIcon(victoryIcon);
+            victoryImage.setVisible(true);
+            if(jeu.getState()=="j1gagne"){
+                if(state.getIA1()){
+                    victoryLabel.setText("L'IA 1 a gagné !");
+                }else{
+                    victoryLabel.setText("Le joueur 1 a gagné !");
+                }
+            }else{
+                if(state.getIA2()){
+                    victoryLabel.setText("l'IA 2 a gagné !");
+                }else{
+                    victoryLabel.setText("Le joueur a 2 gagné !");
+                }
+            }
             victoryLabel.setVisible(true);
         }
     }
@@ -72,9 +90,17 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        victoryLabel = new JLabel(victory);
+        victoryImage = new JLabel(victoryIcon);
+        victoryImage.setVisible(false);
+        layeredPane.add(victoryImage, Integer.valueOf(1));
+
+        victoryLabel = new JLabel("Joueur 1 gagne !");
+        victoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        victoryLabel.setForeground(Color.white);
+        Font font = victoryLabel.getFont();
+        victoryLabel.setFont(new Font(font.getFontName(),Font.BOLD,80));
         victoryLabel.setVisible(false);
-        layeredPane.add(victoryLabel, Integer.valueOf(1));
+        layeredPane.add(victoryLabel, Integer.valueOf(2));
 
         // Menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -264,7 +290,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
                 frameWidth = frame.getWidth();
                 frameHeight = frame.getHeight();
                 mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
-                victoryLabel.setBounds((frameWidth-800)/2,(frameHeight-300)/2,800,300);
+                victoryImage.setBounds(0,0,frameWidth,frameHeight);
+                victoryLabel.setBounds(0,0,frameWidth, frameHeight);
             }
         });
 
@@ -275,7 +302,8 @@ public class InterfaceGraphique implements Runnable, Observateur {
                 frameWidth = frame.getWidth();
                 frameHeight = frame.getHeight();
                 mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
-                victoryLabel.setBounds((frameWidth-800)/2,(frameHeight-300)/2,800,300);
+                victoryImage.setBounds(0,0,frameWidth,frameHeight);
+                victoryLabel.setBounds(0,0,frameWidth, frameHeight);
             }
         });
 
