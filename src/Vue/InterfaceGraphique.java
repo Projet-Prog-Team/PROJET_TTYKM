@@ -15,7 +15,7 @@ import java.awt.event.*;
 import java.net.URL;
 import java.util.Vector;
 
-public class InterfaceGraphique implements Runnable, Observateur {
+public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtilisateur {
 
     private DeroulementJeu jeu;
     private CollecteurEvenements controle;
@@ -34,6 +34,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         this.state = state;
         state.ajouteObservateur(this);
         controle = c;
+        c.fixerInterfaceUtilisateur(this);
         URL in = ClassLoader.getSystemResource("Img/confetti3.gif");
         victoryIcon = new ImageIcon(in);
     }
@@ -60,7 +61,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
                 if(state.getIA2()){
                     victoryLabel.setText("l'IA 2 a gagné !");
                 }else{
-                    victoryLabel.setText("Le joueur a 2 gagné !");
+                    victoryLabel.setText("Le joueur 2 a gagné !");
                 }
             }
             victoryLabel.setVisible(true);
@@ -308,10 +309,32 @@ public class InterfaceGraphique implements Runnable, Observateur {
         });
 
         layeredPane.add(mainPanel,Integer.valueOf(0));
+
+        Timer time = new Timer(16, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controle.ticAnim();
+            }
+        });
+        time.start();
         frame.add(layeredPane);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
     }
 
+    @Override
+    public void decale(double dL, double dC, int l, int c, int epoque) {
+        switch (epoque){
+            case 0:
+                plateauPasse.decale(dL,dC,l,c);
+                break;
+            case 1:
+                plateauPresent.decale(dL,dC,l,c);
+                break;
+            case 2:
+                plateauFuture.decale(dL,dC,l,c);
+                break;
+        }
+    }
 }

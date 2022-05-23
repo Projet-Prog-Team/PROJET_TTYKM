@@ -9,10 +9,13 @@ public class VuePlateau {
 
     DeroulementJeu jeu;
     Plateau plateau;
+    double[][] dC,dL;
 
     public VuePlateau(DeroulementJeu jeu, Plateau p) {
         this.jeu = jeu;
         this.plateau = p;
+        dC = new double[4][4];
+        dL = new double[4][4];
     }
 
     public void dessinerPlateau() {
@@ -86,36 +89,35 @@ public class VuePlateau {
         }
 
         // Affiche les pions en mode preview ou non
-        if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
-            pions = state.getPreview();
-            for (Pion pion : pions) {
-                if (pion.getEpoque() == plateau.getEpoque()) {
-                    if (pion instanceof PionBasique) {
-                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
-                    } else {
-                        plateau.tracerStatue(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, ((Statue) pion).getID());
-                    }
-                }
-            }
-            Pion pionActuel =  jeu.getPionActuel();
-            if(pionActuel.getEpoque()== plateau.getEpoque()){
-                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
-            }
-        }else{
+//        if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
+//            pions = state.getPreview();
+//            for (Pion pion : pions) {
+//                if (pion.getEpoque() == plateau.getEpoque()) {
+//                    if (pion instanceof PionBasique) {
+//                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+//                    } else {
+//                        plateau.tracerStatue(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, ((Statue) pion).getID());
+//                    }
+//                }
+//            }
+//            Pion pionActuel =  jeu.getPionActuel();
+//            if(pionActuel.getEpoque()== plateau.getEpoque()){
+//                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
+//            }
+//        }else{
             pions = jeu.getJeu().getPions();
             for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
+                    double l = pion.getCoordonnees().getL()+dL[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
+                    double c = pion.getCoordonnees().getC()+dC[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
                     if (pion instanceof PionBasique) {
-                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+                        plateau.tracerPion(l, c, 1, pion.getJoueur().getID());
                     } else {
-                        plateau.tracerStatue(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, ((Statue) pion).getID());
+                        plateau.tracerStatue(l, c, 1, ((Statue) pion).getID());
                     }
                 }
             }
-        }
-
-        //TODO: connaitre l'emplacement des statues
-        //plateau.tracerStatue(1,2, 1, 3);
+//        }
 
         // Affiche les focus en mode preview ou non
         Joueur[] joueurs = jeu.getJeu().getJoueurs();
@@ -153,6 +155,11 @@ public class VuePlateau {
                 }
             }
         }
-
     }
+
+    void fixerDecalage(double dL,double dC, int l, int c){
+        this.dC[l][c] = dC;
+        this.dL[l][c] = dL;
+    }
+
 }

@@ -91,31 +91,30 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     @Override
-    public void tracerPion(int l, int c, double alpha, int joueur) {
+    public void tracerPion(double l, double c, double alpha, int joueur) {
         Composite compo = drawable.getComposite();
         if(joueur==1){
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(pionBlanc,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(pionBlanc, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }else{
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(pionNoir,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(pionNoir, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }
         drawable.setComposite(compo);
     }
 
     @Override
-    public void tracerStatue(int l, int c, double alpha, int joueur) {
+    public void tracerStatue(double l, double c, double alpha, int joueur) {
         Composite compo = drawable.getComposite();
-        //TODO: comment reconnaitre les pions entre les joueurs
         if(joueur==1){
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(statueBlanche,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(statueBlanche, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }else if(joueur==2){
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(statueNoire,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(statueNoire, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }else{
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(statueOrange,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(statueOrange, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }
         drawable.setComposite(compo);
     }
@@ -244,4 +243,11 @@ public class PlateauSwing extends JComponent implements Plateau {
     public IHMState getState() {
         return state;
     }
+
+    @Override
+    public void decale(double dL, double dC, int l, int c) {
+        vue.fixerDecalage(dL,dC,l,c);
+        repaint();
+    }
+
 }

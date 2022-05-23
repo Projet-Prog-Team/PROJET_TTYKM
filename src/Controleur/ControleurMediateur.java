@@ -2,12 +2,10 @@ package Controleur;
 
 import Modele.*;
 import Structures.Point;
-import Vue.AdaptateurTemps;
-import Vue.CollecteurEvenements;
-import Vue.Commande;
-import Vue.IHMState;
+import Vue.*;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class ControleurMediateur implements CollecteurEvenements {
 
@@ -18,6 +16,9 @@ public class ControleurMediateur implements CollecteurEvenements {
     IHMState state;
     Timer t;
     int speed;
+    ArrayList<Animation> animations;
+    InterfaceUtilisateur inter;
+    Animation mouvement;
 
     String heuristique = "Heuristique4";
 
@@ -32,6 +33,8 @@ public class ControleurMediateur implements CollecteurEvenements {
     public void init() {
         t = new Timer(speed, new AdaptateurTemps(this));
         t.start();
+        animations = new ArrayList<>();
+        mouvement = null;
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
@@ -44,6 +47,11 @@ public class ControleurMediateur implements CollecteurEvenements {
         state.setDifficultyIA2(difficulty2);
         state.setPauseIA(false);
         activerIA(1, difficulty2, heuristique);
+    }
+
+    @Override
+    public void fixerInterfaceUtilisateur(InterfaceUtilisateur i) {
+        inter = i;
     }
 
     // Clique sur une case
@@ -61,7 +69,8 @@ public class ControleurMediateur implements CollecteurEvenements {
                     if (dj.getConstructionStatue()) {
                         dj.creerStatue(e);
                     } else {
-                        dj.jouerCoup(e, true);
+                        deplace(e, true);
+                        //dj.jouerCoup(e, true);
                     }
                     state.initPreview();
                     break;
@@ -90,7 +99,8 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case MOVE1:
                 case MOVE2:
-                    dj.jouerCoup(j.jouerCoup(),true);
+                    deplace(j.jouerCoup(), true);
+                    //dj.jouerCoup(j.jouerCoup(),true);
                     state.initPreview();
                     break;
                 case FOCUS:
@@ -102,6 +112,29 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case END:
                     break;
+            }
+        }
+    }
+
+    @Override
+    public void ticAnim() {
+        for (Animation animation : animations) {
+            animation.tic();
+            if(animation.estTermine()){
+                //animations.remove(animation);
+                if(animation == mouvement){
+                    mouvement = null;
+                }
+            }
+        }
+    }
+
+    void deplace(Emplacement e, boolean real){
+        if(mouvement == null){
+            Coup cp = dj.jouerCoup(e, real);
+            if (cp!=null){
+                mouvement = new AnimationCoup(cp, inter);
+                animations.add(mouvement);
             }
         }
     }
