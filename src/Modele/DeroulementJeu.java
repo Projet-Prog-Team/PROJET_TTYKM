@@ -148,39 +148,62 @@ public class DeroulementJeu extends Observable implements Comparable  {
     }
 
     public void creerStatue(Emplacement e) {
+        boolean casParticulier = false;
         ArrayList<Emplacement> cases = getJeu().casesDispoStatue(pionActuel);
-            if (cases.contains(e)) {
-                // On crée le pion statue sur la case
-                getJeu().getPions().add(new Statue(e, joueurActuel.getID()));
+        if (cases.contains(e)) {
+            // On crée le pion statue sur la case
+            getJeu().getPions().add(new Statue(e, joueurActuel.getID()));
 
-                for (int i = pionActuel.getEpoque(); i < 2; i++) {
-                    Emplacement eSuivant = new Emplacement(e.getCoordonnees(), i+1);
-                    Pion p = getJeu().getPion(eSuivant);
-                    if (p == null) { // Si case vide dans l'époque suivante
-                        getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
-                    } else {    // Si il y a un pion p
-                        Point cActuel = pionActuel.getEmplacement().getCoordonnees();
-                        int dL = eSuivant.getCoordonnees().getL() - cActuel.getL(); // Distance entre la case cliquée et le pion actuel
-                        int dC = eSuivant.getCoordonnees().getC() - cActuel.getC();
-                        Point dest;
-                        if (p instanceof Statue && p.distancePionBord() == 0) { // Il faut inverser la direction
-                            // Bouger les pions dans direction inverse
-                            eSuivant = new Emplacement(pionActuel.getCoordonnees(), i+1); // Emplacement devant la statue
-                            dest = new Point(eSuivant.getCoordonnees().getL() - dL, eSuivant.getCoordonnees().getC() - dC);
-                            p = getJeu().getPion(eSuivant);
-                        } else {                  // On bouge tout puis on place
-                            dest = new Point(eSuivant.getCoordonnees().getL() + dL, eSuivant.getCoordonnees().getC() + dC);
+            for (int i = pionActuel.getEpoque(); i < 2; i++) {
+                Emplacement eSuivant = new Emplacement(e.getCoordonnees(), i+1);
+                Pion p = getJeu().getPion(eSuivant);
+                if (p == null) { // Si case vide dans l'époque suivante
+                    getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
+                } else {    // Si il y a un pion p
+                    Point cActuel = pionActuel.getEmplacement().getCoordonnees();
+                    int dL = eSuivant.getCoordonnees().getL() - cActuel.getL(); // Distance entre la case cliquée et le pion actuel
+                    int dC = eSuivant.getCoordonnees().getC() - cActuel.getC();
+                    Point dest;
+                    if (p instanceof Statue && p.distancePionBord() == 0) { // Il faut inverser la direction
+                        // Bouger les pions dans direction inverse
+                        eSuivant = new Emplacement(pionActuel.getCoordonnees(), i+1); // Emplacement devant la statue
+                        if ((i+1) == 1) {
+                            casParticulier = true;
                         }
-                        if (p != null) {
-                            move(p, dest);
+                        dest = new Point(eSuivant.getCoordonnees().getL() - dL, eSuivant.getCoordonnees().getC() - dC);
+                        p = getJeu().getPion(eSuivant);
+                    } else {                  // On bouge tout puis on place
+                        dest = new Point(eSuivant.getCoordonnees().getL() + dL, eSuivant.getCoordonnees().getC() + dC);
+                    }
+                    if (p != null) {
+                        move(p, dest);
+                    }
+                    getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
+                }
+            }
+            if (casParticulier) {   // Si le pion du présent a été poussé dans le sens inverse de la création
+                Pion statueFutur = null, statuePresent = null;
+                for (Pion pion : getJeu().getPions()) {
+                    if (pion instanceof Statue && ((Statue) pion).getID() == joueurActuel.getID()) {
+                        if (pion.getEpoque() == 2) {
+                            statueFutur = pion;
+                        } else if (pion.getEpoque() == 1) {
+                            statuePresent = pion;
                         }
-                        getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
                     }
                 }
-                switchStatue();
-                joueurActuel.nbActionsRestantes--;
-                joueurActuel.setStatuePlaced(true);
+                move(statueFutur, statuePresent.getCoordonnees());
             }
+            switchStatue();
+            joueurActuel.nbActionsRestantes--;
+            joueurActuel.setStatuePlaced(true);
+        }
+        if (getJeu().joueurAGagne(joueurActuel)) {
+            aGagne = joueurActuel.getID();
+        } else if (getJeu().joueurAGagne(getJeu().joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
+            aGagne = j.joueurs[(joueurActuel.getID()) % 2].getID();
+        }
+        miseAJour();
     }
 
     public void jouerCoup(Emplacement e, boolean real) {
@@ -225,6 +248,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 // C'est vide, on peut déplacer le pion dans cette case
                 // juste set les coordonnées de pion & return true
                 if (dest.getL() >= 4 || dest.getC() >= 4 || dest.getL()<0 || dest.getC()<0) {
+                    j.getPions().remove(pion);
                     return false;
                 } else {
                     pion.setCoordonnees(dest);
