@@ -35,6 +35,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
+        dj.getJeu().init();
         dj.init();
         state.initPreview();
         state.setIA1(joueurs[0]==1);

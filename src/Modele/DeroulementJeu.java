@@ -231,8 +231,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
                     move(voisin, tmp);
                 }
             }
-        }
-        else {
+        } else {
             if (dest.getL() >= 4 || dest.getC() >= 4 || dest.getL()<0 || dest.getC()<0) {
                 if(real)
                     MemoryManager.UpdateLog(pion,null);
