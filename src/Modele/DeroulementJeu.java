@@ -29,7 +29,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         aGagne = 0;
         //C:/Users/Theo/Desktop/Code/PROJET_TTYKM/res/Saves
         if(controleur!=null)
-            MemoryManager= new ManageFiles(controleur,"../saves/");
+            MemoryManager= new ManageFiles(controleur,"./saves/");
         miseAJour();
 
     }
@@ -214,6 +214,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 else {
                     MemoryManager.move=false;
                     MemoryManager.UpdateLog(null,c.copy(c.getJoueur()));
+                    System.out.println("hey0");
                     move(voisin, tmp);
                 }
             }
@@ -231,8 +232,10 @@ public class DeroulementJeu extends Observable implements Comparable  {
             else {
                 Pion tmp2 = c.copy(c.getJoueur());
                 c.SetCoordonnees(new_coord);
-                if(real)
-                    MemoryManager.UpdateLog(tmp2,c);
+                if(real) {
+                    MemoryManager.move=false;
+                    MemoryManager.UpdateLog(tmp2, c);
+                }
             }
         }
     }
