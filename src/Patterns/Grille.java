@@ -29,7 +29,10 @@ public class Grille {
         PionFocus = t_pionfocus;
         Focus = t_focus;
     }
-
+    public Grille(Pion [] t_cases)
+    {
+        cases = t_cases;
+    }
     public static Pion[] Clone(Pion[]original)
     {
         Pion[] t_pions = new Pion[original.length];
@@ -46,6 +49,9 @@ public class Grille {
     }
     public int Compare(Pion[] second)
     {
+
+        if(second == null || cases == null)
+            return -1;
         int ln= cases.length;
         for (int i=0 ; i<ln;i++) {
             if(cases[i]!=null && second[i]==null || cases[i] ==null && second[i]!=null)

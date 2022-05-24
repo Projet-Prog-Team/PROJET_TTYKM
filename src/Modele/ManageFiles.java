@@ -50,16 +50,15 @@ public class ManageFiles   {
             pions[tmp[i].ID]=tmp[i].copy(tmp[i].getJoueur());
         }
         temp.add(new Grille(Grille.Clone(pions),ETAT.IDLE,0));
-        Path res =null;
-       /* try
+        try
         {
-            res=Paths.get(this.getClass().getClassLoader().getResource("/").toURI());
-        }catch(URISyntaxException e)
+            path = new File(absolutepath).getCanonicalPath() + "\\";
+        }
+        catch(IOException e)
         {
             System.out.println(e);
         }
-        //System.out.println(this.getClass().getClassLoader().getResource("/").getPath());
-        path=res.toAbsolutePath().toString();*/
+
     }
 
     public String GetPath()
@@ -73,7 +72,6 @@ public class ManageFiles   {
         {
 
             File file = new File(path+filepath);
-            System.out.println(path+filepath);
             if(!file.exists())
                 file.createNewFile();
             FileWriter Writer = new FileWriter(file);
@@ -112,20 +110,29 @@ public class ManageFiles   {
             Writer.write(Actual_pos);
             Writer.write(Max_pos);
             Writer.write('\n');
-            Grille tmpgrille=null;
+            Grille tmpgrille=new Grille(new Pion[game.NBPIONS]);
             for(Grille t_grille : temp)
             {
-                if(tmpgrille == null)
-                    tmpgrille=t_grille;
                 Writer.write(t_grille.Focus);
+                System.out.println(t_grille.Focus);
+
                 Writer.write(t_grille.PionFocus);
-                while(tmpgrille.Compare(t_grille.GetCases())!=-1)
+                Writer.write(ETAT.Convert(t_grille.etat));
+                do
                 {
                     int i =tmpgrille.Compare(t_grille.GetCases());
+                    if(i==(-1))
+                        i=0;
+                    Writer.write(" ");
                     Writer.write(i);
+                    Writer.write(" ");
+                    System.out.println(i);
                     if(t_grille.GetCases()[i] != null) {
+
                         Writer.write(t_grille.GetCases()[i].getCoordonnees().getC());
+                        System.out.println("C: "+t_grille.GetCases()[i].getCoordonnees().getC());
                         Writer.write(t_grille.GetCases()[i].getCoordonnees().getL());
+                        System.out.println("L: "+t_grille.GetCases()[i].getCoordonnees().getL());
                         Writer.write(t_grille.GetCases()[i].getEpoque());
                         Writer.write(t_grille.GetCases()[i].focused ? 1 : 0);
                         tmpgrille.GetCases()[i] = t_grille.GetCases()[i].copy(t_grille.GetCases()[i].getJoueur());
@@ -134,9 +141,11 @@ public class ManageFiles   {
                     {
                         tmpgrille.GetCases()[i] = null;
                         Writer.write('\t');
+                        System.out.println("/t");
                     }
-                }
+                }while(tmpgrille.Compare(t_grille.GetCases())!=-1);
                 Writer.write('\n');
+                System.out.println("/n");
 
             }
 
@@ -148,7 +157,27 @@ public class ManageFiles   {
     }
     public void BoardLoad(int index)
     {
-
+        game.SetPions(filter(temp.get(index).GetCases()));
+        DJgame.setPionActuel(temp.get(index).GetCases()[temp.get(index).Focus]);
+             for (Grille t_pion : temp)
+            {
+                Pion[] t_pions=t_pion.GetCases();
+                for(int i=0;i<NBPIONS;i++)
+                {
+                    if(t_pions[i]!=null)
+                    {
+                        System.out.println("i :"+i+" "+t_pions[i].getCoordonnees()+" "+t_pions[i].getEpoque());
+                    }
+                    else
+                    {
+                        System.out.println("i :"+i+" null");
+                    }
+                }
+                System.out.println("__________");
+                System.out.println(t_pion.Focus);
+            }
+            System.out.println("________________________");
+        System.out.println("Lock and Load");
     }
     public void Load(String filepath)
     {
@@ -190,33 +219,57 @@ public class ManageFiles   {
             controleur.state.setDifficultyIA2(diff);
             Actual_pos= Reader.read();
             Max_pos= Reader.read();
+            System.out.println("A: "+Actual_pos);
+            System.out.println("M: "+Max_pos);
             Reader.read();
-            Grille tmpgrille=null;
+            Grille tmpgrille = null;
             temp= new ArrayList<>();
+            int tour=-1;
             for(int i=0; i<Max_pos;i++)
             {
+                System.out.println("i: "+i);
                 if(tmpgrille != null)
+                {
                     tmpgrille=new Grille(Grille.Clone(tmpgrille.GetCases()),tmpgrille.etat, tmpgrille.PionFocus,tmpgrille.Focus);
+                }
+                else
+                {
+                    tmpgrille= new Grille(new Pion[game.NBPIONS]);
+                }
+
                 tmpgrille.Focus=Reader.read();
+                System.out.println("\nF: "+tmpgrille.Focus);
                 tmpgrille.PionFocus= Reader.read();
+                System.out.println("PF: "+tmpgrille.PionFocus);
+                tmpgrille.etat=ETAT.Convert(Reader.read());
+                if(tmpgrille.etat == ETAT.SELECT || tmpgrille.etat == ETAT.IDLE)
+                    tour++;
+                Reader.read();
                 int rd=Reader.read();
+                Reader.read();
                 while(rd!='\n')
                 {
+                    System.out.println("j");
                     int id =rd;
                     rd = Reader.read();
+                    System.out.println(id);
+                    System.out.println("_o"+rd+"o_");
+                    System.out.println(i);
                     if(rd != '\t') {
-
-                        int c = Reader.read();
+                        int c = rd;
                         int l = Reader.read();
-                        tmpgrille.GetCases()[i].SetCoordonnees(new Point(l,c));
-                        tmpgrille.GetCases()[i].SetEpoque(Reader.read());
-                        tmpgrille.GetCases()[i].focused= Reader.read()==1;
+                        System.out.println("L: "+l);
+                        int e = Reader.read();
+                        System.out.println("E: "+e);
+                        tmpgrille.GetCases()[id] = new Pion(new Point(l,c),e,game.getJoueur(id>=NBPIONS/2 ? 1 : 0),id,Reader.read()==1);
                     }
                     else
                     {
                         tmpgrille.GetCases()[i] = null;
                     }
+                    Reader.read();
                     rd= Reader.read();
+                    Reader.read();
                 }
                 temp.add(tmpgrille);
             }

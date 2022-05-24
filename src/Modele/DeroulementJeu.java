@@ -29,7 +29,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         aGagne = 0;
         //C:/Users/Theo/Desktop/Code/PROJET_TTYKM/res/Saves
         if(controleur!=null)
-            MemoryManager= new ManageFiles(controleur,"Saves");
+            MemoryManager= new ManageFiles(controleur,"../saves/");
         miseAJour();
 
     }
