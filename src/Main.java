@@ -38,6 +38,7 @@ public class Main {
             time.start();
             while(!dj.estTermine()) {
             }
+            time.stop();
             if (j.joueurAGagne(j.joueurs[0])) {
                 cpt0++;
             } else {

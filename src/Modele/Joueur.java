@@ -12,6 +12,7 @@ public class Joueur {
         ID = id;
         nbPionsRestants = nbpions;
         statuePlaced = false;
+        nbActionsRestantes = 2;
     }
 
     public boolean isStatuePlaced() {

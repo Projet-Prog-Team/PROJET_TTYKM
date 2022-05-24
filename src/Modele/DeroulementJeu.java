@@ -84,9 +84,9 @@ public class DeroulementJeu extends Observable implements Comparable  {
             case SELECT:
                 return "selection";
             case MOVE1 :
-                return "action2";
-            case MOVE2 :
                 return "action1";
+            case MOVE2 :
+                return "action2";
             case FOCUS:
                 return "focus";
             case END:
