@@ -337,4 +337,11 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
                 break;
         }
     }
+
+    @Override
+    public void reset() {
+        plateauFuture.reset();
+        plateauPasse.reset();
+        plateauPresent.reset();
+    }
 }

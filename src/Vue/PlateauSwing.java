@@ -250,4 +250,9 @@ public class PlateauSwing extends JComponent implements Plateau {
         repaint();
     }
 
+    public void reset(){
+        vue.resetDecalage();
+        repaint();
+    }
+
 }

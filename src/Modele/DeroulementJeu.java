@@ -387,15 +387,15 @@ public class DeroulementJeu extends Observable implements Comparable  {
     }
 
     //------------------------------------
-    public ArrayList<Pion> getPreview(Emplacement e) {
+    public Preview getPreview(Emplacement e) {
         DeroulementJeu djeu = copy();
+        Coup cp;
         if(constructionStatue){
-            djeu.creerStatue(e);
+            cp = djeu.creerStatue(e);
         }else{
-            djeu.jouerCoup(e, real);
+            cp = djeu.jouerCoup(e, real);
         }
-        ArrayList<Pion> preview = djeu.getJeu().getPions();
-        return preview;
+        return new Preview(cp, djeu.getJeu().getPions());
     }
 
     //------------------------------------

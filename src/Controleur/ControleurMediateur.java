@@ -19,6 +19,8 @@ public class ControleurMediateur implements CollecteurEvenements {
     ArrayList<Animation> animations;
     InterfaceUtilisateur inter;
     Animation mouvement;
+    Animation previewAnim;
+    Emplacement previewEmp;
 
     String heuristique = "Heuristique4";
 
@@ -35,6 +37,8 @@ public class ControleurMediateur implements CollecteurEvenements {
         t.start();
         animations = new ArrayList<>();
         mouvement = null;
+        previewAnim = null;
+        previewEmp = null;
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
@@ -118,20 +122,24 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     @Override
     public void ticAnim() {
+        ArrayList<Animation> remove = new ArrayList<>();
         for (Animation animation : animations) {
             animation.tic();
             if(animation.estTermine()){
-                //animations.remove(animation);
+                remove.add(animation);
                 if(animation == mouvement){
                     mouvement = null;
                 }
             }
         }
+        animations.removeAll(remove);
     }
 
     void deplace(Emplacement e, boolean real){
         if(mouvement == null){
             Coup cp = dj.jouerCoup(e, real);
+            state.initPreview();
+            animations.remove(previewAnim);
             if (cp!=null){
                 mouvement = new AnimationCoup(cp, inter);
                 animations.add(mouvement);
@@ -229,6 +237,7 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "newGame":
                 t.stop();
                 init();
+                inter.reset();
                 break;
             case "toggleIA1":
                 activerIA(0, difficulty1, heuristique);
@@ -290,8 +299,31 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     public void enablePreview(int l, int c, int epoque){
         Emplacement e = new Emplacement(new Point(l, c), epoque);
-        if(dj.getEtape()==ETAT.MOVE1 || dj.getEtape()==ETAT.MOVE2){
-            state.setPreview(dj.getPreview(e));
+        // Si on est dans le bon etat
+        if((dj.getEtape()==ETAT.MOVE1 || dj.getEtape()==ETAT.MOVE2) && !joueurActuelEstIA()){
+            // Si la preview est une nouvelle preview
+            if(!e.equals(previewEmp)){
+                animations.remove(previewAnim);
+                // Si le coup est possible
+                Preview preview = dj.getPreview(e);
+                state.setPreview(preview.getPlateau());
+                if (!preview.getCoup().deplacements().isEmpty()) {
+                    previewEmp = e;
+                    previewAnim = new AnimationPreview(preview.getCoup(), inter);
+                    animations.add(previewAnim);
+                    //state.setPreview(preview.getPlateau());
+                }else {
+                    previewEmp = null;
+                    previewAnim = null;
+                    //state.setPreview(null);
+                    inter.reset();
+                }
+            }
         }
+    }
+
+    public boolean joueurActuelEstIA(){
+        int id = dj.getJoueurActuel().getID()-1;
+        return joueurs[id] == 1;
     }
 }

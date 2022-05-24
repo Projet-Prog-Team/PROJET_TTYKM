@@ -89,24 +89,13 @@ public class VuePlateau {
         }
 
         // Affiche les pions en mode preview ou non
-//        if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
-//            pions = state.getPreview();
-//            for (Pion pion : pions) {
-//                if (pion.getEpoque() == plateau.getEpoque()) {
-//                    if (pion instanceof PionBasique) {
-//                        plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
-//                    } else {
-//                        plateau.tracerStatue(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, ((Statue) pion).getID());
-//                    }
-//                }
-//            }
-//            Pion pionActuel =  jeu.getPionActuel();
-//            if(pionActuel.getEpoque()== plateau.getEpoque()){
-//                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
-//            }
-//        }else{
+        if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
+            pions = state.getPreview();
+        }else {
             pions = jeu.getJeu().getPions();
-            for (Pion pion : pions) {
+        }
+
+        for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     double l = pion.getCoordonnees().getL()+dL[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
                     double c = pion.getCoordonnees().getC()+dC[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
@@ -116,8 +105,7 @@ public class VuePlateau {
                         plateau.tracerStatue(l, c, 1, ((Statue) pion).getID());
                     }
                 }
-            }
-//        }
+        }
 
         // Affiche les focus en mode preview ou non
         Joueur[] joueurs = jeu.getJeu().getJoueurs();
@@ -158,8 +146,14 @@ public class VuePlateau {
     }
 
     void fixerDecalage(double dL,double dC, int l, int c){
+//        System.out.println("dC : "+dC);
+//        System.out.println("dL : "+dL);
         this.dC[l][c] = dC;
         this.dL[l][c] = dL;
     }
 
+    void resetDecalage(){
+        this.dC = new double[4][4];
+        this.dL = new double[4][4];
+    }
 }

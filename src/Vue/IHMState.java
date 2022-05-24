@@ -40,7 +40,9 @@ public class IHMState extends Observable {
     }
 
     public void setPreview(ArrayList<Pion> preview) {
-        if(!preview.equals(this.preview)){
+        if(preview==null){
+            this.preview = preview;
+        }else if(!preview.equals(this.preview)){
             this.preview = preview;
             miseAJour();
         }
