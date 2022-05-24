@@ -112,13 +112,14 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
         miseAJour();
     }
-    public void changerEpoque(int epoque) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
+    public void changerEpoque(int epoque, Coup coup) { // Si possible, va déplacer le pion selectionné dans epoque et faire les copies éventuelles
         int PionEpoque = getPionActuel().getEpoque();
         if(Math.abs(PionEpoque-epoque)==1) { // Si l'époque visée est accessible +- 1
             PionBasique pionActuel = getPionActuel();
             Emplacement e = new Emplacement(pionActuel.getCoordonnees(), epoque);
             if (j.getPion(e) == null) { // Si l'emplacement est une case libre
                 PionBasique tmp0 = pionActuel.copy(pionActuel.getJoueur());
+                coup.deplace(pionActuel.getEmplacement().copy(), e.copy());
                 pionActuel.setEpoque(epoque);
                 if(real)
                     MemoryManager.UpdateLog(tmp0, pionActuel.copy(pionActuel.getJoueur()));
@@ -132,6 +133,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
                         tmp=new PionBasique(emplacement, joueurActuel,getJeu().NBPIONS-joueurActuel.getNbPionsRestants(),false);
                     }
                     j.getPions().add(tmp);
+                    coup.deplace(null, tmp.getEmplacement().copy());
                     if(real) {
                         MemoryManager.move=false;
                         MemoryManager.UpdateLog(null, tmp);
@@ -154,12 +156,13 @@ public class DeroulementJeu extends Observable implements Comparable  {
         if (cases.contains(e) && !joueurActuel.isStatuePlaced()) {
             // On crée le pion statue sur la case
             getJeu().getPions().add(new Statue(e, joueurActuel.getID()));
-
+            coup.deplace(null, e.copy());
             for (int i = pionActuel.getEpoque(); i < 2; i++) {
                 Emplacement eSuivant = new Emplacement(e.getCoordonnees(), i+1);
                 Pion p = getJeu().getPion(eSuivant);
                 if (p == null) { // Si case vide dans l'époque suivante
                     getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
+                    coup.deplace(null, eSuivant.copy());
                 } else {    // Si il y a un pion p
                     Point cActuel = pionActuel.getEmplacement().getCoordonnees();
                     int dL = eSuivant.getCoordonnees().getL() - cActuel.getL(); // Distance entre la case cliquée et le pion actuel
@@ -180,6 +183,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
                         move(p, dest, coup);
                     }
                     getJeu().getPions().add(new Statue(eSuivant, joueurActuel.getID()));
+                    coup.deplace(null, eSuivant.copy());
                 }
             }
             if (casParticulier) {   // Si le pion du présent a été poussé dans le sens inverse de la création
@@ -221,7 +225,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
             }
             if (e.getEpoque() != getPionActuel().getEpoque()) {
                 joueurActuel.nbActionsRestantes--;
-                changerEpoque(e.getEpoque());
+                changerEpoque(e.getEpoque(),coup);
             } else {
                 move(getPionActuel(), e.getCoordonnees(), coup);
                 joueurActuel.nbActionsRestantes--;

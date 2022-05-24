@@ -9,13 +9,12 @@ public class VuePlateau {
 
     DeroulementJeu jeu;
     Plateau plateau;
-    double[][] dC,dL;
+    double[][] dC,dL,alpha;
 
     public VuePlateau(DeroulementJeu jeu, Plateau p) {
         this.jeu = jeu;
         this.plateau = p;
-        dC = new double[4][4];
-        dL = new double[4][4];
+        resetDecalage();
     }
 
     public void dessinerPlateau() {
@@ -99,10 +98,11 @@ public class VuePlateau {
                 if (pion.getEpoque() == plateau.getEpoque()) {
                     double l = pion.getCoordonnees().getL()+dL[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
                     double c = pion.getCoordonnees().getC()+dC[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
+                    double a = alpha[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
                     if (pion instanceof PionBasique) {
-                        plateau.tracerPion(l, c, 1, pion.getJoueur().getID());
+                        plateau.tracerPion(l, c, a, pion.getJoueur().getID());
                     } else {
-                        plateau.tracerStatue(l, c, 1, ((Statue) pion).getID());
+                        plateau.tracerStatue(l, c, a, ((Statue) pion).getID());
                     }
                 }
         }
@@ -152,8 +152,20 @@ public class VuePlateau {
         this.dL[l][c] = dL;
     }
 
+    void tp(Emplacement e, double a){
+        this.alpha[e.getCoordonnees().getL()][e.getCoordonnees().getC()] = a;
+    }
+
     void resetDecalage(){
         this.dC = new double[4][4];
         this.dL = new double[4][4];
+        alpha = new double[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                alpha[i][j] = 1;
+            }
+        }
     }
+
+
 }

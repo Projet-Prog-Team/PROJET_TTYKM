@@ -72,7 +72,8 @@ public class ControleurMediateur implements CollecteurEvenements {
                 case MOVE2:
                 case MOVE1:
                     if (dj.getConstructionStatue()) {
-                        dj.creerStatue(e);
+                        creerStatue(e);
+                        //dj.creerStatue(e);
                     } else {
                         deplace(e, true);
                         //dj.jouerCoup(e, true);
@@ -143,6 +144,18 @@ public class ControleurMediateur implements CollecteurEvenements {
     void deplace(Emplacement e, boolean real){
         if(mouvement == null){
             Coup cp = dj.jouerCoup(e, real);
+            state.initPreview();
+            animations.remove(previewAnim);
+            if (cp!=null){
+                mouvement = new AnimationCoup(cp, inter);
+                animations.add(mouvement);
+            }
+        }
+    }
+
+    void creerStatue(Emplacement e){
+        if(mouvement == null){
+            Coup cp = dj.creerStatue(e);
             state.initPreview();
             animations.remove(previewAnim);
             if (cp!=null){

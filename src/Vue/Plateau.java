@@ -1,5 +1,7 @@
 package Vue;
 
+import Modele.Emplacement;
+
 public interface Plateau {
     void tracerBrillancePion(int l, int c);
     void tracerBrillanceCase(int l, int c);
@@ -13,4 +15,5 @@ public interface Plateau {
     int getEpoque();
     IHMState getState();
     void decale(double dL, double dC, int l, int c);
+    void tp(Emplacement depart, Emplacement arrive, double alphaDep, double alphaArr);
 }

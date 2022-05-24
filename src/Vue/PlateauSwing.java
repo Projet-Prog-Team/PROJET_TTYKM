@@ -2,6 +2,7 @@ package Vue;
 
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
+import Modele.Emplacement;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -247,6 +248,15 @@ public class PlateauSwing extends JComponent implements Plateau {
     @Override
     public void decale(double dL, double dC, int l, int c) {
         vue.fixerDecalage(dL,dC,l,c);
+        repaint();
+    }
+
+    public void tp(Emplacement depart, Emplacement arrive, double alphaDep, double alphaArr){
+        if(depart!=null && depart.getEpoque()==epoque){
+            vue.tp(depart, alphaDep);
+        }else if (arrive.getEpoque()==epoque){
+            vue.tp(arrive, alphaArr);
+        }
         repaint();
     }
 

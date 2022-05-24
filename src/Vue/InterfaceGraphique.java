@@ -3,6 +3,7 @@ package Vue;
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
 import Modele.ETAT;
+import Modele.Emplacement;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -20,7 +21,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
     private DeroulementJeu jeu;
     private CollecteurEvenements controle;
     private JFrame frame;
-    private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
+    private PlateauSwing plateauPasse, plateauPresent, plateauFutur;
     private int frameWidth = 1600;
     private int frameHeight = 700;
     ImageIcon victoryIcon;
@@ -43,7 +44,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
     public void metAJour() {
         plateauPasse.repaint();
         plateauPresent.repaint();
-        plateauFuture.repaint();
+        plateauFutur.repaint();
         if(jeu.getEtape()!= ETAT.END){
             victoryImage.setVisible(false);
             victoryLabel.setVisible(false);
@@ -272,11 +273,11 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         plateauPresent.addMouseListener(a2);
         plateauBox.add(plateauPresent);
 
-        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
-        AdaptateurSouris a3 = new AdaptateurSouris(plateauFuture, controle);
-        plateauFuture.addMouseMotionListener(a3);
-        plateauFuture.addMouseListener(a3);
-        plateauBox.add(plateauFuture);
+        plateauFutur = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
+        AdaptateurSouris a3 = new AdaptateurSouris(plateauFutur, controle);
+        plateauFutur.addMouseMotionListener(a3);
+        plateauFutur.addMouseListener(a3);
+        plateauBox.add(plateauFutur);
 
         mainPanel.add(plateauBox, BorderLayout.CENTER);
 
@@ -333,14 +334,21 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
                 plateauPresent.decale(dL,dC,l,c);
                 break;
             case 2:
-                plateauFuture.decale(dL,dC,l,c);
+                plateauFutur.decale(dL,dC,l,c);
                 break;
         }
     }
 
     @Override
+    public void tp(Emplacement depart, Emplacement arrive, double alphaDep, double alphaArr) {
+        plateauPasse.tp(depart, arrive, alphaDep, alphaArr);
+        plateauPresent.tp(depart, arrive, alphaDep, alphaArr);
+        plateauFutur.tp(depart, arrive, alphaDep, alphaArr);
+    }
+
+    @Override
     public void reset() {
-        plateauFuture.reset();
+        plateauFutur.reset();
         plateauPasse.reset();
         plateauPresent.reset();
     }
