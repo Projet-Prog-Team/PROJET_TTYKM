@@ -8,7 +8,8 @@ public class Grille {
     private Pion [] cases;
     public ETAT etat;
     public int PionFocus;
-    public int Focus;
+    public int FocusJ1;
+    public int FocusJ2;
     public Pion [] GetCases()
     {
         return cases;
@@ -22,12 +23,13 @@ public class Grille {
 
     }
 
-    public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus)
+    public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus, int t_focus2)
     {
         cases = t_cases;
         etat=t_etat;
         PionFocus = t_pionfocus;
-        Focus = t_focus;
+        FocusJ1 = t_focus;
+        FocusJ2 = t_focus2;
     }
     public Grille(Pion [] t_cases)
     {
