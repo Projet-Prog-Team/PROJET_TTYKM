@@ -1,6 +1,7 @@
 package Controleur;
 
 import Modele.*;
+import Structures.Couple;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -19,10 +20,10 @@ public class IAFacile extends IA {
         return pionsDispo.get(x);
     }
 
-    public Emplacement jouerCoup() {
+    public Couple<Integer, Emplacement> jouerCoup() {
         ArrayList<Emplacement> casesDispo = calcul.getDj().getJeu().casesDispo(calcul.getDj().getJoueurActuel(), calcul.getDj().getPionActuel());
         int x = r.nextInt(casesDispo.size());
-        return(casesDispo.get(x));
+        return (new Couple(1, casesDispo.get(x)));
     }
 
     public Integer choixFocus() {

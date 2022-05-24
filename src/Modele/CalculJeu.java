@@ -130,16 +130,34 @@ public class CalculJeu {
     public ArrayList<Couple<DeroulementJeu, Tour>> branchementsCoup(DeroulementJeu djeu) {     // j est dans l'étape jouer un coup
         ArrayList<Couple<DeroulementJeu, Tour>> jeux = new ArrayList<>();
         ArrayList<Emplacement> casesDispo = djeu.getJeu().casesDispo(djeu.getJoueurActuel(), djeu.getPionActuel());
+        ArrayList<Emplacement> casesDispoStatue = djeu.getJeu().casesDispoStatue(djeu.getPionActuel());
         for (Emplacement caseDispo : casesDispo) {
-            DeroulementJeu jeuCoup = djeu.copy();
+            DeroulementJeu jeuCoup = djeu.copy();   // Déplacement
             jeuCoup.jouerCoup(caseDispo,false);
             Tour t = new Tour();
             if (djeu.getJoueurActuel().getNbActionsRestantes() == 2) {
+                t.setTypeCoup1(1);
                 t.setCoup1(caseDispo);
             } else {
+                t.setTypeCoup2(1);
                 t.setCoup2(caseDispo);
             }
             jeux.add(new Couple(jeuCoup, t));
+        }
+        for (Emplacement caseDispoS : casesDispoStatue) {
+            if (djeu.getJeu().getPion(caseDispoS) == null && !djeu.getJoueurActuel().isStatuePlaced()) { // Si on peut y créer une statue
+                DeroulementJeu jeuStatue = djeu.copy();
+                jeuStatue.creerStatue(caseDispoS);
+                Tour tourStatue = new Tour();
+                if (djeu.getJoueurActuel().getNbActionsRestantes() == 2) {
+                    tourStatue.setTypeCoup1(2);
+                    tourStatue.setCoup1(caseDispoS);
+                } else {
+                    tourStatue.setTypeCoup2(2);
+                    tourStatue.setCoup2(caseDispoS);
+                }
+                jeux.add(new Couple(jeuStatue, tourStatue));
+            }
         }
         return jeux;
     }
@@ -191,6 +209,7 @@ public class CalculJeu {
                         ArrayList<Couple<DeroulementJeu, Tour>> coups = branchementsCoup(j.getFirst());
                         for (Couple<DeroulementJeu, Tour> c : coups) {
                             c.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                            c.getSecond().setTypeCoup1(j.getSecond().getTypeCoup1());
                             c.getSecond().setCoup1(j.getSecond().getCoup1());
                         }
                         jeuxCoup2.addAll(coups);
@@ -206,7 +225,9 @@ public class CalculJeu {
                     ArrayList<Couple<DeroulementJeu, Tour>> focus = branchementsFocus(j.getFirst());
                     for (Couple<DeroulementJeu, Tour> f : focus) {
                         f.getSecond().setPionSelectionne(j.getSecond().getPionSelectionne());
+                        f.getSecond().setTypeCoup1(j.getSecond().getTypeCoup1());
                         f.getSecond().setCoup1(j.getSecond().getCoup1());
+                        f.getSecond().setTypeCoup2(j.getSecond().getTypeCoup2());
                         f.getSecond().setCoup2(j.getSecond().getCoup2());
                     }
                     jeuxFocus.addAll(focus);

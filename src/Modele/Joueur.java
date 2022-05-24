@@ -4,7 +4,7 @@ public class Joueur {
     int ID;
     private boolean statuePlaced;
     private int nbPionsRestants;
-    public int nbActionsRestantes = 2;
+    public int nbActionsRestantes;
     int focus;
 
 
@@ -56,12 +56,14 @@ public class Joueur {
                 ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
                 ", focus=" + focus +
+                ", statuePlaced=" + statuePlaced +
                 '}';
     }
     public Joueur copy() {
         Joueur j = new Joueur(getID(),nbPionsRestants);
         j.nbActionsRestantes = getNbActionsRestantes();
         j.setFocus(getFocus());
+        j.setStatuePlaced(statuePlaced);
         return j;
     }
     public int getNbPionsRestants() {

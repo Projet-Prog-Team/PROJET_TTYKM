@@ -1,6 +1,7 @@
 package Controleur;
 
 import Modele.*;
+import Structures.Couple;
 import Structures.Point;
 import Vue.*;
 
@@ -10,9 +11,9 @@ import java.util.ArrayList;
 public class ControleurMediateur implements CollecteurEvenements {
 
     DeroulementJeu dj;
-    IA joueur1, joueur2, suggestion;
+    public IA joueur1, joueur2, suggestion;
     int [] joueurs;
-    String difficulty1 = "facile", difficulty2 = "facile";
+    String difficulty1 = "difficile", difficulty2 = "difficile";
     IHMState state;
     Timer t;
     int speed;
@@ -103,8 +104,12 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case MOVE1:
                 case MOVE2:
-                    deplace(j.jouerCoup(), true);
-                    //dj.jouerCoup(j.jouerCoup(),true);
+                    Couple<Integer, Emplacement> c = j.jouerCoup();
+                    if (c.getFirst() == 1) {
+                        deplace(c.getSecond(),true);
+                    } else if (c.getFirst() == 2){
+                        dj.creerStatue(c.getSecond());
+                    }
                     state.initPreview();
                     break;
                 case FOCUS:
@@ -152,12 +157,23 @@ public class ControleurMediateur implements CollecteurEvenements {
         switch(dj.getEtape()) {
             case SELECT:
                 state.setSuggestionSource(suggestion.selectPion().getEmplacement());
-                state.setSuggestionDestination(suggestion.jouerCoup());
+
+                Couple<Integer, Emplacement> c = suggestion.jouerCoup();
+                if (c.getFirst() == 1) {
+                    state.setSuggestionDestination(c.getSecond());
+                }
                 break;
             case MOVE1:
             case MOVE2:
                 state.setSuggestionSource(dj.getPionActuel().getEmplacement());
-                state.setSuggestionDestination(suggestion.jouerCoup());
+
+                c = suggestion.jouerCoup();
+                if (c.getFirst() == 1) {
+                    state.setSuggestionDestination(c.getSecond());
+                } else if (c.getFirst() == 2){
+                    // TODO : voir quoi faire pr suggestion création de statue
+                    state.setSuggestionDestination(c.getSecond());
+                }
                 break;
             case FOCUS:
                 state.setSuggestionFocus(suggestion.choixFocus());

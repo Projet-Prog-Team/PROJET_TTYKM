@@ -151,7 +151,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         Coup coup = new Coup();
         boolean casParticulier = false;
         ArrayList<Emplacement> cases = getJeu().casesDispoStatue(pionActuel);
-        if (cases.contains(e)) {
+        if (cases.contains(e) && !joueurActuel.isStatuePlaced()) {
             // On crée le pion statue sur la case
             getJeu().getPions().add(new Statue(e, joueurActuel.getID()));
 
@@ -193,22 +193,26 @@ public class DeroulementJeu extends Observable implements Comparable  {
                         }
                     }
                 }
-                move(statueFutur, statuePresent.getCoordonnees(), coup);
+                if (!statueFutur.getCoordonnees().equals(statuePresent.getCoordonnees())) {
+                    move(statueFutur, statuePresent.getCoordonnees(), coup);
+                }
             }
-            switchStatue();
+            constructionStatue = false;
             joueurActuel.nbActionsRestantes--;
             joueurActuel.setStatuePlaced(true);
+
+            if (getJeu().joueurAGagne(joueurActuel)) {
+                aGagne = joueurActuel.getID();
+            } else if (getJeu().joueurAGagne(getJeu().joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
+                aGagne = j.joueurs[(joueurActuel.getID()) % 2].getID();
+            }
+            miseAJour();
         }
-        if (getJeu().joueurAGagne(joueurActuel)) {
-            aGagne = joueurActuel.getID();
-        } else if (getJeu().joueurAGagne(getJeu().joueurs[(joueurActuel.getID()) % 2]) && joueurActuel.nbActionsRestantes == 0) {
-            aGagne = j.joueurs[(joueurActuel.getID()) % 2].getID();
-        }
-        miseAJour();
         return coup;
     }
 
     public Coup jouerCoup(Emplacement e, boolean real) {
+        //System.out.println(getPionActuel() + " etape + " + getEtape() + "joueur act" + joueurActuel);
         Coup coup = new Coup();
         ArrayList<Emplacement> cases = getJeu().casesDispo(joueurActuel,pionActuel);
         if (cases.contains(e)) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup
@@ -221,7 +225,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
             } else {
                 move(getPionActuel(), e.getCoordonnees(), coup);
                 joueurActuel.nbActionsRestantes--;
-                if (getJeu().getPion(getPionActuel().getEmplacement()) == null) {   // Si le joueur a tué son propre pion
+                if (getJeu().getPion(getPionActuel().getEmplacement()) == null || getJeu().getPion(getPionActuel().getEmplacement()) instanceof Statue) {   // Si le joueur a tué son propre pion
                     joueurActuel.nbActionsRestantes = 0;
                 }
             }
@@ -236,17 +240,20 @@ public class DeroulementJeu extends Observable implements Comparable  {
     }
 
     public boolean move (Pion pion, Point dest, Coup coup)  {
-        Pion pionDestination = j.getPion(new Emplacement(dest, pion.getEpoque()));
+        Pion pionDestination = j.getPion(new Emplacement(dest.copy(), pion.getEpoque()));
+        boolean pousse = false;
         int dL = dest.getL() - pion.getCoordonnees().getL();
         int dC = dest.getC() - pion.getCoordonnees().getC();
-        Point pointSD = new Point(dest.getL() + dL, dest.getC() + dC); // Derrière le pionDestination
+        Point pointSD = new Point(dest.getL() + dL, dest.getC() + dC); // Derrière le pionDestination"
+        //System.out.println("pionActuel :" + pion + "\n" + "dest : " + dest + "\n" + "pionDestination : " + pionDestination +  "\npointSD : " + pointSD + "\n-------------------------\n");
 
         if (pion instanceof PionBasique) {
             // Pull
+            Point casPull = null;
             Pion pionDerrierePion = j.getPion(new Emplacement(new Point(pion.getCoordonnees().getL() - dL, pion.getCoordonnees().getC() - dC), pion.getEpoque()));
-            if (pionDerrierePion instanceof Statue && !constructionStatue) {
+            if (pionDerrierePion instanceof Statue && !constructionStatue && pion.equals(getPionActuel())) {
                 coup.deplace(pionDerrierePion.getEmplacement().copy(), pion.getEmplacement().copy());
-                deplacerStatue(pionDerrierePion, pion.getCoordonnees(), coup);
+                casPull = pion.getCoordonnees().copy();
             }
 
             if (pionDestination == null) {
@@ -254,95 +261,98 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 // juste set les coordonnées de pion & return true
                 if (dest.getL() >= 4 || dest.getC() >= 4 || dest.getL()<0 || dest.getC()<0) {
                     j.getPions().remove(pion);
-                    return false;
+                    pousse = false;
                 } else {
                     coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                     pion.setCoordonnees(dest);
-                    return true;
+                    pousse = true;
                 }
             } else if (pionDestination instanceof PionBasique) {
                 if (pion.getJoueur() == pionDestination.getJoueur()) {
                     // Remove les deux & return true
-                    coup.deplace(pion.getEmplacement().copy(), pionDestination.getEmplacement().copy());
+                    coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                     j.getPions().remove(pion);
                     j.getPions().remove(pionDestination);
-                    return true;
+                    pousse = true;
                 } else {
                     if (pointSD.getL() >= 4 || pointSD.getC() >= 4 || pointSD.getL()<0 || pointSD.getC()<0) {
                         // Si la case derrière la destination est en dehors du plateau, ça veut dire qu'on pousse le pion dans le vide
                         // Supprimer pionDestination
                         // Puis déplacer pion & return true
-                        coup.deplace(pion.getEmplacement().copy(), pionDestination.getEmplacement().copy());
+                        coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                         j.getPions().remove(pionDestination);
                         pion.setCoordonnees(dest);
-                        return true;
+                        pousse = true;
                     } else {
                         // return appel récursif sur pionDestination avec pointSD
-                        coup.deplace(pion.getEmplacement().copy(), pionDestination.getEmplacement().copy());
+                        coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                         pion.setCoordonnees(dest);
-                        return move(pionDestination, pointSD, coup);
+                        pousse = move(pionDestination, pointSD, coup);
                     }
                 }
             } else if (pionDestination instanceof Statue) {
                 if (pointSD.getL() >= 4 || pointSD.getC() >= 4 || pointSD.getL()<0 || pointSD.getC()<0) {
                     j.getPions().remove(pion);
-                    return true;
+                    pousse =  true;
                 } else {
                     if (move(pionDestination, pointSD, coup) == true) {
                         // déplacer pion & return true
                         coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                         pion.setCoordonnees(dest);
-                        return true;
+                        pousse = true;
                     } else {
                         j.getPions().remove(pion);
-                        return true;
+                        pousse = true;
                     }
                 }
+            }
+            if (casPull != null) { // Si pull de statue
+                deplacerStatue(pionDerrierePion, casPull, coup);
             }
         } else { // Si pion à déplacer sur dest est une statue
             if (pionDestination == null) {
                 // On peut déplacer la statue dans cette case : set les coo & return true
                 if (dest.getL() >= 4 || dest.getC() >= 4 || dest.getL()<0 || dest.getC()<0) {
-                    return false;
+                    pousse = false;
                 } else {
                     coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                     deplacerStatue(pion, dest, coup);
-                    return true;
+                    pousse = true;
                 }
             } else if (pionDestination instanceof PionBasique) {
                 if (pointSD.getL() >= 4 || pointSD.getC() >= 4 || pointSD.getL()<0 || pointSD.getC()<0) {
                     // Si la case derrière la destination est en dehors du plateau, ça veut dire qu'on pousse le pion dans le vide
                     // Supprimer pionDestination
                     // Puis déplacer statue & return true
-                    coup.deplace(pion.getEmplacement().copy(), pionDestination.getEmplacement().copy());
+                    coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                     j.getPions().remove(pionDestination);
                     deplacerStatue(pion, dest, coup);
-                    return true;
+                    pousse = true;
                 } else {
                     // Déplacer statue et return appel récursif sur pionDestination avec pointSD
-                    coup.deplace(pion.getEmplacement().copy(), pionDestination.getEmplacement().copy());
+                    coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                     deplacerStatue(pion, dest, coup);
-                    return move(pionDestination, pointSD, coup);
+                    pousse = move(pionDestination, pointSD, coup);
                 }
             } else if (pionDestination instanceof Statue) {
                 if (pointSD.getL() >= 4 || pointSD.getC() >= 4 || pointSD.getL()<0 || pointSD.getC()<0) {
-                    return false;
+                    pousse = false;
                 } else {
                     // bool = appel recursif sur pionDestination et pointSD
                     // si bool = true : Déplacer statue & return true
                     // sinon : return false
                     boolean poussable = move(pionDestination, pointSD, coup);
                     if (poussable) {
-                        coup.deplace(pion.getEmplacement().copy(), pionDestination.getEmplacement().copy());
+                        coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                         deplacerStatue(pion, dest, coup);
-                        return true;
+                        pousse = true;
                     } else {
-                        return false;
+                        pousse = false;
                     }
                 }
             }
         }
-        return false;
+        return pousse;
     }
 
     private void deplacerStatue(Pion pion, Point dest, Coup coup) {
@@ -420,10 +430,10 @@ public class DeroulementJeu extends Observable implements Comparable  {
     @Override
     public String toString() {
         return "DeroulementJeu{" +
-                "joueurActuel=" + joueurActuel +
-                ", pionActuel=" + pionActuel +
-                ", aGagne=" + aGagne +
-                ", j=" + j +
+                "joueurActuel=" + joueurActuel + "\n" +
+                ", pionActuel=" + pionActuel + "\n" +
+                ", aGagne=" + aGagne + "\n" +
+                ", j=" + j + "\n" +
                 '}';
     }
 

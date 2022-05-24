@@ -1,6 +1,7 @@
 package Controleur;
 
 import Modele.*;
+import Structures.Couple;
 
 public class IAMoyenne extends IA{
 
@@ -14,7 +15,7 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public Emplacement jouerCoup() {
+    public Couple<Integer, Emplacement> jouerCoup() {
         return null;
     }
 

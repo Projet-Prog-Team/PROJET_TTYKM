@@ -18,7 +18,7 @@ public class IADifficile extends IA{
     Method method;
     public IADifficile(Method method) {
         tour = new Tour();
-        this.horizon = 10;
+        this.horizon = 15;
         this.method = method;
     }
 
@@ -37,10 +37,6 @@ public class IADifficile extends IA{
             ArrayList<Couple<Integer, Tour>> fils = new ArrayList<>();
 
             ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
-            if(branchements.size() == 0) {
-                System.out.println(c.getDj().getJeu());
-                System.out.println("FF MAINTENANT REVERT FAST ");
-            }
             for (Couple<DeroulementJeu, Tour> couple : branchements) {
                 fils.add(new Couple<>(calculCoup(couple.getFirst(), horizon - 1, !joueur), couple.getSecond()));
             }
@@ -75,18 +71,18 @@ public class IADifficile extends IA{
     }
 
     @Override
-    public Emplacement jouerCoup() {
+    public Couple<Integer, Emplacement> jouerCoup() {
         if (calcul.getDj().getEtape() == ETAT.MOVE1) {
             if (tour.getCoup1() == null) {
                 calculCoup(calcul.getDj(), horizon, true);
             }
-            return tour.getCoup1();
+            return new Couple(tour.getTypeCoup1(), tour.getCoup1());
         }
         if (calcul.getDj().getEtape() == ETAT.MOVE2) {
             if (tour.getCoup2() == null) {
                 calculCoup(calcul.getDj(), horizon, true);
             }
-            return tour.getCoup2();
+            return new Couple(tour.getTypeCoup2(), tour.getCoup2());
         }
         return null;
     }

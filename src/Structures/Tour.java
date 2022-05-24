@@ -7,12 +7,31 @@ import Modele.PionBasique;
 public class Tour {
     PionBasique pionSelectionne;
     Emplacement coup1;
+    int typeCoup1; // 1 : deplacement et 2 : creer tour
     Emplacement coup2;
+    int typeCoup2;
+
     Integer focus;
 
     public Tour(){
     }
 
+
+    public int getTypeCoup1() {
+        return typeCoup1;
+    }
+
+    public void setTypeCoup1(int typeCoup1) {
+        this.typeCoup1 = typeCoup1;
+    }
+
+    public int getTypeCoup2() {
+        return typeCoup2;
+    }
+
+    public void setTypeCoup2(int typeCoup2) {
+        this.typeCoup2 = typeCoup2;
+    }
     public PionBasique getPionSelectionne() {
         return pionSelectionne;
     }

@@ -33,7 +33,6 @@ public class Jeu implements Comparable {
             pions.add(s);
             joueurs[0].supprimerPion();
             joueurs[1].supprimerPion();
-
         }
 
         joueurs[0].setFocus(0);
@@ -185,7 +184,7 @@ public class Jeu implements Comparable {
     @Override
     public String toString() {
         return "Jeu{" +
-                "pions=" + pions +
+                "pions=" + pions + "\n" +
                 ", joueurs=" + Arrays.toString(joueurs) +
                 '}';
     }

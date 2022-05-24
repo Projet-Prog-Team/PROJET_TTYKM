@@ -1,6 +1,7 @@
 package Controleur;
 
 import Modele.*;
+import Structures.Couple;
 
 import java.lang.reflect.Method;
 
@@ -35,7 +36,7 @@ public abstract class IA {
     }
     public abstract PionBasique selectPion();
 
-    public abstract Emplacement jouerCoup();
+    public abstract Couple<Integer, Emplacement> jouerCoup();
 
     public abstract Integer choixFocus();
 
