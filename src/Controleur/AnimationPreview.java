@@ -14,7 +14,7 @@ public class AnimationPreview extends Animation {
         super(1);
         cp = c;
         progres = 0;
-        vitesse = 0.02;
+        vitesse = 0.03;
         vue = i;
         miseAjour();
     }
