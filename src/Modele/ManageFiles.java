@@ -145,8 +145,8 @@ public class ManageFiles   {
                         System.out.println("/t");
                     }
                 }while(tmpgrille.Compare(t_grille.GetCases())!=-1);
+                Writer.write(' ');
                 Writer.write('\n');
-                Writer.write(0xFF);
                 System.out.println("/n");
 
             }
@@ -184,7 +184,7 @@ public class ManageFiles   {
         game.getJoueur(0).SetNbPionsRestants( NBPIONS/2-(j2)-(NBPIONS/2-(j2)-game.getJoueur(0).getNbPionsRestants()));
         if(pos>=NBPIONS/2)
         {
-            pos = (pos-(NBPIONS/2-(NBPIONS/2-j1))-1);
+            pos = (pos-(NBPIONS/2-(NBPIONS/2-j1)))-1-(NBPIONS/2-(j2+game.getJoueur(1).getNbPionsRestants()));
         }
         DJgame.setPionActuel(game.getPions().get(pos));
         if(temp.get(index).PionFocus>=NBPIONS/2)
@@ -231,10 +231,11 @@ public class ManageFiles   {
             FileReader Reader = new FileReader(path+filepath);
             FileInputStream fis=new FileInputStream(path+filepath);
             Scanner scan = new Scanner(fis);
-            controleur.joueurs[0]=Reader.read();
-            controleur.joueurs[1]=Reader.read();
+            byte info[] = scan.nextLine().getBytes();
+            controleur.joueurs[0]=info[0];
+            controleur.joueurs[1]=info[1];
             String diff="";
-            switch(Reader.read())
+            switch(info[2])
             {
                 case 1:
                     diff="facile";
@@ -249,7 +250,7 @@ public class ManageFiles   {
                     break;
             }
             controleur.state.setDifficultyIA1(diff);
-            switch(Reader.read())
+            switch(info[3])
             {
                 case 1:
                     diff="facile";
@@ -264,18 +265,17 @@ public class ManageFiles   {
                     break;
             }
             controleur.state.setDifficultyIA2(diff);
-            Actual_pos= Reader.read();
-            Max_pos= Reader.read();
+            Actual_pos= info[4];
+            Max_pos= info[5];
             System.out.println("A: "+Actual_pos);
             System.out.println("M: "+Max_pos);
-            Reader.read();
-            scan.nextLine();
-            scan.nextLine();
             Grille tmpgrille = null;
             temp= new ArrayList<>();
             int tour=-1;
+
             for(int i=0; i<Max_pos;i++)
             {
+                info = scan.nextLine().getBytes();
                 System.out.println("i: "+i);
                 if(tmpgrille != null)
                 {
@@ -286,54 +286,49 @@ public class ManageFiles   {
                     tmpgrille= new Grille(new Pion[game.NBPIONS]);
                 }
 
-                tmpgrille.FocusJ1=Reader.read();
-                tmpgrille.FocusJ2=Reader.read();
+                tmpgrille.FocusJ1=info[0];
+                tmpgrille.FocusJ2=info[1];
                 //System.out.println("\nF: "+tmpgrille.Focus);
-                tmpgrille.PionFocus= Reader.read();
+                tmpgrille.PionFocus= info[2];
                 //System.out.println("PF: "+tmpgrille.PionFocus);
-                tmpgrille.etat=ETAT.Convert(Reader.read());
+                tmpgrille.etat=ETAT.Convert(info[3]);
                 if(tmpgrille.etat == ETAT.SELECT || tmpgrille.etat == ETAT.IDLE)
                     tour++;
-                Reader.read();
-                String s_tmp=scan.nextLine();
+                /*String s_tmp=scan.nextLine();
                 if(!s_tmp.matches("-?\\d+"))
                 {
                     s_tmp=scan.nextLine();
                 }
                 int rd=Integer.parseInt(s_tmp);
-                int afrd =' ';
+                int afrd =' ';*/
                 //Reader.read();
-                while(rd!='\n' && afrd!='\n')
-                {
-                    int id =rd;
-                    rd = afrd;
-                    System.out.println("id: "+id);
+                do {
+                    String idtmp = scan.nextLine();
+                    System.out.println(idtmp);
+                    int id = Integer.parseInt(idtmp);
+                    info = scan.nextLine().getBytes();
+                    System.out.println("id: " + id);
                     //System.out.println(i);
-                    if(rd != '\t') {
-                        int c = rd;
-                        int l = Reader.read();
-                        //System.out.println("L: "+l);
-                        int e = Reader.read();
-                        //System.out.println("E: "+e);
-                        tmpgrille.GetCases()[id] = new Pion(new Point(l,c),e,game.getJoueur(id>=NBPIONS/2 ? 1 : 0),id,Reader.read()==1);
+                    if (info[0] != '\t') {
+                        int c = info[0];
+                        int l = info[1];
+                        System.out.println("L: "+l);
+                        int e = info[2];
+                        System.out.println("E: "+e);
+                        tmpgrille.GetCases()[id] = new Pion(new Point(l, c), e, game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, Reader.read() == 1);
+                    } else {
+                        tmpgrille.GetCases()[id] = null;
                     }
-                    else
-                    {
-                        tmpgrille.GetCases()[i] = null;
-                    }
-                    s_tmp=scan.nextLine();
-                    if(!s_tmp.matches("-?\\d+"))
-                    {
-                        s_tmp=scan.nextLine();
-                    }
-                    rd=Integer.parseInt(s_tmp);
-                    afrd=Reader.read();
-                }
-                scan.nextLine();
+                    /*idtmp =scan.nextLine();
+                    info=idtmp.getBytes();
+                    System.out.println("c:"+(char)info[0]);*/
+                }while(scan.hasNextInt());
                 temp.add(tmpgrille);
+
             }
             Reader.close();
             BoardLoad(Actual_pos);
+            DJgame.miseAJour();
             pions = new Pion[NBPIONS];
             pions = Grille.Clone(temp.get(Actual_pos).GetCases());
         } catch (IOException e) {
@@ -449,6 +444,7 @@ public class ManageFiles   {
                     {
                         DJgame.joueurActuel=game.joueurs[0];
                     }
+
                     game.getJoueurs()[0].setFocus(pred_focusJ1);
                     game.getJoueurs()[1].setFocus(pred_focusJ2);
                     break;
@@ -608,6 +604,12 @@ public class ManageFiles   {
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
                     DJgame.setPionActuel(game.getPions().get(0));
                     DJgame.joueurActuel.nbActionsRestantes=0;
+                    if(temp.get(Actual_pos-1).etat==ETAT.MOVE2)
+                    {
+                        DJgame.switchPlayer();
+                        System.out.println("hey222");
+                    }
+
                     break;
             }
             move=true;

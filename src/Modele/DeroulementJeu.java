@@ -214,7 +214,6 @@ public class DeroulementJeu extends Observable implements Comparable  {
                 else {
                     MemoryManager.move=false;
                     MemoryManager.UpdateLog(null,c.copy(c.getJoueur()));
-                    System.out.println("hey0");
                     move(voisin, tmp);
                 }
             }
@@ -256,6 +255,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         } else if (pionInFocus.size() == 0){
             setPionActuel(new Pion(new Point(-1, -1), joueurActuel.getFocus(), joueurActuel));
             joueurActuel.nbActionsRestantes=0;
+            MemoryManager.AddLog(ETAT.FOCUS);
         } else {
             setPionActuel(null);
             MemoryManager.AddLog(ETAT.SELECT);
