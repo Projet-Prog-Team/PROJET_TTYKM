@@ -318,6 +318,9 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
             }
         });
         time.start();
+
+        frame.setFocusable(true);
+        frame.addKeyListener(new AdaptateurClavier(controle));
         frame.add(layeredPane);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(frameWidth, frameHeight);

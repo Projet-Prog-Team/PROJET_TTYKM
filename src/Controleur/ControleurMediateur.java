@@ -22,6 +22,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     Animation mouvement;
     Animation previewAnim;
     Emplacement previewEmp;
+    Boolean animationsActives=true;
 
     String heuristique = "Heuristique4";
 
@@ -128,17 +129,19 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     @Override
     public void ticAnim() {
-        ArrayList<Animation> remove = new ArrayList<>();
-        for (Animation animation : animations) {
-            animation.tic();
-            if(animation.estTermine()){
-                remove.add(animation);
-                if(animation == mouvement){
-                    mouvement = null;
+        if(animationsActives || mouvement != null){
+            ArrayList<Animation> remove = new ArrayList<>();
+            for (Animation animation : animations) {
+                animation.tic();
+                if(animation.estTermine()){
+                    remove.add(animation);
+                    if(animation == mouvement){
+                        mouvement = null;
+                    }
                 }
             }
+            animations.removeAll(remove);
         }
-        animations.removeAll(remove);
     }
 
     void deplace(Emplacement e, boolean real){
@@ -146,7 +149,7 @@ public class ControleurMediateur implements CollecteurEvenements {
             Coup cp = dj.jouerCoup(e, real);
             state.initPreview();
             animations.remove(previewAnim);
-            if (cp!=null){
+            if (cp!=null && animationsActives){
                 mouvement = new AnimationCoup(cp, inter);
                 animations.add(mouvement);
             }
@@ -158,7 +161,7 @@ public class ControleurMediateur implements CollecteurEvenements {
             Coup cp = dj.creerStatue(e);
             state.initPreview();
             animations.remove(previewAnim);
-            if (cp!=null){
+            if (cp!=null && animationsActives){
                 mouvement = new AnimationCoup(cp, inter);
                 animations.add(mouvement);
             }
@@ -267,6 +270,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 init();
                 inter.reset();
                 break;
+            case "anim":
+                animationsActives = !animationsActives;
+                break;
             case "toggleIA1":
                 activerIA(0, difficulty1, heuristique);
                 break;
@@ -335,15 +341,13 @@ public class ControleurMediateur implements CollecteurEvenements {
                 // Si le coup est possible
                 Preview preview = dj.getPreview(e);
                 state.setPreview(preview.getPlateau());
-                if (!preview.getCoup().deplacements().isEmpty()) {
+                if (!preview.getCoup().deplacements().isEmpty() && animationsActives) {
                     previewEmp = e;
                     previewAnim = new AnimationPreview(preview.getCoup(), inter);
                     animations.add(previewAnim);
-                    //state.setPreview(preview.getPlateau());
                 }else {
                     previewEmp = null;
                     previewAnim = null;
-                    //state.setPreview(null);
                     inter.reset();
                 }
             }
