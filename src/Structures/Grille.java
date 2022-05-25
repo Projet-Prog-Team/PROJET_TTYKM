@@ -1,23 +1,33 @@
 package Structures;
 
 import Modele.Pion;
+import Modele.PionBasique;
+import Modele.Statue;
 import Modele.ETAT;
-import java.util.Arrays;
 
 public class Grille {
-    private Pion [] cases;
+    private PionBasique [] cases;
+    private Statue[] statues;
     public ETAT etat;
     public int PionFocus;
     public int FocusJ1;
     public int FocusJ2;
-    public Pion [] GetCases()
+    public PionBasique [] GetCases()
+    {
+        return cases;
+    }
+
+    public Statue [] GetStatue() {return statues;}
+    public Pion [] GetPions()
     {
         return cases;
     }
 
     public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus)
     {
-        cases = t_cases;
+        Grille tmpgrille = new Grille(t_cases);
+        cases = tmpgrille.GetCases();
+        statues=tmpgrille.GetStatue();
         etat=t_etat;
         PionFocus = t_pionfocus;
 
@@ -25,7 +35,9 @@ public class Grille {
 
     public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus, int t_focus2)
     {
-        cases = t_cases;
+        Grille tmpgrille = new Grille(t_cases);
+        cases = tmpgrille.GetCases();
+        statues=tmpgrille.GetStatue();
         etat=t_etat;
         PionFocus = t_pionfocus;
         FocusJ1 = t_focus;
@@ -33,9 +45,34 @@ public class Grille {
     }
     public Grille(Pion [] t_cases)
     {
-        cases = t_cases;
+        PionBasique[] tcases = new PionBasique[t_cases.length];
+        Statue[] tstatues = new Statue[t_cases.length];
+        int i=0;
+        int j=0;
+        for(Pion tmp : t_cases)
+        {
+            if(tmp instanceof PionBasique)
+            {
+                tcases[tmp.ID]=(PionBasique) tmp;
+                i++;
+            }
+            else
+            {
+                if(tmp != null)
+                {
+                    tstatues[tmp.ID]=(Statue)tmp;
+                    j++;
+                }
+
+            }
+        }
+
+        cases = new PionBasique[i];
+        cases = (PionBasique[]) tcases;
+        statues = new Statue[i];
+        statues = (Statue[]) tstatues;
     }
-    public static Pion[] Clone(Pion[]original)
+    public static Pion[] Clone(Pion[] original)
     {
         Pion[] t_pions = new Pion[original.length];
         int i=0;
@@ -50,7 +87,7 @@ public class Grille {
         //return Arrays.copyOf(original, original.length);
         
     }
-    public int Compare(Pion[] second)
+    public int Compare(PionBasique[] second)
     {
 
         if(second == null || cases == null)

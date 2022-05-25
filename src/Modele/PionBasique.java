@@ -29,6 +29,7 @@ public class PionBasique extends Pion{
 
     @Override
     public Pion copy() {
+        System.out.println("hey");
         return null;
     }
 

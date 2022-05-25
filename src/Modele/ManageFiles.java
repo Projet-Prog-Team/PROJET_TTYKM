@@ -1,16 +1,9 @@
 package Modele;
 import Controleur.ControleurMediateur;
-import Patterns.Grille;
+import Structures.Grille;
 import Structures.Point;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.FileInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -33,21 +26,28 @@ public class ManageFiles   {
 
     private final int SEPSECT = 10000;
     private final int NBPIONS;
+    private final int NBSTATUES;
 
-    public ManageFiles(ControleurMediateur t_controleur, String absolutepath)
-    {
-        controleur=t_controleur;
+    public ManageFiles(ControleurMediateur t_controleur, String absolutepath) {
+        controleur = t_controleur;
         DJgame = controleur.dj;
-        game=DJgame.getJeu();
-        NBPIONS=game.NBPIONS;
-        temp =  new ArrayList<Grille>();
-        pions=new Pion[NBPIONS];
-        Pion [] tmp =game.getPions().toArray(new Pion[0]);
-        for(int i =0 ;i < tmp.length;i++)
-        {
-            pions[tmp[i].ID]=tmp[i].copy(tmp[i].getJoueur());
+        game = DJgame.getJeu();
+        NBPIONS = game.NBPIONS;
+        NBSTATUES = game.NBSTATUES;
+        temp = new ArrayList<Grille>();
+        pions = new Pion[NBPIONS + NBSTATUES];
+        Pion[] tmp = game.getPions().toArray(new Pion[0]);
+        for (int i = 0; i < tmp.length; i++) {
+            if(tmp[i] instanceof PionBasique)
+            {
+                pions[tmp[i].ID] = tmp[i].copy(tmp[i].getJoueur());
+            }
+            else
+            {
+                pions[tmp[i].ID] = tmp[i].copy();
+            }
         }
-        temp.add(new Grille(Grille.Clone(pions),ETAT.IDLE,0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus()));
+        temp.add(new Grille(Grille.Clone(pions), ETAT.IDLE, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus()));
         try
         {
 
@@ -193,7 +193,7 @@ public class ManageFiles   {
         {
             pos = (pos-(NBPIONS/2-(NBPIONS/2-j1)))-1-(NBPIONS/2-(j2+game.getJoueur(1).getNbPionsRestants()));
         }
-        DJgame.setPionActuel(game.getPions().get(pos));
+        DJgame.setPionActuel((PionBasique) game.getPions().get(pos));
         if(temp.get(index).PionFocus>=NBPIONS/2)
         {
             DJgame.joueurActuel=game.joueurs[1];
@@ -238,7 +238,7 @@ public class ManageFiles   {
     }
     public void Load(String filepath)
     {
-        try
+        /*try
         {
             FileReader Reader = new FileReader(path+filepath);
             FileInputStream fis=new FileInputStream(path+filepath);
@@ -306,13 +306,6 @@ public class ManageFiles   {
                 tmpgrille.etat=ETAT.Convert(info[3]);
                 if(tmpgrille.etat == ETAT.SELECT || tmpgrille.etat == ETAT.IDLE)
                     tour++;
-                /*String s_tmp=scan.nextLine();
-                if(!s_tmp.matches("-?\\d+"))
-                {
-                    s_tmp=scan.nextLine();
-                }
-                int rd=Integer.parseInt(s_tmp);
-                int afrd =' ';*/
                 //Reader.read();
                 do {
                     String idtmp = scan.nextLine();
@@ -331,9 +324,6 @@ public class ManageFiles   {
                     } else {
                         tmpgrille.GetCases()[id] = null;
                     }
-                    /*idtmp =scan.nextLine();
-                    info=idtmp.getBytes();
-                    System.out.println("c:"+(char)info[0]);*/
                 }while(scan.hasNextInt());
                 temp.add(tmpgrille);
 
@@ -347,7 +337,7 @@ public class ManageFiles   {
             System.out.println("cannot write  in memory or cannot read file");
             e.printStackTrace();
         }
-
+*/
     }
     public void CTRLZ()
     {
@@ -372,9 +362,9 @@ public class ManageFiles   {
             if(Actual_pos-1>=0)
                 pred = temp.get(Actual_pos).Compare(temp.get(Actual_pos-1).GetCases()); // si pred et actual reçoivent -1 alors on est sur la selection d'un focus sinon sur un pions
  
-            int actual = temp.get(Actual_pos).Compare(temp.get(Actual_pos+1).GetCases());
+            //int actual = temp.get(Actual_pos).Compare(temp.get(Actual_pos+1).GetCases());
             int pred_focus=-1;
-            int red=(NBPIONS/2-game.joueurs[0].getNbPionsRestants())+1;
+            //int red=(NBPIONS/2-game.joueurs[0].getNbPionsRestants())+1;
             int pos=temp.get(Actual_pos).PionFocus;
             Pion[] temp0=temp.get(Actual_pos).GetCases();
             int j1=0;
@@ -440,7 +430,7 @@ public class ManageFiles   {
                 case MOVE1:
                     System.out.println("MOVE1");
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                    DJgame.setPionActuel(game.getPions().get(pos));
+                    DJgame.setPionActuel((PionBasique) game.getPions().get(pos));
                     DJgame.joueurActuel.nbActionsRestantes=1;
                     break;
 
@@ -770,8 +760,6 @@ public class ManageFiles   {
             Actual_pos=Max_pos-1;
         }
 
-        if(!move && !init )
-        {
             int nbpions = game.pionsFocusJoueur(DJgame.getPionActuel().getEpoque(),DJgame.getJoueurActuel()).size();
             float nbtour = (float)(Actual_pos+1)/4;
             int etat = (int)((nbtour-(float)(Max_pos/4))*4); 
@@ -779,8 +767,18 @@ public class ManageFiles   {
                 addetat++;
             if(af != null)
             {
-                temp.get(Actual_pos).GetCases()[af.ID]=af.copy(af.getJoueur());
-                pions[af.ID]=af.copy(af.getJoueur());
+                if(af instanceof PionBasique)
+                {
+                    temp.get(Actual_pos).GetCases()[af.ID]=(PionBasique) af.copy(af.getJoueur());
+                    pions[af.ID]=af.copy(af.getJoueur());
+                }
+                else
+                {
+                    temp.get(Actual_pos).GetStatue()[af.ID]=(Statue) af.copy();
+                    pions[af.ID]=af.copy();
+                }
+
+
             }
             else
             {
@@ -817,7 +815,7 @@ public class ManageFiles   {
                 System.out.println("__________");}
             System.out.println("________________________");*/
 
-        }
+
         move=true;
         init=false;
     }

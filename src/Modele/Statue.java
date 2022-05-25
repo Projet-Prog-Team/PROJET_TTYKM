@@ -3,24 +3,24 @@ package Modele;
 import java.util.Objects;
 
 public class Statue extends Pion {
-    int id;
+    int color;
 
-    public Statue(Emplacement emplacement, int id) {
+    public Statue(Emplacement emplacement, int t_color) {
         super(emplacement);
-        this.id = id;
+        this.color = color;
     }
 
-    public Statue(Emplacement emplacement, int t_ID, boolean t_focused, int id) {
+    public Statue(Emplacement emplacement, int t_ID, boolean t_focused, int t_color) {
         super(emplacement, t_ID, t_focused);
-        this.id = id;
+        this.color = color;
     }
 
-    public int getID() {
-        return id;
+    public int getColor() {
+        return color;
     }
 
-    public void setID(int id) {
-        this.id = id;
+    public void setColor(int color) {
+        this.color = color;
     }
 
     @Override
@@ -29,12 +29,12 @@ public class Statue extends Pion {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Statue statue = (Statue) o;
-        return id == statue.id;
+        return color == statue.color;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(color);
     }
 
     @Override
@@ -49,13 +49,13 @@ public class Statue extends Pion {
 
     @Override
     public Pion copy() {
-        return new Statue(getEmplacement().copy(), ID, focused, id);
+        return new Statue(getEmplacement().copy(), ID, focused, color);
     }
 
     @Override
     public String toString() {
         return super.toString() +
-                "id=" + getID() +
+                "id=" + getColor() +
                 " TYPE = STATUE" +
                 '}';
     }

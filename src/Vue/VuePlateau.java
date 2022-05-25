@@ -102,7 +102,7 @@ public class VuePlateau {
                     if (pion instanceof PionBasique) {
                         plateau.tracerPion(l, c, a, pion.getJoueur().getID());
                     } else {
-                        plateau.tracerStatue(l, c, a, ((Statue) pion).getID());
+                        plateau.tracerStatue(l, c, a, ((Statue) pion).getColor());
                     }
                 }
         }

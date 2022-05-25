@@ -2,9 +2,13 @@ package Controleur;
 
 import Modele.CalculJeu;
 import Modele.DeroulementJeu;
+import Modele.Emplacement;
 import Modele.Pion;
 import Modele.ETAT;
+import Modele.Coup;
+import Modele.Preview;
 import Structures.Point;
+import Structures.Couple;
 import Vue.*;
 
 import javax.swing.*;
@@ -46,6 +50,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs[0] = 0;
         joueurs[1] = 0;
         dj.init(this);
+
         state.initPreview();
         state.setIA1(joueurs[0]==1);
         state.setIA2(joueurs[1]==1);

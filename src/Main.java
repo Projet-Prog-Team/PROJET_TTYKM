@@ -22,6 +22,7 @@ public class Main {
             DeroulementJeu dj = new DeroulementJeu(j,false,null);
             IHMState state = new IHMState();
             ControleurMediateur c = new ControleurMediateur(dj,1, state);
+            System.out.println("heyyyy3");
             dj.init(c);
             c.desactiverIA(1);
             c.activerIA(0, dif1, heuristique1);
@@ -56,6 +57,7 @@ public class Main {
         DeroulementJeu dj = new DeroulementJeu(j,true,null);
         IHMState state = new IHMState();
         ControleurMediateur c = new ControleurMediateur(dj,1000, state);
+        dj.init(c);
         /*ArrayList<Couple<DeroulementJeu, Tour>> liste = gros.Branchements();
         for (Couple<DeroulementJeu, Tour> lalala : liste) {
             InterfaceGraphique.demarrer(lalala.getFirst(), c, state);
