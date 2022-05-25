@@ -3,6 +3,7 @@ package Vue;
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
 import Modele.ETAT;
+import Modele.Emplacement;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -11,22 +12,20 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.net.URL;
 import java.util.Vector;
 
-public class InterfaceGraphique implements Runnable, Observateur {
+public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtilisateur {
 
     private DeroulementJeu jeu;
     private CollecteurEvenements controle;
     private JFrame frame;
-    private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
+    private PlateauSwing plateauPasse, plateauPresent, plateauFutur;
     private int frameWidth = 1600;
     private int frameHeight = 700;
-    ImageIcon victory;
+    ImageIcon victoryIcon;
+    JLabel victoryImage;
     JLabel victoryLabel;
     IHMState state;
 
@@ -36,18 +35,36 @@ public class InterfaceGraphique implements Runnable, Observateur {
         this.state = state;
         state.ajouteObservateur(this);
         controle = c;
-        URL in = ClassLoader.getSystemResource("Img/victory.gif");
-        victory = new ImageIcon(in);
+        c.fixerInterfaceUtilisateur(this);
+        URL in = ClassLoader.getSystemResource("Img/confetti3.gif");
+        victoryIcon = new ImageIcon(in);
     }
 
     @Override
     public void metAJour() {
         plateauPasse.repaint();
         plateauPresent.repaint();
-        plateauFuture.repaint();
+        plateauFutur.repaint();
         if(jeu.getEtape()!= ETAT.END){
+            victoryImage.setVisible(false);
             victoryLabel.setVisible(false);
         }else{
+            victoryIcon.setImage(victoryIcon.getImage().getScaledInstance(frameWidth,frameHeight,Image.SCALE_DEFAULT));
+            victoryImage.setIcon(victoryIcon);
+            victoryImage.setVisible(true);
+            if(jeu.getState()=="j1gagne"){
+                if(state.getIA1()){
+                    victoryLabel.setText("L'IA 1 a gagné !");
+                }else{
+                    victoryLabel.setText("Le joueur 1 a gagné !");
+                }
+            }else{
+                if(state.getIA2()){
+                    victoryLabel.setText("l'IA 2 a gagné !");
+                }else{
+                    victoryLabel.setText("Le joueur 2 a gagné !");
+                }
+            }
             victoryLabel.setVisible(true);
         }
     }
@@ -75,9 +92,17 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        victoryLabel = new JLabel(victory);
+        victoryImage = new JLabel(victoryIcon);
+        victoryImage.setVisible(false);
+        layeredPane.add(victoryImage, Integer.valueOf(1));
+
+        victoryLabel = new JLabel("Joueur 1 gagne !");
+        victoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        victoryLabel.setForeground(Color.white);
+        Font font = victoryLabel.getFont();
+        victoryLabel.setFont(new Font(font.getFontName(),Font.BOLD,80));
         victoryLabel.setVisible(false);
-        layeredPane.add(victoryLabel, Integer.valueOf(1));
+        layeredPane.add(victoryLabel, Integer.valueOf(2));
 
         // Menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -228,7 +253,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
         mainPanel.add(lateralPane, BorderLayout.EAST);
 
         // Inventaire joueur 1
-        Inventory inv1 = new Inventory(1, jeu, state);
+        Inventory inv1 = new Inventory(1, jeu, state, controle);
         mainPanel.add(inv1.getPanel(), BorderLayout.NORTH);
 
         // Plateaux
@@ -246,16 +271,16 @@ public class InterfaceGraphique implements Runnable, Observateur {
         plateauPresent.addMouseListener(a2);
         plateauBox.add(plateauPresent);
 
-        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
-        AdaptateurSouris a3 = new AdaptateurSouris(plateauFuture, controle);
-        plateauFuture.addMouseMotionListener(a3);
-        plateauFuture.addMouseListener(a3);
-        plateauBox.add(plateauFuture);
+        plateauFutur = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
+        AdaptateurSouris a3 = new AdaptateurSouris(plateauFutur, controle);
+        plateauFutur.addMouseMotionListener(a3);
+        plateauFutur.addMouseListener(a3);
+        plateauBox.add(plateauFutur);
 
         mainPanel.add(plateauBox, BorderLayout.CENTER);
 
         // Inventaire joueur 2
-        Inventory inv2 = new Inventory(2, jeu, state);
+        Inventory inv2 = new Inventory(2, jeu, state, controle);
         mainPanel.add(inv2.getPanel(), BorderLayout.SOUTH);
 
         frame.addComponentListener(new ComponentAdapter() {
@@ -265,15 +290,64 @@ public class InterfaceGraphique implements Runnable, Observateur {
                 frameWidth = frame.getWidth();
                 frameHeight = frame.getHeight();
                 mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
-                victoryLabel.setBounds((frameWidth-800)/2,(frameHeight-300)/2,800,300);
+                victoryImage.setBounds(0,0,frameWidth,frameHeight);
+                victoryLabel.setBounds(0,0,frameWidth, frameHeight);
+            }
+        });
+
+        frame.addWindowStateListener(new WindowAdapter() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                super.windowStateChanged(e);
+                frameWidth = frame.getWidth();
+                frameHeight = frame.getHeight();
+                mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
+                victoryImage.setBounds(0,0,frameWidth,frameHeight);
+                victoryLabel.setBounds(0,0,frameWidth, frameHeight);
             }
         });
 
         layeredPane.add(mainPanel,Integer.valueOf(0));
+
+        Timer time = new Timer(16, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controle.ticAnim();
+            }
+        });
+        time.start();
         frame.add(layeredPane);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
     }
 
+    @Override
+    public void decale(double dL, double dC, int l, int c, int epoque) {
+        switch (epoque){
+            case 0:
+                plateauPasse.decale(dL,dC,l,c);
+                break;
+            case 1:
+                plateauPresent.decale(dL,dC,l,c);
+                break;
+            case 2:
+                plateauFutur.decale(dL,dC,l,c);
+                break;
+        }
+    }
+
+    @Override
+    public void tp(Emplacement depart, Emplacement arrive, double alphaDep, double alphaArr) {
+        plateauPasse.tp(depart, arrive, alphaDep, alphaArr);
+        plateauPresent.tp(depart, arrive, alphaDep, alphaArr);
+        plateauFutur.tp(depart, arrive, alphaDep, alphaArr);
+    }
+
+    @Override
+    public void reset() {
+        plateauFutur.reset();
+        plateauPasse.reset();
+        plateauPresent.reset();
+    }
 }

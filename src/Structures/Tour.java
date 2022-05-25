@@ -1,37 +1,58 @@
 package Structures;
 
+import Modele.Emplacement;
 import Modele.Pion;
+import Modele.PionBasique;
 
 public class Tour {
-    Pion pionSelectionne;
-    Pion coup1;
-    Pion coup2;
+    PionBasique pionSelectionne;
+    Emplacement coup1;
+    int typeCoup1; // 1 : deplacement et 2 : creer tour
+    Emplacement coup2;
+    int typeCoup2;
+
     Integer focus;
 
     public Tour(){
     }
 
-    public Pion getPionSelectionne() {
+
+    public int getTypeCoup1() {
+        return typeCoup1;
+    }
+
+    public void setTypeCoup1(int typeCoup1) {
+        this.typeCoup1 = typeCoup1;
+    }
+
+    public int getTypeCoup2() {
+        return typeCoup2;
+    }
+
+    public void setTypeCoup2(int typeCoup2) {
+        this.typeCoup2 = typeCoup2;
+    }
+    public PionBasique getPionSelectionne() {
         return pionSelectionne;
     }
 
-    public void setPionSelectionne(Pion pionSelectionne) {
+    public void setPionSelectionne(PionBasique pionSelectionne) {
         this.pionSelectionne = pionSelectionne;
     }
 
-    public Pion getCoup1() {
+    public Emplacement getCoup1() {
         return coup1;
     }
 
-    public void setCoup1(Pion coup1) {
+    public void setCoup1(Emplacement coup1) {
         this.coup1 = coup1;
     }
 
-    public Pion getCoup2() {
+    public Emplacement getCoup2() {
         return coup2;
     }
 
-    public void setCoup2(Pion coup2) {
+    public void setCoup2(Emplacement coup2) {
         this.coup2 = coup2;
     }
 

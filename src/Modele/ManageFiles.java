@@ -15,8 +15,6 @@ import java.util.Scanner;
 import java.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.io.IOException;
 
 public class ManageFiles   {
     
@@ -448,7 +446,10 @@ public class ManageFiles   {
 
                 case MOVE2:
                     System.out.println("FOCUS");
-                    DJgame.setPionActuel(game.getPions().get(0));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(0));
+                    }
                     DJgame.joueurActuel.nbActionsRestantes=0;
                     if( DJgame.joueurActuel== game.joueurs[0])
                     {
@@ -609,14 +610,20 @@ public class ManageFiles   {
                 case MOVE1:
                     System.out.println("MOVE1");
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                    DJgame.setPionActuel(game.getPions().get(pos));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(pos));
+                    }
                     DJgame.joueurActuel.nbActionsRestantes=1;
                     break;
 
                 case MOVE2:
                     System.out.println("FOCUS");
                     game.SetPions(filter(Grille.Clone(temp.get(Actual_pos).GetCases())));
-                    DJgame.setPionActuel(game.getPions().get(0));
+                    // TODO : vérifier que ça ne cause pas de problèmes
+                    if (game.getPions().get(pos) instanceof PionBasique) {
+                        DJgame.setPionActuel((PionBasique) game.getPions().get(0));
+                    }
                     DJgame.joueurActuel.nbActionsRestantes=0;
                     if(temp.get(Actual_pos-1).etat==ETAT.MOVE2)
                     {

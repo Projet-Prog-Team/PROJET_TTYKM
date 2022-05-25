@@ -2,13 +2,25 @@ package Modele;
 
 public class Joueur {
     int ID;
+    private boolean statuePlaced;
     private int nbPionsRestants;
-    public int nbActionsRestantes = 2;
+    public int nbActionsRestantes;
     int focus;
+
 
     public Joueur(int id,int nbpions) {
         ID = id;
         nbPionsRestants = nbpions;
+        statuePlaced = false;
+        nbActionsRestantes = 2;
+    }
+
+    public boolean isStatuePlaced() {
+        return statuePlaced;
+    }
+
+    public void setStatuePlaced(boolean statuePlaced) {
+        this.statuePlaced = statuePlaced;
     }
 
     public int getID() {
@@ -45,12 +57,14 @@ public class Joueur {
                 ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
                 ", focus=" + focus +
+                ", statuePlaced=" + statuePlaced +
                 '}';
     }
     public Joueur copy() {
         Joueur j = new Joueur(getID(),nbPionsRestants);
         j.nbActionsRestantes = getNbActionsRestantes();
         j.setFocus(getFocus());
+        j.setStatuePlaced(statuePlaced);
         return j;
     }
     public int getNbPionsRestants() {

@@ -1,4 +1,4 @@
-package Patterns;
+package Structures;
 
 import Modele.Pion;
 import Modele.ETAT;
@@ -42,6 +42,7 @@ public class Grille {
         for(Pion t_pion : original)
         {
             if(t_pion!=null)
+                //TODO : Verifier quel copy est appelé
                 t_pions[i]=t_pion.copy(t_pion.getJoueur());
             i++;
         }
