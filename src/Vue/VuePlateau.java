@@ -75,6 +75,11 @@ public class VuePlateau {
                 plateau.tracerSuggestionFocus(jeu.getJoueurActuel().getID());
             }
 
+            // Affiche les suggestion de statue
+            if(dest!=null && source==null && plateau.getEpoque()==dest.getEpoque()){
+                plateau.tracerSuggestionStatue(dest.getCoordonnees().getL(), dest.getCoordonnees().getC());
+            }
+
             // Affiche les brillances de focus
             if (jeu.getEtape() == ETAT.FOCUS) {
                 Joueur joueur = jeu.getJoueurActuel();

@@ -12,6 +12,7 @@ public interface Plateau {
     void tracerFocusNoir(double alpha);
     void tracerSuggestionCase(int l, int c);
     void tracerSuggestionFocus(int focus);
+    void tracerSuggestionStatue(double l, double c);
     int getEpoque();
     IHMState getState();
     void decale(double dL, double dC, int l, int c);

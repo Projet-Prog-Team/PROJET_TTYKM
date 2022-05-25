@@ -178,13 +178,12 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case MOVE1:
             case MOVE2:
-                state.setSuggestionSource(dj.getPionActuel().getEmplacement());
-
                 c = suggestion.jouerCoup();
                 if (c.getFirst() == 1) {
+                    state.setSuggestionSource(dj.getPionActuel().getEmplacement());
                     state.setSuggestionDestination(c.getSecond());
                 } else if (c.getFirst() == 2){
-                    // TODO : voir quoi faire pr suggestion création de statue
+                    state.setSuggestionSource(null);
                     state.setSuggestionDestination(c.getSecond());
                 }
                 break;

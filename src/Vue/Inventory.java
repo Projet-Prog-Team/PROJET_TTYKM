@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class Inventory implements Observateur {
@@ -23,6 +24,8 @@ public class Inventory implements Observateur {
     JLabel labelPlayer;
     IHMState state;
     CollecteurEvenements controleur;
+    ImageIcon loadingIcon;
+    JLabel loadingLabel;
 
     Inventory(int joueur, DeroulementJeu jeu, IHMState state, CollecteurEvenements controleur){
 
@@ -48,14 +51,22 @@ public class Inventory implements Observateur {
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueNoire.png");
                 pionStatue = ImageIO.read(in).getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             }
+            URL url = ClassLoader.getSystemResource("Img/arrow.gif");
+            loadingIcon = new ImageIcon(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER,25,5));
         panel.setMaximumSize(new Dimension((int) panel.getMaximumSize().getWidth(), 60));
         panel.setPreferredSize(new Dimension((int) panel.getMaximumSize().getWidth(), 60));
+
+        loadingLabel = new JLabel(loadingIcon);
+        loadingIcon.setImage(loadingIcon.getImage().getScaledInstance(50,50,Image.SCALE_DEFAULT));
+        loadingLabel.setIcon(loadingIcon);
+        loadingLabel.setVisible(false);
+        panel.add(loadingLabel);
 
         labelPlayer = new JLabel("Joueur "+joueur+" : ");
         labelPlayer.setFont(new Font(Font.MONOSPACED, Font.BOLD, 30));
@@ -106,9 +117,11 @@ public class Inventory implements Observateur {
         if(jeu.getJoueurActuel().getID()==joueur){
             panel.setBackground(Color.ORANGE);
             labelPlayer.setForeground(Color.BLACK);
+            loadingLabel.setVisible(true);
         }else{
             panel.setBackground(Color.DARK_GRAY);
             labelPlayer.setForeground(Color.WHITE);
+            loadingLabel.setVisible(false);
         }
         // Affiche si joueur ou IA
         if(joueur==1){

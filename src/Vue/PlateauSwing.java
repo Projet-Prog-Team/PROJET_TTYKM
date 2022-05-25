@@ -19,7 +19,8 @@ public class PlateauSwing extends JComponent implements Plateau {
     Image pionNoir;
     Image statueBlanche;
     Image statueNoire;
-    Image statueOrange;
+    Image statueViolette;
+    Image statueVerte;
     VuePlateau vue;
     Graphics2D drawable;
     private final double pionSize = 0.8;
@@ -69,8 +70,11 @@ public class PlateauSwing extends JComponent implements Plateau {
             in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueNoire.png");
             statueNoire = ImageIO.read(in);
 
-            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueOrange.png");
-            statueOrange = ImageIO.read(in);
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueViolette.png");
+            statueViolette = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueVerte.png");
+            statueVerte = ImageIO.read(in);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,7 +119,7 @@ public class PlateauSwing extends JComponent implements Plateau {
             drawable.drawImage(statueNoire, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }else{
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(statueOrange, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(statueViolette, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }
         drawable.setComposite(compo);
     }
@@ -177,6 +181,10 @@ public class PlateauSwing extends JComponent implements Plateau {
         Color myColour = new Color(18, 255, 0,175 );
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
+    }
+
+    public void tracerSuggestionStatue(double l, double c) {
+        drawable.drawImage(statueVerte, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
     }
 
     public void tracerBrillanceFocus(int focus){
