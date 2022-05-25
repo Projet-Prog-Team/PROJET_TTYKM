@@ -52,7 +52,16 @@ public class ManageFiles   {
         temp.add(new Grille(Grille.Clone(pions),ETAT.IDLE,0));
         try
         {
-            path = new File(absolutepath).getCanonicalPath() + "\\";
+
+            if(System.getProperty("os.name").toLowerCase().contains("win"))
+            {
+                path = new File(absolutepath).getCanonicalPath() + "\\";
+            }
+            else
+            {
+                path = new File(absolutepath).getCanonicalPath() + "/";
+            }
+
         }
         catch(IOException e)
         {
@@ -606,12 +615,36 @@ public class ManageFiles   {
                     DJgame.joueurActuel.nbActionsRestantes=0;
                     if(temp.get(Actual_pos-1).etat==ETAT.MOVE2)
                     {
-                        DJgame.switchPlayer();
+                        if( DJgame.joueurActuel== game.joueurs[0])
+                        {
+                            DJgame.joueurActuel=game.joueurs[1];
+                        }
+                        else
+                        {
+                            DJgame.joueurActuel=game.joueurs[0];
+                        }
                         System.out.println("hey222");
                     }
 
                     break;
             }
+            for (Grille t_pion : temp)
+            {
+                Pion[] t_pions=t_pion.GetCases();
+                System.out.println(t_pion.etat);
+                for( i=0;i<NBPIONS;i++)
+                {
+                    if(t_pions[i]!=null)
+                    {
+                        System.out.println("i :"+i+" "+t_pions[i].getCoordonnees()+" "+t_pions[i].getEpoque());
+                    }
+                    else
+                    {
+                        System.out.println("i :"+i+" null");
+                    }
+                }
+                System.out.println("__________");}
+            System.out.println("________________________");
             move=true;
             pions=new Pion[NBPIONS];
             for(Pion t_pion : game.getPions())
