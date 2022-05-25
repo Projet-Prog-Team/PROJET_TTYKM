@@ -49,7 +49,7 @@ public class ManageFiles   {
         {
             pions[tmp[i].ID]=tmp[i].copy(tmp[i].getJoueur());
         }
-        temp.add(new Grille(Grille.Clone(pions),ETAT.IDLE,0));
+        temp.add(new Grille(Grille.Clone(pions),ETAT.IDLE,0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus()));
         try
         {
 
@@ -229,6 +229,11 @@ public class ManageFiles   {
             case UNDEFINED:
 
                 break;
+        }
+        if(CanCTRLZ())
+        {
+            CTRLZ();
+            CTRLY();
         }
         System.out.println(DJgame.getEtape());
         System.out.println("Lock and Load");
