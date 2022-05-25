@@ -1,8 +1,7 @@
 import Controleur.ControleurMediateur;
-import Modele.CalculJeu;
-import Modele.DeroulementJeu;
-import Modele.Jeu;
+import Modele.*;
 import Structures.Couple;
+import Structures.Point;
 import Structures.Tour;
 import Vue.IHMState;
 import Vue.InterfaceGraphique;
@@ -55,6 +54,7 @@ public class Main {
         DeroulementJeu dj = new DeroulementJeu(j,true);
         IHMState state = new IHMState();
         ControleurMediateur c = new ControleurMediateur(dj,1000, state);
+
         /*ArrayList<Couple<DeroulementJeu, Tour>> liste = gros.Branchements();
         for (Couple<DeroulementJeu, Tour> lalala : liste) {
             InterfaceGraphique.demarrer(lalala.getFirst(), c, state);
@@ -80,7 +80,6 @@ public class Main {
                     break;
             }
         }
-
         //InterfaceGraphique.demarrer(j, c);
     }
 }

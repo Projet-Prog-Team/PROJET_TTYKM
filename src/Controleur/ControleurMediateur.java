@@ -24,7 +24,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     Emplacement previewEmp;
     Boolean animationsActives=true;
 
-    String heuristique = "Heuristique4";
+    String heuristique = "Heuristique";
 
     public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
         dj = djeu;
@@ -105,12 +105,20 @@ public class ControleurMediateur implements CollecteurEvenements {
                     dj.selectPion(j.selectPion().getEmplacement());
                     break;
                 case MOVE1:
-                case MOVE2:
-                    Couple<Integer, Emplacement> c = j.jouerCoup();
+                    Couple<Integer, Emplacement> c = j.getCoup1();
                     if (c.getFirst() == 1) {
                         deplace(c.getSecond(),true);
                     } else if (c.getFirst() == 2){
-                        dj.creerStatue(c.getSecond());
+                        creerStatue(c.getSecond());
+                    }
+                    state.initPreview();
+                    break;
+                case MOVE2:
+                    c = j.getCoup2();
+                    if (c.getFirst() == 1) {
+                        deplace(c.getSecond(),true);
+                    } else if (c.getFirst() == 2){
+                        creerStatue(c.getSecond());
                     }
                     state.initPreview();
                     break;
@@ -169,19 +177,28 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void suggestion () {
-        suggestion.calculCoup(dj, 10, true);
+        suggestion.calculCoup(dj, 3, true, null);
         switch(dj.getEtape()) {
             case SELECT:
                 state.setSuggestionSource(suggestion.selectPion().getEmplacement());
 
-                Couple<Integer, Emplacement> c = suggestion.jouerCoup();
+                Couple<Integer, Emplacement> c = suggestion.getCoup1();
                 if (c.getFirst() == 1) {
                     state.setSuggestionDestination(c.getSecond());
                 }
                 break;
             case MOVE1:
+                c = suggestion.getCoup1();
+                if (c.getFirst() == 1) {
+                    state.setSuggestionSource(dj.getPionActuel().getEmplacement());
+                    state.setSuggestionDestination(c.getSecond());
+                } else if (c.getFirst() == 2){
+                    state.setSuggestionSource(null);
+                    state.setSuggestionDestination(c.getSecond());
+                }
+                break;
             case MOVE2:
-                c = suggestion.jouerCoup();
+                c = suggestion.getCoup2();
                 if (c.getFirst() == 1) {
                     state.setSuggestionSource(dj.getPionActuel().getEmplacement());
                     state.setSuggestionDestination(c.getSecond());
@@ -345,9 +362,11 @@ public class ControleurMediateur implements CollecteurEvenements {
                     previewEmp = e;
                     previewAnim = new AnimationPreview(preview.getCoup(), inter);
                     animations.add(previewAnim);
+                    //state.setPreview(preview.getPlateau());
                 }else {
                     previewEmp = null;
                     previewAnim = null;
+                    //state.setPreview(null);
                     inter.reset();
                 }
             }

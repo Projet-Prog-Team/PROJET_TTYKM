@@ -57,6 +57,6 @@ public class Statue extends Pion {
         return super.toString() +
                 "id=" + getID() +
                 " TYPE = STATUE" +
-                '}';
+                '}' + "\n";
     }
 }

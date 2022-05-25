@@ -15,7 +15,12 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public Couple<Integer, Emplacement> jouerCoup() {
+    public Couple<Integer, Emplacement> getCoup1() {
+        return null;
+    }
+
+    @Override
+    public Couple<Integer, Emplacement> getCoup2() {
         return null;
     }
 
@@ -25,7 +30,7 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut) {
         return 0;
     }
 }

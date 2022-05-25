@@ -50,6 +50,15 @@ public abstract class Pion {
         return d;
     }
 
+    public int distancePion(Pion p) {
+        int l1 = getCoordonnees().getL();
+        int c1 = getCoordonnees().getC();
+        int l2 = p.getCoordonnees().getL();
+        int c2 = p.getCoordonnees().getC();
+        int res = Math.abs(c2 - c1) + Math.abs(l2 - l1);
+        return res;
+    }
+
     public abstract Joueur getJoueur();
     public abstract Pion copy(Joueur joueur);
     public abstract Pion copy();

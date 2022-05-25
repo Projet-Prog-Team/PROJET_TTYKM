@@ -49,8 +49,7 @@ public class PionBasique extends Pion{
     @Override
     public String toString() {
         return super.toString() +
-                "joueur=" + joueur +
                 " TYPE = PION BASIQUE" +
-                '}';
+                '}' + "\n";
     }
 }

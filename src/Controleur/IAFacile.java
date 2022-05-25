@@ -20,10 +20,16 @@ public class IAFacile extends IA {
         return pionsDispo.get(x);
     }
 
-    public Couple<Integer, Emplacement> jouerCoup() {
+    @Override
+    public Couple<Integer, Emplacement> getCoup1() {
         ArrayList<Emplacement> casesDispo = calcul.getDj().getJeu().casesDispo(calcul.getDj().getJoueurActuel(), calcul.getDj().getPionActuel());
         int x = r.nextInt(casesDispo.size());
         return (new Couple(1, casesDispo.get(x)));
+    }
+
+    @Override
+    public Couple<Integer, Emplacement> getCoup2() {
+        return getCoup1();
     }
 
     public Integer choixFocus() {
@@ -35,7 +41,7 @@ public class IAFacile extends IA {
     }
 
     @Override
-    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut) {
         return 0;
     }
 }

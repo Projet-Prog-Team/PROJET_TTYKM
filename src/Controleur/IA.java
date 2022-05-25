@@ -35,10 +35,8 @@ public abstract class IA {
         return resultat;
     }
     public abstract PionBasique selectPion();
-
-    public abstract Couple<Integer, Emplacement> jouerCoup();
-
+    public abstract Couple<Integer, Emplacement> getCoup1();
+    public abstract Couple<Integer, Emplacement> getCoup2();
     public abstract Integer choixFocus();
-
-    public abstract int calculCoup(DeroulementJeu dj, int horizon, boolean joueur);
+    public abstract int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut);
 }

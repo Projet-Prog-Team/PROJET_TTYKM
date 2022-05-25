@@ -20,11 +20,11 @@ public class CalculJeu {
 
     // -------HEURISTIQUES-------
     public int Heuristique() {
-        if (dj.getJeu().joueurAGagne(dj.joueurActuel)) { // Si on gagne
-            return 10000;
+        if (dj.getJeu().joueurAGagne(dj.joueurActuel)) { // Si le joueur adverse perd
+            return -10000;
         } else if (!dj.getJeu().joueurAGagne(dj.getJeu().getJoueur(dj.joueurActuel.getID() % 2))) { // Si on ne perd pas
-            //int pionsJoueur1 = dj.getJeu().getJoueur(0).nbPionsRestants;
-            //int pionsJoueur2 = dj.getJeu().getJoueur(1).nbPionsRestants;
+            int diffMains;
+            int diffPlateaux;
             int pionsJoueur1 = 0;
             int pionsJoueur2 = 0;
 
@@ -34,84 +34,18 @@ public class CalculJeu {
             for (int i = 0; i < 3; i++) {
                 pionsJoueur2 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(1)).size();
             }
-
             if (dj.joueurActuel.getID() == 1) {
-                return (pionsJoueur1 - pionsJoueur2) * 100;
+                diffMains = dj.getJeu().getJoueur(1).getNbPionsRestants() - dj.getJeu().getJoueur(0).getNbPionsRestants();
+                diffPlateaux = pionsJoueur2 - pionsJoueur1;
             } else {
-                return (pionsJoueur2 - pionsJoueur1) * 100;
+                diffMains = dj.getJeu().getJoueur(0).getNbPionsRestants() - dj.getJeu().getJoueur(1).getNbPionsRestants();
+                diffPlateaux = pionsJoueur1 - pionsJoueur2;
             }
-        } else { // Si on perd
-            return -10000;
+            return diffMains + diffPlateaux;
+        } else { // Si on gagne
+            return 10000;
         }
-        /* Objectif : permettre à l'IA de tuer des pions
-            sinon se démultiplier
-         * */
     }
-    public int Heuristique2() {
-        int heuristique = Heuristique();
-        for (Pion pion : dj.getJeu().getPions()) {
-            if (pion.getJoueur() == dj.getJoueurActuel()) {
-                heuristique += 30*pion.distancePionBord();
-            }
-        }
-        return heuristique;
-        /*
-         * Objectif : favoriser les pions au milieu (4 cases au milieu)
-         * distancePionBord = soit 0 soit 1
-         */
-    }
-    public int Heuristique3() {
-        int heuristique = Heuristique2();
-        for (int i = 0; i < 3; i++) {
-            ArrayList<PionBasique> pions = getDj().getJeu().pionsFocusJoueur(i, getDj().getJoueurActuel());
-            ArrayList<PionBasique> pionsVisites = new ArrayList<>();
-            if (pions.size() >= 2) {
-                for (PionBasique pion1 : pions) {
-                    pionsVisites.add(pion1);
-                    for (PionBasique pion2 : pions) {
-                        if (!pionsVisites.contains(pion2)) {
-                            if (pion1.colle(pion2)) {
-                                heuristique -= 30;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return heuristique;
-        /*
-         * Objectif : éviter les pions collés
-         */
-    }
-    public int Heuristique4() {
-        int heuristique = Heuristique3();
-        int pionsJoueur1 = dj.getJeu().getJoueur(0).getNbPionsRestants();
-        int pionsJoueur2 = dj.getJeu().getJoueur(1).getNbPionsRestants();
-        for (int i = 0; i < 3; i++) {
-            pionsJoueur1 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(0)).size();
-        }
-        for (int i = 0; i < 3; i++) {
-            pionsJoueur2 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(1)).size();
-        }
-
-        if (dj.joueurActuel.getID() == 1) {
-            return heuristique + (pionsJoueur1 - pionsJoueur2) * 61;
-        } else {
-            return heuristique + (pionsJoueur2 - pionsJoueur1) * 61;
-        }
-        // Privilégie de tuer un pion plutôt que de se dédoubler si c'est possible
-    }
-    /*
-    J1 : Heuristique3 vs J2 : Heuristique3  -> 30% victoire pour J2
-    J1 : Heuristique4 vs J2 : Heuristique4  -> 58% victoire pour J2
-
-
-    J1 : Heuristique3 vs J2 : Heuristique4  -> 61% victoire pour J2
-    J1 : Heuristique4 vs J2 : Heuristique3  -> 22% victoire pour J2
-
-
-    Heuristique 4 semble être meilleur que 3 !
-     */
 
     // -------CALCUL DES BRANCHEMENTS-------
     public ArrayList<Couple<DeroulementJeu, Tour>> branchementsSelect(DeroulementJeu djeu) {   // On considere que le jeu j est dans l'étape selection
@@ -168,6 +102,7 @@ public class CalculJeu {
             if (djeu.peutSelectionnerFocus(i, djeu.getJoueurActuel().getID())) {
                 DeroulementJeu jeuFocus = djeu.copy();
                 jeuFocus.getJoueurActuel().setFocus(i);
+                jeuFocus.switchPlayer();
                 Tour t = new Tour();
                 t.setFocus(i);
                 jeux.add(new Couple(jeuFocus, t));
