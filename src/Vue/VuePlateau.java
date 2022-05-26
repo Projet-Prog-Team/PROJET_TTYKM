@@ -26,7 +26,6 @@ public class VuePlateau {
 
         // Si c'est au tour de l'IA de jouer on désactive les feedback/feedforward/suggestion
         if((jeu.getJoueurActuel().getID()==1 && !state.getIA1() || jeu.getJoueurActuel().getID()==2 && !state.getIA2())){
-
             // Affiche les suggestions de pions
             Emplacement source = state.getSuggestionSource();
             Emplacement dest = state.getSuggestionDestination();
