@@ -63,7 +63,7 @@ public class VuePlateau {
             if (jeu.getEtape() == ETAT.SELECT && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
                 pionsBasiques = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
                 for (PionBasique pion : pionsBasiques) {
-                    if(!pion.equals(source)){
+                    if(!pion.getEmplacement().equals(source)){
                         plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
                     }
                 }
