@@ -78,7 +78,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 case MOVE2:
                 case MOVE1:
                     if (dj.getConstructionStatue()) {
+                        dj.MemoryManager.AddLog(ETAT.MOVE1);
                         creerStatue(e);
+
                         //dj.creerStatue(e);
                     } else {
                         deplace(e, true);
@@ -115,7 +117,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                     if (c.getFirst() == 1) {
                         deplace(c.getSecond(),true);
                     } else if (c.getFirst() == 2){
+                        dj.MemoryManager.AddLog(ETAT.MOVE1);
                         dj.creerStatue(c.getSecond());
+
+
                     }
                     state.initPreview();
                     break;
@@ -214,7 +219,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                         //choix focus
                         if (dj.peutSelectionnerFocus(c.getEpoque(), c.getJoueur())) {
                             dj.getJoueurActuel().setFocus(c.getEpoque());
-                            dj.MemoryManager.move =false;
                             dj.MemoryManager.UpdateLog(null,null);
                             dj.switchPlayer();
                             state.initPreview();

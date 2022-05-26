@@ -11,7 +11,7 @@ public class Jeu implements Comparable {
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
     public final int NBPIONS =14;
-    public final int NBSTATUES =5;
+    public final int NBSTATUES =9;
     public Jeu() {
         init();
     }

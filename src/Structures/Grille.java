@@ -5,28 +5,41 @@ import Modele.PionBasique;
 import Modele.Statue;
 import Modele.ETAT;
 
+import java.util.Arrays;
+
 public class Grille {
     private PionBasique [] cases;
     private Statue[] statues;
+    private Pion[] result;
     public ETAT etat;
     public int PionFocus;
     public int FocusJ1;
     public int FocusJ2;
-    public PionBasique [] GetCases()
+    public Pion [] GetCases()
     {
-        return cases;
+        /*int caseslength = cases.length;
+
+        System.arraycopy(cases, 0, result, 0, caseslength);
+        for(Statue t_pion : statues)
+        {
+            if(t_pion != null)
+                result[t_pion.ID]=t_pion;
+        }*/
+        return result;
     }
 
     public Statue [] GetStatue() {return statues;}
-    public Pion [] GetPions()
+    public PionBasique [] GetPions()
     {
+
         return cases;
     }
 
     public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus)
     {
         Grille tmpgrille = new Grille(t_cases);
-        cases = tmpgrille.GetCases();
+        result=tmpgrille.GetCases();
+        cases = tmpgrille.GetPions();
         statues=tmpgrille.GetStatue();
         etat=t_etat;
         PionFocus = t_pionfocus;
@@ -36,8 +49,9 @@ public class Grille {
     public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus, int t_focus2)
     {
         Grille tmpgrille = new Grille(t_cases);
-        cases = tmpgrille.GetCases();
+        cases = tmpgrille.GetPions();
         statues=tmpgrille.GetStatue();
+        result=tmpgrille.GetCases();
         etat=t_etat;
         PionFocus = t_pionfocus;
         FocusJ1 = t_focus;
@@ -47,6 +61,7 @@ public class Grille {
     {
         PionBasique[] tcases = new PionBasique[t_cases.length];
         Statue[] tstatues = new Statue[t_cases.length];
+        result = t_cases;
         int i=0;
         int j=0;
         for(Pion tmp : t_cases)
@@ -67,10 +82,9 @@ public class Grille {
             }
         }
 
-        cases = new PionBasique[i];
         cases = (PionBasique[]) tcases;
-        statues = new Statue[i];
         statues = (Statue[]) tstatues;
+
     }
     public static Pion[] Clone(Pion[] original)
     {
@@ -79,28 +93,38 @@ public class Grille {
         for(Pion t_pion : original)
         {
             if(t_pion!=null)
-                //TODO : Verifier quel copy est appelé
-                t_pions[i]=t_pion.copy(t_pion.getJoueur());
+            {
+                if(t_pion instanceof PionBasique)
+                {
+                    t_pions[i]=t_pion.copy(t_pion.getJoueur());
+                }
+                else
+                {
+                    t_pions[i]=t_pion.copy();
+                }
+
+            }
+
             i++;
         }
         return t_pions;
         //return Arrays.copyOf(original, original.length);
         
     }
-    public int Compare(PionBasique[] second)
+    public int Compare(Pion[] second)
     {
-
-        if(second == null || cases == null)
+        Pion [] result = GetCases();
+        if(second == null || result == null)
             return -1;
-        int ln= cases.length;
+        int ln= result.length;
         for (int i=0 ; i<ln;i++) {
-            if(cases[i]!=null && second[i]==null || cases[i] ==null && second[i]!=null)
+            if(result[i]!=null && second[i]==null || result[i] ==null && second[i]!=null)
                 return i;
-            if(cases[i]!=null && second[i]!=null)
+            if(result[i]!=null && second[i]!=null)
             {
-                if(cases[i].getCoordonnees().getC()!= second[i].getCoordonnees().getC() || cases[i].getCoordonnees().getL()!= second[i].getCoordonnees().getL())
+                if(result[i].getCoordonnees().getC()!= second[i].getCoordonnees().getC() || result[i].getCoordonnees().getL()!= second[i].getCoordonnees().getL())
                     return i;
-                if(cases[i].getEpoque()!= second[i].getEpoque())
+                if(result[i].getEpoque()!= second[i].getEpoque())
                     return i;
             }
 

@@ -18,6 +18,7 @@ public class Joueur {
     public boolean isStatuePlaced() {
         return statuePlaced;
     }
+    public void SetStatuePlaced(boolean placed) {statuePlaced=placed;}
 
     public void setStatuePlaced(boolean statuePlaced) {
         this.statuePlaced = statuePlaced;

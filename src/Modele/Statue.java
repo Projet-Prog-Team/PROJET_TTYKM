@@ -7,12 +7,12 @@ public class Statue extends Pion {
 
     public Statue(Emplacement emplacement, int t_color) {
         super(emplacement);
-        this.color = color;
+        this.color = t_color;
     }
 
     public Statue(Emplacement emplacement, int t_ID, boolean t_focused, int t_color) {
         super(emplacement, t_ID, t_focused);
-        this.color = color;
+        this.color = t_color;
     }
 
     public int getColor() {
