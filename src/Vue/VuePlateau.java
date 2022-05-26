@@ -1,9 +1,6 @@
 package Vue;
 
-import Modele.DeroulementJeu;
-import Modele.ETAT;
-import Modele.Joueur;
-import Modele.Pion;
+import Modele.*;
 
 import java.util.ArrayList;
 
@@ -12,84 +9,106 @@ public class VuePlateau {
 
     DeroulementJeu jeu;
     Plateau plateau;
+    double[][] dC,dL,alpha;
 
     public VuePlateau(DeroulementJeu jeu, Plateau p) {
         this.jeu = jeu;
         this.plateau = p;
+        resetDecalage();
     }
 
     public void dessinerPlateau() {
 
+        ArrayList<Emplacement> casesDispoDeplacement;
+        ArrayList<PionBasique> pionsBasiques;
         ArrayList<Pion> pions;
         IHMState state = plateau.getState();
 
-        // Affiche les suggestions de pions
-        Pion source = state.getSuggestionSource();
-        Pion dest = state.getSuggestionDestination();
-        if(source!=null && dest!=null){
-            if(plateau.getEpoque()==source.getEpoque()){
-                plateau.tracerSuggestionCase(source.getCoordonnees().getL(), source.getCoordonnees().getC());
-            }
-            if(plateau.getEpoque()==dest.getEpoque()){
-                plateau.tracerSuggestionCase(dest.getCoordonnees().getL(), dest.getCoordonnees().getC());
-            }
-        }
-
-        // Affiche les cases disponibles pour le déplacement
-        if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) {
-            pions = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
-            for (Pion pion : pions) {
-                if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerBrillanceCase(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+        // Si c'est au tour de l'IA de jouer on désactive les feedback/feedforward/suggestion
+        if((jeu.getJoueurActuel().getID()==1 && !state.getIA1() || jeu.getJoueurActuel().getID()==2 && !state.getIA2())){
+            // Affiche les suggestions de pions
+            Emplacement source = state.getSuggestionSource();
+            Emplacement dest = state.getSuggestionDestination();
+            if(source!=null && dest!=null){
+                if(plateau.getEpoque()==source.getEpoque()){
+                    plateau.tracerSuggestionCase(source.getCoordonnees().getL(), source.getCoordonnees().getC());
+                }
+                if(plateau.getEpoque()==dest.getEpoque()){
+                    plateau.tracerSuggestionCase(dest.getCoordonnees().getL(), dest.getCoordonnees().getC());
                 }
             }
-        }
 
-        // Affiche les pions selectionnables
-        if (jeu.getEtape() == ETAT.SELECT && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
-            pions = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
-            for (Pion pion : pions) {
-                if(!pion.equals(source)){
-                    plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+            // Affiche les cases disponibles pour le déplacement
+            if (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2 && !jeu.getConstructionStatue()) {
+                casesDispoDeplacement = jeu.getJeu().casesDispo(jeu.getJoueurActuel(), jeu.getPionActuel());
+                for (Emplacement emplacement : casesDispoDeplacement) {
+                    if (emplacement.getEpoque() == plateau.getEpoque()) {
+                        plateau.tracerBrillanceCase(emplacement.getCoordonnees().getL(), emplacement.getCoordonnees().getC());
+                    }
                 }
             }
+
+            // Affiche les cases disponibles pour la construction d'un statue
+            if((jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2) && jeu.getConstructionStatue()){
+                casesDispoDeplacement = jeu.getJeu().casesDispoStatue(jeu.getPionActuel());
+                for (Emplacement emplacement : casesDispoDeplacement) {
+                    if (emplacement.getEpoque() == plateau.getEpoque()) {
+                        plateau.tracerBrillancePion(emplacement.getCoordonnees().getL(), emplacement.getCoordonnees().getC());
+                    }
+                }
+            }
+
+            // Affiche les pions selectionnables
+            if (jeu.getEtape() == ETAT.SELECT && plateau.getEpoque()==jeu.getJoueurActuel().getFocus()) {
+                pionsBasiques = jeu.getJeu().pionsFocusJoueur(jeu.getJoueurActuel().getFocus(), jeu.getJoueurActuel());
+                for (PionBasique pion : pionsBasiques) {
+                    if(!pion.getEmplacement().equals(source)){
+                        plateau.tracerBrillancePion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC());
+                    }
+                }
+            }
+
+            // Affiche les suggestion de focus
+            int suggestionFocus = state.getSuggestionFocus();
+            if(suggestionFocus!=3 && plateau.getEpoque()==suggestionFocus){
+                plateau.tracerSuggestionFocus(jeu.getJoueurActuel().getID());
+            }
+
+            // Affiche les suggestion de statue
+            if(dest!=null && source==null && plateau.getEpoque()==dest.getEpoque()){
+                plateau.tracerSuggestionStatue(dest.getCoordonnees().getL(), dest.getCoordonnees().getC());
+            }
+
+            // Affiche les brillances de focus
+            if (jeu.getEtape() == ETAT.FOCUS) {
+                Joueur joueur = jeu.getJoueurActuel();
+                if (joueur.getID() == 1 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 1) && suggestionFocus!= plateau.getEpoque()) {
+                    plateau.tracerBrillanceFocus(1);
+                } else if (joueur.getID() == 2 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 2) && suggestionFocus!= plateau.getEpoque()) {
+                    plateau.tracerBrillanceFocus(0);
+                }
+            }
+
         }
 
         // Affiche les pions en mode preview ou non
         if(state.getPreview()!=null && (jeu.getEtape() == ETAT.MOVE1 || jeu.getEtape()== ETAT.MOVE2)){
             pions = state.getPreview();
-            for (Pion pion : pions) {
-                if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
-                }
-            }
-            Pion pionActuel =  jeu.getPionActuel();
-            if(pionActuel.getEpoque()== plateau.getEpoque()){
-                plateau.tracerPion(pionActuel.getCoordonnees().getL(), pionActuel.getCoordonnees().getC(),0.3, pionActuel.getJoueur().getID());
-            }
-        }else{
+        }else {
             pions = jeu.getJeu().getPions();
-            for (Pion pion : pions) {
+        }
+
+        for (Pion pion : pions) {
                 if (pion.getEpoque() == plateau.getEpoque()) {
-                    plateau.tracerPion(pion.getCoordonnees().getL(), pion.getCoordonnees().getC(), 1, pion.getJoueur().getID());
+                    double l = pion.getCoordonnees().getL()+dL[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
+                    double c = pion.getCoordonnees().getC()+dC[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
+                    double a = alpha[pion.getCoordonnees().getL()][pion.getCoordonnees().getC()];
+                    if (pion instanceof PionBasique) {
+                        plateau.tracerPion(l, c, a, pion.getJoueur().getID());
+                    } else {
+                        plateau.tracerStatue(l, c, a, ((Statue) pion).getColor());
+                    }
                 }
-            }
-        }
-
-        // Affiche les suggestion de focus
-        int suggestionFocus = state.getSuggestionFocus();
-        if(suggestionFocus!=3 && plateau.getEpoque()==suggestionFocus){
-            plateau.tracerSuggestionFocus(jeu.getJoueurActuel().getID());
-        }
-
-        // Affiche les brillances de focus
-        if (jeu.getEtape() == ETAT.FOCUS) {
-            Joueur joueur = jeu.getJoueurActuel();
-            if (joueur.getID() == 1 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 1) && suggestionFocus!= plateau.getEpoque()) {
-                plateau.tracerBrillanceFocus(1);
-            } else if (joueur.getID() == 2 && jeu.peutSelectionnerFocus(plateau.getEpoque(), 2) && suggestionFocus!= plateau.getEpoque()) {
-                plateau.tracerBrillanceFocus(0);
-            }
         }
 
         // Affiche les focus en mode preview ou non
@@ -128,6 +147,29 @@ public class VuePlateau {
                 }
             }
         }
-
     }
+
+    void fixerDecalage(double dL,double dC, int l, int c){
+//        System.out.println("dC : "+dC);
+//        System.out.println("dL : "+dL);
+        this.dC[l][c] = dC;
+        this.dL[l][c] = dL;
+    }
+
+    void tp(Emplacement e, double a){
+        this.alpha[e.getCoordonnees().getL()][e.getCoordonnees().getC()] = a;
+    }
+
+    void resetDecalage(){
+        this.dC = new double[4][4];
+        this.dL = new double[4][4];
+        alpha = new double[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                alpha[i][j] = 1;
+            }
+        }
+    }
+
+
 }

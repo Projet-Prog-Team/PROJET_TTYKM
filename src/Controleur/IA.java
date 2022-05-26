@@ -1,9 +1,7 @@
 package Controleur;
 
-import Modele.CalculJeu;
-import Modele.DeroulementJeu;
-import Modele.Jeu;
-import Modele.Pion;
+import Modele.*;
+import Structures.Couple;
 
 import java.lang.reflect.Method;
 
@@ -36,11 +34,9 @@ public abstract class IA {
         }
         return resultat;
     }
-    public abstract Pion selectPion();
-
-    public abstract Pion jouerCoup();
-
+    public abstract PionBasique selectPion();
+    public abstract Couple<Integer, Emplacement> getCoup1();
+    public abstract Couple<Integer, Emplacement> getCoup2();
     public abstract Integer choixFocus();
-
-    public abstract int calculCoup(DeroulementJeu dj, int horizon, boolean joueur);
+    public abstract int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut);
 }

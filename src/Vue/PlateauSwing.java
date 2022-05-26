@@ -2,6 +2,7 @@ package Vue;
 
 import Modele.DeroulementJeu;
 import Modele.EPOQUE;
+import Modele.Emplacement;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,9 +17,13 @@ public class PlateauSwing extends JComponent implements Plateau {
     Image focusNoir;
     Image pionBlanc;
     Image pionNoir;
+    Image statueBlanche;
+    Image statueNoire;
+    Image statueViolette;
+    Image statueVerte;
     VuePlateau vue;
     Graphics2D drawable;
-    private final double pionSize = 0.6;
+    private final double pionSize = 0.8;
     private int xOffset = 0;
     private int yOffset = 50;
     private int focusRadius = 40;
@@ -53,11 +58,24 @@ public class PlateauSwing extends JComponent implements Plateau {
             in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusNoir.png");
             focusNoir = ImageIO.read(in);
 
-            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc.png");
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc2.png");
             pionBlanc = ImageIO.read(in);
 
-            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir.png");
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir2.png");
             pionNoir = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueBlanche.png");
+            statueBlanche = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueNoire.png");
+            statueNoire = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueViolette.png");
+            statueViolette = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/statueVerte.png");
+            statueVerte = ImageIO.read(in);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,14 +96,30 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     @Override
-    public void tracerPion(int l, int c, double alpha, int joueur) {
+    public void tracerPion(double l, double c, double alpha, int joueur) {
         Composite compo = drawable.getComposite();
         if(joueur==1){
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(pionBlanc,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(pionBlanc, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }else{
             drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
-            drawable.drawImage(pionNoir,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
+            drawable.drawImage(pionNoir, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
+        }
+        drawable.setComposite(compo);
+    }
+
+    @Override
+    public void tracerStatue(double l, double c, double alpha, int joueur) {
+        Composite compo = drawable.getComposite();
+        if(joueur==1){
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(statueBlanche, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
+        }else if(joueur==2){
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(statueNoire, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
+        }else{
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(statueViolette, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
         }
         drawable.setComposite(compo);
     }
@@ -147,6 +181,10 @@ public class PlateauSwing extends JComponent implements Plateau {
         Color myColour = new Color(18, 255, 0,175 );
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
+    }
+
+    public void tracerSuggestionStatue(double l, double c) {
+        drawable.drawImage(statueVerte, (int) (getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2), (int) (getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2), getPionlargeur(), getPionHauteur(), this);
     }
 
     public void tracerBrillanceFocus(int focus){
@@ -214,4 +252,25 @@ public class PlateauSwing extends JComponent implements Plateau {
     public IHMState getState() {
         return state;
     }
+
+    @Override
+    public void decale(double dL, double dC, int l, int c) {
+        vue.fixerDecalage(dL,dC,l,c);
+        repaint();
+    }
+
+    public void tp(Emplacement depart, Emplacement arrive, double alphaDep, double alphaArr){
+        if(depart!=null && depart.getEpoque()==epoque){
+            vue.tp(depart, alphaDep);
+        }else if (arrive.getEpoque()==epoque){
+            vue.tp(arrive, alphaArr);
+        }
+        repaint();
+    }
+
+    public void reset(){
+        vue.resetDecalage();
+        repaint();
+    }
+
 }

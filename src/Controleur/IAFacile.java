@@ -1,8 +1,7 @@
 package Controleur;
 
-import Modele.DeroulementJeu;
-import Modele.Jeu;
-import Modele.Pion;
+import Modele.*;
+import Structures.Couple;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -14,17 +13,23 @@ public class IAFacile extends IA {
         r = new Random();
     }
 
-    public Pion selectPion() {
+    public PionBasique selectPion() {
         int epoque = calcul.getDj().getJoueurActuel().getFocus();
-        ArrayList<Pion> pionsDispo = calcul.getDj().getJeu().pionsFocusJoueur(epoque, calcul.getDj().getJoueurActuel());
+        ArrayList<PionBasique> pionsDispo = calcul.getDj().getJeu().pionsFocusJoueur(epoque, calcul.getDj().getJoueurActuel());
         int x = r.nextInt(pionsDispo.size());
         return pionsDispo.get(x);
     }
 
-    public Pion jouerCoup() {
-        ArrayList<Pion> casesDispo = calcul.getDj().getJeu().casesDispo(calcul.getDj().getJoueurActuel(), calcul.getDj().getPionActuel());
+    @Override
+    public Couple<Integer, Emplacement> getCoup1() {
+        ArrayList<Emplacement> casesDispo = calcul.getDj().getJeu().casesDispo(calcul.getDj().getJoueurActuel(), calcul.getDj().getPionActuel());
         int x = r.nextInt(casesDispo.size());
-        return(casesDispo.get(x));
+        return (new Couple(1, casesDispo.get(x)));
+    }
+
+    @Override
+    public Couple<Integer, Emplacement> getCoup2() {
+        return getCoup1();
     }
 
     public Integer choixFocus() {
@@ -36,7 +41,7 @@ public class IAFacile extends IA {
     }
 
     @Override
-    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut) {
         return 0;
     }
 }

@@ -1,9 +1,6 @@
 package Controleur;
 
-import Modele.CalculJeu;
-import Modele.DeroulementJeu;
-import Modele.ETAT;
-import Modele.Pion;
+import Modele.*;
 import Structures.Couple;
 import Structures.Tour;
 
@@ -21,82 +18,79 @@ public class IADifficile extends IA{
     Method method;
     public IADifficile(Method method) {
         tour = new Tour();
-        this.horizon = 10;
+        this.horizon = 3;
         this.method = method;
     }
 
-    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur) {     // joueur = true <=> calculCoup_Joueur_A
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut) {     // joueur = true <=> calculCoup_Joueur_A
         cpt++;
         CalculJeu c = new CalculJeu(dj);
         if (dj.getEtape() == ETAT.END || horizon == 0) {   // Si horizon atteint ou jeu terminé, on retourne l'évaluation de jeu
             try {
-                return (int) method.invoke(c,null);
+                int heuristique = (int) method.invoke(c, null);
+                return heuristique;
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
         } else {                                // Sinon, on descend dans l'arbre
-            ArrayList<Couple<Integer, Tour>> fils = new ArrayList<>();
-
             ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
-            if(branchements.size() == 0) {
-                System.out.println(c.getDj().getJeu());
-                System.out.println("FF MAINTENANT REVERT FAST ");
-            }
+            Integer minMax = null;
+            int valFils;
+            Tour tourMinMax = null;
             for (Couple<DeroulementJeu, Tour> couple : branchements) {
-                fils.add(new Couple<>(calculCoup(couple.getFirst(), horizon - 1, !joueur), couple.getSecond()));
+                if (minMax == null) {
+                    valFils = calculCoup(couple.getFirst(), horizon - 1, !joueur, null);
+                } else {
+                    valFils = calculCoup(couple.getFirst(), horizon - 1, !joueur, minMax);
+                    /*
+                    if (borneCut != null) {
+                        if ((joueur && borneCut <= valFils) || (!joueur && borneCut >= valFils)) {
+                            break;
+                        }
+                    }*/
+                }
+                if (minMax == null || (joueur && valFils > minMax) || (!joueur && valFils < minMax)) {
+                    minMax = valFils;
+                    tourMinMax = couple.getSecond();
+                }
+                //System.out.println(valFils);
             }
-            int minMax = joueur ? Math.abs(Collections.min(fils).getFirst())+1 : Math.abs(Collections.max(fils).getFirst())+1;
-            int somme = 0;
-            for (int i = 0; i < fils.size(); i++) {
-                int valeur = joueur ? (fils.get(i).getFirst() + minMax) : (-1 * fils.get(i).getFirst() + minMax);
-                fils.get(i).setFirst(valeur);
-                somme += fils.get(i).getFirst();
-            }
-            Collections.sort(fils);  // Valeurs des fils triées en ordre décroissant
-
-
-            Random r = new Random();    // Tirage d'un coup aléatoirement
-            int x = r.nextInt(somme);   // On tire entre borne inf et borne sup de fils[1]
-            int index = 0;
-            while (index < fils.size()-1 && x >= fils.get(index).getFirst()) {
-                index++;
-            }
-
-            tour = fils.get(index).getSecond();
-            return joueur ? (fils.get(index).getFirst() - minMax) : (fils.get(index).getFirst() - minMax) * -1;
+            //System.out.println("CHOISIE : " + minMax);
+            tour = tourMinMax;
+            return minMax;
         }
     }
 
     @Override
-    public Pion selectPion() {
+    public PionBasique selectPion() {
         if (tour.getPionSelectionne() == null) {
-            calculCoup(calcul.getDj(), horizon, true);
+            calculCoup(calcul.getDj(), horizon, true, null);
         }
         return tour.getPionSelectionne();
     }
 
     @Override
-    public Pion jouerCoup() {
-        if (calcul.getDj().getEtape() == ETAT.MOVE1) {
-            if (tour.getCoup1() == null) {
-                calculCoup(calcul.getDj(), horizon, true);
-            }
-            return tour.getCoup1();
+    public Couple<Integer, Emplacement> getCoup1() {
+        if (tour.getCoup1() == null) {
+            calculCoup(calcul.getDj(), horizon, true, null);
         }
-        if (calcul.getDj().getEtape() == ETAT.MOVE2) {
-            if (tour.getCoup2() == null) {
-                calculCoup(calcul.getDj(), horizon, true);
-            }
-            return tour.getCoup2();
-        }
-        return null;
+        return new Couple(tour.getTypeCoup1(), tour.getCoup1());
     }
+
+    @Override
+    public Couple<Integer, Emplacement> getCoup2() {
+        if (tour.getCoup2() == null) {
+            calculCoup(calcul.getDj(), horizon, true, null);
+        }
+        return new Couple(tour.getTypeCoup2(), tour.getCoup2());
+    }
+
     @Override
     public Integer choixFocus() {
         if (tour.getFocus() == null) {
-            calculCoup(calcul.getDj(), horizon, true);
+            calculCoup(calcul.getDj(), horizon, true, null);
         }
         Integer res = tour.getFocus();
         tour = new Tour();  // Tour suivant, il faut recalculer
