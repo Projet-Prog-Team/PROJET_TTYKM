@@ -117,6 +117,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                     if (c.getFirst() == 1) {
                         deplace(c.getSecond(),true);
                     } else if (c.getFirst() == 2){
+                        dj.MemoryManager.AddLog(ETAT.MOVE1);
                         creerStatue(c.getSecond());
                     }
                     state.initPreview();
