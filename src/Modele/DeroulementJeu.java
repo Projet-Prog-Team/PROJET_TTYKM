@@ -375,6 +375,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
     }
 
     public void switchPlayer() {
+        constructionStatue = false;
         // Inversion du joueurActuel
         if(joueurActuel == getJeu().joueurs[0]) {
             joueurActuel=getJeu().joueurs[1];
