@@ -38,7 +38,7 @@ public class SaveDialog {
                     text.setBorder(new LineBorder(Color.RED, 2));
                 }else{
                     Commande com = new Commande("save");
-                    com.setSaveName(text.getText().trim()+".sav");
+                    com.setSaveName(text.getText().trim()+".TTYKM");
                     controle.commande(com);
                     dialog.dispose();
                 }

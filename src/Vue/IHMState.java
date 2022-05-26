@@ -64,6 +64,7 @@ public class IHMState extends Observable {
     }
 
     public void setPreviewFocus2(int previewFocus2) {
+
         if(previewFocus2!=this.previewFocus2){
             this.previewFocus2 = previewFocus2;
             miseAJour();

@@ -130,9 +130,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
             public void actionPerformed(ActionEvent e) {
                 // TODO: Fonction permettant de récupérer les noms des fichiers de save disponibles
                 Vector<String> saveNames = new Vector<>();
-                saveNames.add("Test1");
-                saveNames.add("Test2");
-                saveNames.add("Test3");
+                saveNames=jeu.MemoryManager.GetFiles();
                 LoadDialog loadDialog = new LoadDialog(controle, saveNames);
             }
         });

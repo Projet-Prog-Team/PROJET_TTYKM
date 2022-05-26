@@ -11,7 +11,7 @@ public class Jeu implements Comparable {
     ArrayList<Pion> pions;
     public Joueur[] joueurs = new Joueur[2];
     public final int NBPIONS =14;
-
+    public final int NBSTATUES =9;
     public Jeu() {
         init();
     }
@@ -27,9 +27,9 @@ public class Jeu implements Comparable {
         for(int i = 0; i < 3; i++) {
             PionBasique p1 = new PionBasique(new Emplacement(new Point(0, 0), i), joueurs[0],NBPIONS/2-joueurs[0].getNbPionsRestants(),false);
             pions.add(p1);
-            PionBasique p2 = new PionBasique(new Emplacement(new Point(3, 3), i), joueurs[1],NBPIONS/2-joueurs[1].getNbPionsRestants(),false);
+            PionBasique p2 = new PionBasique(new Emplacement(new Point(3, 3), i), joueurs[1],NBPIONS-joueurs[1].getNbPionsRestants(),false);
             pions.add(p2);
-            Statue s = new Statue(new Emplacement(new Point(1, 2), i), 3);
+            Statue s = new Statue(new Emplacement(new Point(1, 2), i),NBPIONS+i,false, 3);
             pions.add(s);
             joueurs[0].supprimerPion();
             joueurs[1].supprimerPion();
