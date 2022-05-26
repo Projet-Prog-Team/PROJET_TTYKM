@@ -3,18 +3,18 @@ package Structures;
 import java.util.Objects;
 
 public class Point {
-    int x;
-    int y;
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
+    int l;
+    int c;
+    public Point(int l, int c) {
+        this.l = l;
+        this.c = c;
     }
 
     @Override
     public String toString() {
         return "Point{" +
-                "x=" + x +
-                ", y=" + y +
+                "l=" + l +
+                ", c=" + c +
                 '}';
     }
 
@@ -23,19 +23,23 @@ public class Point {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Point point = (Point) o;
-        return x == point.x && y == point.y;
+        return l == point.l && c == point.c;
+    }
+
+    public Point copy() {
+        return new Point(l, c);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(l, c);
     }
 
-    public int getX() {
-        return x;
+    public int getL() {
+        return l;
     }
 
-    public int getY() {
-        return y;
+    public int getC() {
+        return c;
     }
 }

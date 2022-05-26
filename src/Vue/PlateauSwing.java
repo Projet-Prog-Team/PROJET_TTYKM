@@ -1,52 +1,72 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.EPOQUE;
-import Modele.Jeu;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class PlateauSwing extends JComponent implements Plateau {
 
     Image bg;
-    Image focus1;
-    Image focus2;
-    int epoque;
+    Image focusBlanc;
+    Image focusNoir;
+    Image pionBlanc;
+    Image pionNoir;
     VuePlateau vue;
     Graphics2D drawable;
     private final double pionSize = 0.6;
     private int xOffset = 0;
     private int yOffset = 50;
     private int focusRadius = 40;
+    private int epoque;
+    private IHMState state;
 
-    PlateauSwing(int epoque, Jeu j){
+    PlateauSwing(int epoque, DeroulementJeu j, IHMState state){
         this.epoque = epoque;
+        this.state = state;
+
         vue = new VuePlateau(j,this);
 
-        ImageIcon img = null;
+        InputStream in = null;
         switch(epoque){
             case EPOQUE.PASSE:
-                img = new ImageIcon("res/Img/passe.png");
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/passe.png");
                 break;
             case EPOQUE.PRESENT:
-                img = new ImageIcon("res/Img/present.png");
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/present.png");
                 break;
             case EPOQUE.FUTUR:
-                img = new ImageIcon("res/Img/futur.png");
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/futur.png");
                 break;
         }
-        bg = img.getImage();
 
-        img = new ImageIcon("res/Img/focus1.png");
-        focus1 = img.getImage();
+        try {
+            bg = ImageIO.read(in);
 
-        img = new ImageIcon("res/Img/focus2.png");
-        focus2 = img.getImage();
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusBlanc.png");
+            focusBlanc = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusNoir.png");
+            focusNoir = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionBlanc.png");
+            pionBlanc = ImageIO.read(in);
+
+            in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/pionNoir.png");
+            pionNoir = ImageIO.read(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         drawable = (Graphics2D) g;
         drawable.drawImage(bg,xOffset,yOffset,getWidth()-2*xOffset,getHeight()-2*yOffset,this);
         vue.dessinerPlateau();
@@ -58,60 +78,93 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     @Override
-    public void tracerPion(int l, int c, int joueur) {
+    public void tracerPion(int l, int c, double alpha, int joueur) {
+        Composite compo = drawable.getComposite();
         if(joueur==1){
-            drawable.setColor(Color.CYAN);
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(pionBlanc,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
         }else{
-            drawable.setColor(Color.ORANGE);
+            drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+            drawable.drawImage(pionNoir,getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur(), this);
         }
-        drawable.fillOval(getXoffset()+c*getLargeurCase()+(getLargeurCase()-getPionlargeur())/2, getYoffset()+l* getHauteurCase()+(getHauteurCase()-getPionHauteur())/2, getPionlargeur(), getPionHauteur());
+        drawable.setComposite(compo);
     }
 
-    public void tracerFocus1(){
+    public void tracerFocusBlanc(double alpha){
         int width = focusRadius*2;
         int height = focusRadius*2;
-        drawable.drawImage(focus1, (getWidth()-width)/2,yOffset-height/2,width,height, this);
+        Composite compo = drawable.getComposite();
+        drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+        drawable.drawImage(focusBlanc, (getWidth()-width)/2,yOffset-height/2,width,height, this);
+        drawable.setComposite(compo);
     }
 
-    public void tracerFocus2(){
+    public void tracerFocusNoir(double alpha){
         int width = focusRadius*2;
         int height = focusRadius*2;
-        drawable.drawImage(focus2, (getWidth()-width)/2,getHeight()-yOffset-height/2,width,height, this);
+        Composite compo = drawable.getComposite();
+        drawable.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) alpha));
+        drawable.drawImage(focusNoir, (getWidth()-width)/2,getHeight()-yOffset-height/2,width,height, this);
+        drawable.setComposite(compo);
     }
 
-    public void tracerBrillance(int l, int c){
+    public void tracerBrillancePion(int l, int c){
         int x = getXoffset()+c*getLargeurCase();
         int y = getYoffset()+l* getHauteurCase();
-        Color myColour = new Color(95, 255, 163,125 );
+        Color myColour = new Color(255, 200,0,125 );
         drawable.setColor(myColour);
-        drawable.fillRect(x,y,getLargeurCase(),getHauteurCase());
+        drawable.fillRect(x,y,getLargeurCase()+3,getHauteurCase());
     }
 
-    public void tracerBrillanceFocus1(){
+    public void tracerBrillanceCase(int l, int c){
+        int x = getXoffset()+c*getLargeurCase();
+        int y = getYoffset()+l*getHauteurCase();
+        Color myColour;
+        if((l+c) % 2==0){
+            myColour = new Color(158,158,158 );
+        }else{
+            myColour = new Color(127,127,127 );
+        }
+        drawable.setColor(myColour);
+
+        int width = getLargeurCase()/3;
+        int height = getHauteurCase()/3;
+
+        drawable.fillOval(x+getLargeurCase()/3,y+getHauteurCase()/3,width,height);
+    }
+
+    public void tracerSuggestionCase(int l, int c){
+        int x = getXoffset()+c*getLargeurCase();
+        int y = getYoffset()+l* getHauteurCase();
+        Color myColour = new Color(18, 255, 0,125 );
+        drawable.setColor(myColour);
+        drawable.fillRect(x,y,getLargeurCase()+3,getHauteurCase());
+    }
+
+    public void tracerSuggestionFocus(int focus){
         int xFocus = getWidth()/2;
-        int yFocus = yOffset;
-        Color myColour = new Color(231, 245, 124,125 );
+        int yFocus = focus==1 ? yOffset:getHeight()-yOffset;
+        Color myColour = new Color(18, 255, 0,175 );
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
     }
 
-    public void tracerBrillanceFocus2(){
+    public void tracerBrillanceFocus(int focus){
         int xFocus = getWidth()/2;
-        int yFocus = getHeight()-yOffset;
-        Color myColour = new Color(231, 245, 124,125 );
+        int yFocus = focus==1 ? yOffset:getHeight()-yOffset;
+        Color myColour = new Color(255, 200,0, 175);
         drawable.setColor(myColour);
         drawable.fillOval(xFocus-focusRadius, yFocus-focusRadius, focusRadius*2, focusRadius*2);
     }
 
-
-    public boolean isInFocus1(int clic_x, int clic_y){
+    public boolean isInFocusBlanc(int clic_x, int clic_y){
         int xFocus = getWidth()/2;
         int yFocus = yOffset;
         double distance = Math.sqrt(Math.pow((clic_x-xFocus),2)+Math.pow((clic_y-yFocus),2));
         return distance<focusRadius;
     }
 
-    public boolean isInFocus2(int clic_x, int clic_y){
+    public boolean isInFocusNoir(int clic_x, int clic_y){
         int xFocus = getWidth()/2;
         int yFocus = getHeight()-yOffset;
         double distance = Math.sqrt(Math.pow((clic_x-xFocus),2)+Math.pow((clic_y-yFocus),2));
@@ -143,14 +196,22 @@ public class PlateauSwing extends JComponent implements Plateau {
     }
 
     public int getCol(int x){
-        return (x-getXoffset())/getLargeurCase();
+        if(x>getXoffset()){
+            return (x-getXoffset())/getLargeurCase();
+        }else{
+            return -1;
+        }
     }
 
     public int getLig(int y){
-        return (y-getYoffset())/getHauteurCase();
+        if(y>getYoffset()){
+            return (y-getYoffset())/getHauteurCase();
+        }else{
+            return -1;
+        }
     }
 
-    public int getFocusRadius() {
-        return focusRadius;
+    public IHMState getState() {
+        return state;
     }
 }
