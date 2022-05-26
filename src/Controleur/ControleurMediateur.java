@@ -50,6 +50,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
+        dj.getJeu().init();
         dj.init(this);
 
         state.initPreview();
@@ -136,8 +137,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                     break;
                 case FOCUS:
                     dj.getPionActuel().focused=false;
+
                     int focus = j.choixFocus();
                     dj.getJoueurActuel().setFocus(focus);
+                    dj.MemoryManager.UpdateLog(null,null);
                     dj.switchPlayer();
                     state.initPreview();
                     break;

@@ -34,8 +34,8 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
         else
         {
-            if(real)
-                MemoryManager= new ManageFiles(controleur,"./Saves/");
+
+            MemoryManager= new ManageFiles(controleur,"./Saves/");
         }
 
         constructionStatue = false;
@@ -240,8 +240,6 @@ public class DeroulementJeu extends Observable implements Comparable  {
 
     public Coup jouerCoup(Emplacement e, boolean real) {
         //System.out.println(getPionActuel() + " etape + " + getEtape() + "joueur act" + joueurActuel);
-        if(real)
-            System.out.println("coup");
         Coup coup = new Coup();
         ArrayList<Emplacement> cases = getJeu().casesDispo(joueurActuel,pionActuel);
         if (cases.contains(e)) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup
@@ -443,8 +441,10 @@ public class DeroulementJeu extends Observable implements Comparable  {
             setPionActuel(new PionBasique(new Emplacement(new Point(-1, -1), joueurActuel.getFocus()), joueurActuel));
             joueurActuel.nbActionsRestantes=0;
             MemoryManager.AddLog(ETAT.MOVE2);
+            System.out.println("switch");
         } else {
             setPionActuel(null);
+
             MemoryManager.AddLog(ETAT.SELECT);
         }
         miseAJour();

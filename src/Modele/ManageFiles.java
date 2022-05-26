@@ -117,6 +117,8 @@ public class ManageFiles   {
             }
             Writer.write(Actual_pos);
             Writer.write(Max_pos);
+            Writer.write(game.getJoueur(0).getNbPionsRestants());
+            Writer.write(game.getJoueur(1).getNbPionsRestants());
             Writer.write('\n');
             Grille tmpgrille=new Grille(new Pion[game.NBPIONS+NBSTATUES]);
             for(Grille t_grille : temp)
@@ -190,8 +192,21 @@ public class ManageFiles   {
                 }
             i++;
         }
-        game.getJoueur(0).SetNbPionsRestants( NBPIONS/2-(j1)-(NBPIONS/2-(j1)-game.getJoueur(0).getNbPionsRestants()));
-        game.getJoueur(0).SetNbPionsRestants( NBPIONS/2-(j2)-(NBPIONS/2-(j2)-game.getJoueur(0).getNbPionsRestants()));
+        while(j1+game.getJoueur(0).getNbPionsRestants() != NBPIONS/2)
+            if (j1 + game.getJoueur(0).getNbPionsRestants() > NBPIONS / 2) {
+                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants() + 1);
+            } else {
+                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants() - 1);
+            }
+        while(j2+game.getJoueur(1).getNbPionsRestants() != NBPIONS/2)
+            if(j2+game.getJoueur(1).getNbPionsRestants() > NBPIONS/2)
+            {
+                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()+1);
+            }
+            else
+            {
+                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()-1);
+            }
         if(pos>=NBPIONS/2)
         {
             pos = (pos-(NBPIONS/2-(NBPIONS/2-j1)))-1-(NBPIONS/2-(j2+game.getJoueur(1).getNbPionsRestants()));
@@ -200,10 +215,12 @@ public class ManageFiles   {
         if(temp.get(index).PionFocus>=NBPIONS/2)
         {
             DJgame.joueurActuel=game.joueurs[1];
+            game.joueurs[0].nbActionsRestantes=0;
         }
         else
         {
             DJgame.joueurActuel=game.joueurs[0];
+            game.joueurs[1].nbActionsRestantes=0;
         }
         t_etat=temp.get(index).etat;
         if(index-1>=0 && temp.get(index-1).etat == ETAT.MOVE2 && temp.get(index).etat==ETAT.MOVE2)
@@ -231,6 +248,9 @@ public class ManageFiles   {
 
                 break;
         }
+        System.out.println(game.getJoueur(0).nbActionsRestantes);
+        System.out.println(game.getJoueur(1).nbActionsRestantes);
+
         System.out.println("Lock and Load");
     }
     public void Load(String filepath)
@@ -277,6 +297,8 @@ public class ManageFiles   {
             controleur.state.setDifficultyIA2(diff);
             Actual_pos= info[4];
             Max_pos= info[5];
+            game.getJoueur(0).SetNbPionsRestants(info[6]);
+            game.getJoueur(1).SetNbPionsRestants(info[7]);
             Grille tmpgrille = null;
             temp= new ArrayList<>();
             int tour=-1;
@@ -395,8 +417,24 @@ public class ManageFiles   {
                     }
                 i++;
             }
-            game.getJoueur(0).SetNbPionsRestants( NBPIONS/2-(j1)-(NBPIONS/2-(j1)-game.getJoueur(0).getNbPionsRestants()));
-            game.getJoueur(1).SetNbPionsRestants( NBPIONS/2-(j2)-(NBPIONS/2-(j2)-game.getJoueur(1).getNbPionsRestants()));
+            if(j1+game.getJoueur(0).getNbPionsRestants() != NBPIONS/2)
+                if(j1+game.getJoueur(0).getNbPionsRestants() < NBPIONS/2)
+                {
+                    game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()+1);
+                }
+                else
+                {
+                    game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()-1);
+                }
+            if(j2+game.getJoueur(1).getNbPionsRestants() != NBPIONS/2)
+                if(j2+game.getJoueur(1).getNbPionsRestants() < NBPIONS/2)
+                {
+                    game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()+1);
+                }
+                else
+                {
+                    game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()-1);
+                }
             game.getJoueur(0).SetStatuePlaced(S_j1);
             game.getJoueur(1).SetStatuePlaced(S_j2);
             int oldpos = pos;
@@ -474,7 +512,7 @@ public class ManageFiles   {
                 {
                     pions[t_pion.ID]=t_pion;
                 }
-
+            System.out.println(DJgame.getEtape());
             DJgame.miseAJour();
 
         }
@@ -557,8 +595,27 @@ public class ManageFiles   {
                 }
                 i++;
             }
+            if(j1+game.getJoueur(0).getNbPionsRestants() != NBPIONS/2)
+            if(j1+game.getJoueur(0).getNbPionsRestants() < NBPIONS/2)
+            {
+                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()+1);
+            }
+            else
+            {
+                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()-1);
+            }
+            if(j2+game.getJoueur(1).getNbPionsRestants() != NBPIONS/2)
+            if(j2+game.getJoueur(1).getNbPionsRestants() < NBPIONS/2)
+            {
+                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()+1);
+            }
+            else
+            {
+                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()-1);
+            }
+/*
             game.getJoueur(0).SetNbPionsRestants( NBPIONS/2-(j1)-(NBPIONS/2-(j1)-game.getJoueur(0).getNbPionsRestants()));
-            game.getJoueur(1).SetNbPionsRestants( NBPIONS/2-(j2)-(NBPIONS/2-(j2)-game.getJoueur(1).getNbPionsRestants()));
+            game.getJoueur(1).SetNbPionsRestants( NBPIONS/2-(j2)-(NBPIONS/2-(j2)-game.getJoueur(1).getNbPionsRestants()));*/
             game.getJoueur(0).SetStatuePlaced(S_j1);
             game.getJoueur(1).SetStatuePlaced(S_j2);
             int oldpos = pos;
@@ -586,7 +643,6 @@ public class ManageFiles   {
                 pred_focus=(oldpos>=NBPIONS/2?pred_focusJ2:pred_focusJ1);
 
             }
-            System.out.println("etat: "+t_etat);
             switch(t_etat)
             {
                 case IDLE:
@@ -643,7 +699,6 @@ public class ManageFiles   {
                         {
                             DJgame.joueurActuel=game.joueurs[0];
                         }
-                        System.out.println("hey222");
                     }
 
                     break;
@@ -747,7 +802,7 @@ public class ManageFiles   {
     public void UpdateLog(Pion be, Pion af)
     {
         
-        if(Actual_pos<(Max_pos-1) && !move && !init )
+        if(Actual_pos<(Max_pos-1))
         {
             System.out.println("changement");
             ArrayList<Grille> tmp = new ArrayList<>();
@@ -800,22 +855,6 @@ public class ManageFiles   {
             Max_pos=temp.size();
 
         //----------------
-            for (Grille t_pion : temp)
-            {
-                Pion[] t_pions=t_pion.GetCases();
-                for(int i=0;i<NBPIONS+NBSTATUES;i++)
-                {
-                    if(t_pions[i]!=null)
-                    {
-                        System.out.println("i :"+i+" "+t_pions[i].getCoordonnees()+" "+t_pions[i].getEpoque());
-                    }
-                    else
-                    {
-                        System.out.println("i :"+i+" null");
-                    }
-                }
-                System.out.println("__________");}
-            System.out.println("________________________");
 
 
         move=true;
