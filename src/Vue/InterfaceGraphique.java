@@ -194,7 +194,10 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         historyList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                controle.commande(new Commande("historique"));
+                Commande tmpCom = new Commande("historique");
+                JList tmplist = (JList)e.getSource();
+                tmpCom.setSaveName(Integer.toString(tmplist.getSelectedIndex()));
+                controle.commande(tmpCom);
             }
         });
         JScrollPane historyPane = new JScrollPane(historyList);
@@ -259,19 +262,19 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
 
-        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu, state);
+        plateauPasse = new PlateauSwing(EPOQUE.Convert(EPOQUE.PASSE), jeu, state);
         AdaptateurSouris a1 = new AdaptateurSouris(plateauPasse, controle);
         plateauPasse.addMouseMotionListener(a1);
         plateauPasse.addMouseListener(a1);
         plateauBox.add(plateauPasse);
 
-        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu, state);
+        plateauPresent = new PlateauSwing(EPOQUE.Convert(EPOQUE.PRESENT), jeu, state);
         AdaptateurSouris a2 = new AdaptateurSouris(plateauPresent, controle);
         plateauPresent.addMouseMotionListener(a2);
         plateauPresent.addMouseListener(a2);
         plateauBox.add(plateauPresent);
 
-        plateauFutur = new PlateauSwing(EPOQUE.FUTUR, jeu, state);
+        plateauFutur = new PlateauSwing(EPOQUE.Convert(EPOQUE.FUTUR), jeu, state);
         AdaptateurSouris a3 = new AdaptateurSouris(plateauFutur, controle);
         plateauFutur.addMouseMotionListener(a3);
         plateauFutur.addMouseListener(a3);

@@ -4,7 +4,6 @@ public enum ETAT {
     SELECT,
     MOVE1,
     MOVE2,
-    TOTEM,
     FOCUS,
     IDLE,
     END,

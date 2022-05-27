@@ -75,13 +75,13 @@ public class Jeu implements Comparable {
         ArrayList<Emplacement> casesDisponibles = new ArrayList<>();
         Point coo = p.getCoordonnees();
         int epoque = p.getEpoque();
-        if (epoque - 1 >= EPOQUE.PASSE) {   // Si on peut aller vers le passé
+        if (epoque - 1 >= EPOQUE.Convert(EPOQUE.PASSE)) {   // Si on peut aller vers le passé
             Emplacement e = new Emplacement(coo, epoque-1);
             if (getPion(e) == null && j.getNbPionsRestants() > 0) {
                 casesDisponibles.add(e);
             }
         }
-        if (epoque + 1 <= EPOQUE.FUTUR) {   // Si on peut aller vers le futur
+        if (epoque + 1 <= EPOQUE.Convert(EPOQUE.FUTUR)) {   // Si on peut aller vers le futur
             Emplacement e = new Emplacement(coo, epoque+1);
             if (getPion(e) == null) {
                 casesDisponibles.add(e);

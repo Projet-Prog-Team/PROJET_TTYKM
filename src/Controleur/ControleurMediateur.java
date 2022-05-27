@@ -316,6 +316,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 System.out.println(c.getDifficulty());
                 setDifficultyIA(c.getIA(), c.getDifficulty());
                 break;
+            case "historique":
+                System.out.println(c.getSaveName());
+                break;
             default:
                 return false;
         }

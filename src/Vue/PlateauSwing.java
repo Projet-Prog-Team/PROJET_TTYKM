@@ -37,14 +37,14 @@ public class PlateauSwing extends JComponent implements Plateau {
         vue = new VuePlateau(j,this);
 
         InputStream in = null;
-        switch(epoque){
-            case EPOQUE.PASSE:
+        switch(EPOQUE.Convert(epoque)){
+            case PASSE:
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/passe.png");
                 break;
-            case EPOQUE.PRESENT:
+            case PRESENT:
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/present.png");
                 break;
-            case EPOQUE.FUTUR:
+            case FUTUR:
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/futur.png");
                 break;
         }

@@ -145,7 +145,6 @@ public class DeroulementJeu extends Observable implements Comparable  {
                     j.getPions().add(tmp);
                     coup.deplace(null, tmp.getEmplacement().copy());
                     if(real) {
-                        MemoryManager.move=false;
                         MemoryManager.UpdateLog(null, tmp);
                     }
                     //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
