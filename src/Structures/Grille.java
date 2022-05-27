@@ -12,6 +12,9 @@ public class Grille {
     private Statue[] statues;
     private Pion[] result;
     public ETAT etat;
+
+    public int nbrestantJ1=0;
+    public int nbrestantJ2=0;
     public int PionFocus;
     public int FocusJ1;
     public int FocusJ2;
@@ -46,7 +49,7 @@ public class Grille {
 
     }
 
-    public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus, int t_focus2)
+    public Grille(Pion [] t_cases, ETAT t_etat,int t_pionfocus,int t_focus, int t_focus2,int tnbpion1, int tnbpion2)
     {
         Grille tmpgrille = new Grille(t_cases);
         cases = tmpgrille.GetPions();
@@ -56,6 +59,8 @@ public class Grille {
         PionFocus = t_pionfocus;
         FocusJ1 = t_focus;
         FocusJ2 = t_focus2;
+        nbrestantJ1=tnbpion1;
+        nbrestantJ2=tnbpion2;
     }
     public Grille(Pion [] t_cases)
     {

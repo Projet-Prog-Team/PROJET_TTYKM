@@ -4,6 +4,7 @@ import Structures.Grille;
 import Structures.Point;
 
 import java.io.*;
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -14,6 +15,8 @@ public class ManageFiles   {
     private ArrayList<Grille> temp;
     private DeroulementJeu DJgame;
     private Jeu game;
+
+    private int tmpIHM=0;
     private String path;
     private Pion[] pions;
     public int Actual_pos=0;
@@ -44,7 +47,7 @@ public class ManageFiles   {
                 pions[tmp[i].ID] = tmp[i].copy();
             }
         }
-        temp.add(new Grille(Grille.Clone(pions), ETAT.IDLE, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus()));
+        temp.add(new Grille(Grille.Clone(pions), ETAT.IDLE, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
         try
         {
 
@@ -82,42 +85,42 @@ public class ManageFiles   {
             FileWriter Writer = new FileWriter(file);
             //ia? si oui difficulté
 
-            Writer.write((byte)controleur.joueurs[0]);
-            Writer.write((byte)controleur.joueurs[1]);
+            Writer.write(Integer.toString(controleur.joueurs[0]));
+            Writer.write(Integer.toString(controleur.joueurs[1]));
             switch(controleur.state.getDifficultyIA1())
             {
                 default:
-                    Writer.write((byte)1);
+                    Writer.write(Integer.toString(1));
                     break;
 
                 case "moyenne":
-                    Writer.write((byte)2);
+                    Writer.write(Integer.toString(2));
                     break;
 
                 case "difficile":
-                    Writer.write((byte)3);
+                    Writer.write(Integer.toString(3));
                     break;
             }
             switch(controleur.state.getDifficultyIA2())
             {
                 default:
-                    Writer.write((byte)1);
+                    Writer.write(Integer.toString(1));
                     break;
 
                 case "moyenne":
-                    Writer.write((byte)2);
+                    Writer.write(Integer.toString(2));
                     break;
 
                 case "difficile":
-                    Writer.write((byte)3);
+                    Writer.write(Integer.toString(3));
                     break;
             }
-            Writer.write((byte)Actual_pos);
-            Writer.write((byte)Max_pos);
-            Writer.write((byte)game.getJoueur(0).getNbPionsRestants());
-            Writer.write((byte)game.getJoueur(1).getNbPionsRestants());
-            Writer.write((byte)(game.getJoueur(0).isStatuePlaced()?1:0));
-            Writer.write((byte)(game.getJoueur(1).isStatuePlaced()?1:0));
+            Writer.write(Integer.toString(Actual_pos));
+            Writer.write(Integer.toString(Max_pos));
+            Writer.write(Integer.toString(game.getJoueur(0).getNbPionsRestants()));
+            Writer.write(Integer.toString(game.getJoueur(1).getNbPionsRestants()));
+            Writer.write(Integer.toString(game.getJoueur(0).isStatuePlaced()?1:0));
+            Writer.write(Integer.toString(game.getJoueur(1).isStatuePlaced()?1:0));
             Writer.write('\n');
             Grille tmpgrille=new Grille(new Pion[game.NBPIONS+NBSTATUES]);
             for(Grille t_grille : temp)
@@ -127,6 +130,8 @@ public class ManageFiles   {
 
                 Writer.write((byte)t_grille.PionFocus);
                 Writer.write((byte)ETAT.Convert(t_grille.etat));
+                Writer.write((byte)t_grille.nbrestantJ1);
+                Writer.write((byte)t_grille.nbrestantJ2);
                 do
                 {
                     int i =tmpgrille.Compare(t_grille.GetCases());
@@ -167,8 +172,29 @@ public class ManageFiles   {
             e.printStackTrace();
         }
     }
+
+    public void IHMLogLoad(int i)
+    {
+        System.out.println("i: "+i);
+        tmpIHM=i;
+        while(tmpIHM!=Actual_pos && tmpIHM !=-1)
+        {
+            if(tmpIHM>Actual_pos)
+            {
+                CTRLY();
+            }
+            else
+            {
+                CTRLZ();
+            }
+            System.out.println("i: "+tmpIHM);
+            System.out.println("AP: "+Actual_pos);
+        }
+
+    }
     public void BoardLoad(int index)
     {
+        Actual_pos=index;
         game.SetPions(filter(Grille.Clone(temp.get(index).GetCases())));
         game.getJoueurs()[0].setFocus(temp.get(index).FocusJ1);
         game.getJoueurs()[1].setFocus(temp.get(index).FocusJ2);
@@ -192,21 +218,8 @@ public class ManageFiles   {
                 }
             i++;
         }
-        while(j1+game.getJoueur(0).getNbPionsRestants() != NBPIONS/2)
-            if (j1 + game.getJoueur(0).getNbPionsRestants() > NBPIONS / 2) {
-                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants() + 1);
-            } else {
-                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants() - 1);
-            }
-        while(j2+game.getJoueur(1).getNbPionsRestants() != NBPIONS/2)
-            if(j2+game.getJoueur(1).getNbPionsRestants() > NBPIONS/2)
-            {
-                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()+1);
-            }
-            else
-            {
-                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()-1);
-            }
+        game.getJoueur(0).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ1);
+        game.getJoueur(1).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ2);
         if(pos>=NBPIONS/2)
         {
             pos = (pos-(NBPIONS/2-(NBPIONS/2-j1)))-1-(NBPIONS/2-(j2+game.getJoueur(1).getNbPionsRestants()));
@@ -248,122 +261,150 @@ public class ManageFiles   {
 
                 break;
         }
-
         System.out.println("Lock and Load");
     }
     public void Load(String filepath)
     {
-        try
-        {
-            FileInputStream fis=new FileInputStream(path+filepath);
-            Scanner scan = new Scanner(fis);
-            byte info[] = scan.nextLine().getBytes();
-            controleur.joueurs[0]=info[0];
-            controleur.joueurs[1]=info[1];
-            controleur.state.setIA1(info[0]==1);
-            controleur.state.setIA2(info[1]==1);
-            String diff="";
-            switch(info[2])
+            try
             {
-                case 1:
-                    diff="facile";
-                    break;
-
-                case 2:
-                    diff="moyenne";
-                    break;
-
-                case 3:
-                    diff="difficile";
-                    break;
-            }
-            controleur.state.setDifficultyIA1(diff);
-            switch(info[3])
-            {
-                case 1:
-                    diff="facile";
-                    break;
-
-                case 2:
-                    diff="moyenne";
-                    break;
-
-                case 3:
-                    diff="difficile";
-                    break;
-            }
-            controleur.state.setDifficultyIA2(diff);
-            Actual_pos= info[4];
-            Max_pos= info[5];
-            game.getJoueur(0).SetNbPionsRestants(info[6]);
-            game.getJoueur(1).SetNbPionsRestants(info[7]);
-            game.getJoueur(0).setStatuePlaced(info[8]==1);
-            game.getJoueur(1).setStatuePlaced(info[9]==1);
-            Grille tmpgrille = null;
-            temp= new ArrayList<>();
-            int tour=-1;
-
-            for(int i=0; i<Max_pos;i++)
-            {
-                info = scan.nextLine().getBytes();
-                if(tmpgrille != null)
+                FileInputStream fis=new FileInputStream(path+filepath);
+                Scanner scan = new Scanner(fis);
+                String th = scan.nextLine();
+                char t_info [] = new char[th.length()];
+                th.getChars(0,th.length(),t_info,0);
+                int sinfo[]=new int[th.length()];
+                for (int k=0;k<th.length();k++)
+                     sinfo[k]= Character.getNumericValue(t_info[k]);
+                controleur.joueurs[0]=sinfo[0];
+                controleur.joueurs[1]=sinfo[1];
+                controleur.state.setIA1(sinfo[0]==1);
+                controleur.state.setIA2(sinfo[1]==1);
+                String diff="";
+                switch(sinfo[2])
                 {
-                    tmpgrille=new Grille(Grille.Clone(tmpgrille.GetCases()),tmpgrille.etat, tmpgrille.PionFocus,tmpgrille.FocusJ1, tmpgrille.FocusJ2);
+                    case 1:
+                        diff="facile";
+                        break;
+
+                    case 2:
+                        diff="moyenne";
+                        break;
+
+                    case 3:
+                        diff="difficile";
+                        break;
+                }
+                controleur.state.setDifficultyIA1(diff);
+                switch(sinfo[3])
+                {
+                    case 1:
+                        diff="facile";
+                        break;
+
+                    case 2:
+                        diff="moyenne";
+                        break;
+
+                    case 3:
+                        diff="difficile";
+                        break;
+                }
+                controleur.state.setDifficultyIA2(diff);
+                int add=0;
+                if(sinfo.length==12)
+                {
+                    Actual_pos= sinfo[5]+10*sinfo[4];
+                    add++;
                 }
                 else
                 {
-                    tmpgrille= new Grille(new Pion[game.NBPIONS+ game.NBSTATUES]);
+                    Actual_pos= sinfo[4];
                 }
+                if(sinfo.length>=11)
+                {
+                    if(sinfo.length!=11)
+                    {
+                        Max_pos= sinfo[7]+10*sinfo[6];
+                        add++;
+                    }
+                    else
+                    {
+                        Max_pos= sinfo[6]+10*sinfo[5];
+                    }
 
-                tmpgrille.FocusJ1=info[0];
-                tmpgrille.FocusJ2=info[1];
-                tmpgrille.PionFocus= info[2];
-                tmpgrille.etat=ETAT.Convert(info[3]);
-                if(tmpgrille.etat == ETAT.SELECT || tmpgrille.etat == ETAT.IDLE)
-                    tour++;
-                do {
-                    String idtmp = scan.nextLine();
-                    int id = Integer.parseInt(idtmp);
+                }
+                else
+                {
+                    Max_pos= sinfo[5];
+                }
+                game.getJoueur(0).SetNbPionsRestants(sinfo[6+add]);
+                game.getJoueur(1).SetNbPionsRestants(sinfo[7+add]);
+                game.getJoueur(0).setStatuePlaced(sinfo[8+add]==1);
+                game.getJoueur(1).setStatuePlaced(sinfo[9+add]==1);
+                Grille tmpgrille = null;
+                temp= new ArrayList<>();
+                byte[] info;
+                for(int i=0; i<Max_pos;i++)
+                {
                     info = scan.nextLine().getBytes();
-                    if (info[0] != '\t') {
-                        int c = info[0];
-                        int l = info[1];
-                        int e = info[2];
-                        if(id>=NBPIONS)
-                        {
-                            int color=0;
-                            if(id>=NBPIONS+3)
+                    if(tmpgrille != null)
+                    {
+                        tmpgrille=new Grille(Grille.Clone(tmpgrille.GetCases()),tmpgrille.etat, tmpgrille.PionFocus,tmpgrille.FocusJ1, tmpgrille.FocusJ2,tmpgrille.nbrestantJ1,tmpgrille.nbrestantJ2);
+                    }
+                    else
+                    {
+                        tmpgrille= new Grille(new Pion[game.NBPIONS+ game.NBSTATUES]);
+                    }
+
+                    tmpgrille.FocusJ1=info[0];
+                    tmpgrille.FocusJ2=info[1];
+                    tmpgrille.PionFocus= info[2];
+                    tmpgrille.etat=ETAT.Convert(info[3]);
+                    tmpgrille.nbrestantJ1 = info[4];
+                    tmpgrille.nbrestantJ2 = info[5];
+                    do {
+                        String idtmp = scan.nextLine();
+                        int id = Integer.parseInt(idtmp);
+                        info = scan.nextLine().getBytes();
+                        if (info[0] != '\t') {
+                            int c = info[0];
+                            int l = info[1];
+                            int e = info[2];
+                            if(id>=NBPIONS)
                             {
-                                color = id>=NBPIONS+6 ? 2 : 1;
+                                int color=0;
+                                if(id>=NBPIONS+3)
+                                {
+                                    color = id>=NBPIONS+6 ? 2 : 1;
+                                }
+                                else
+                                {
+                                    color=3;
+                                }
+                                tmpgrille.GetCases()[id] = new Statue(new Emplacement(new Point(l, c), e), id, false,color);
                             }
                             else
                             {
-                                color=3;
+                                tmpgrille.GetCases()[id] = new PionBasique(new Emplacement(new Point(l, c), e), game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, info[3] == 1);
                             }
-                            tmpgrille.GetCases()[id] = new Statue(new Emplacement(new Point(l, c), e), id, false,color);
-                        }
-                        else
-                        {
-                            tmpgrille.GetCases()[id] = new PionBasique(new Emplacement(new Point(l, c), e), game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, info[3] == 1);
-                        }
 
-                    } else {
-                        tmpgrille.GetCases()[id] = null;
-                    }
-                }while(scan.hasNextInt());
-                temp.add(tmpgrille);
+                        } else {
+                            tmpgrille.GetCases()[id] = null;
+                        }
+                    }while(scan.hasNextInt());
+                    temp.add(tmpgrille);
 
+                }
+                BoardLoad(Actual_pos);
+                DJgame.miseAJour();
+                pions = new Pion[NBPIONS];
+                pions = Grille.Clone(temp.get(Actual_pos).GetCases());
+            } catch (IOException e) {
+                System.out.println("cannot write  in memory or cannot read file");
+                e.printStackTrace();
             }
-            BoardLoad(Actual_pos);
-            DJgame.miseAJour();
-            pions = new Pion[NBPIONS];
-            pions = Grille.Clone(temp.get(Actual_pos).GetCases());
-        } catch (IOException e) {
-            System.out.println("cannot write  in memory or cannot read file");
-            e.printStackTrace();
-        }
 
-    }
+        }
     public void CTRLZ()
     {
         if(Actual_pos>0)
@@ -412,24 +453,8 @@ public class ManageFiles   {
                     }
                 i++;
             }
-            if(j1+game.getJoueur(0).getNbPionsRestants() != NBPIONS/2)
-                if(j1+game.getJoueur(0).getNbPionsRestants() < NBPIONS/2)
-                {
-                    game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()+1);
-                }
-                else
-                {
-                    game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()-1);
-                }
-            if(j2+game.getJoueur(1).getNbPionsRestants() != NBPIONS/2)
-                if(j2+game.getJoueur(1).getNbPionsRestants() < NBPIONS/2)
-                {
-                    game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()+1);
-                }
-                else
-                {
-                    game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()-1);
-                }
+            game.getJoueur(0).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ1);
+            game.getJoueur(1).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ2);
             game.getJoueur(0).SetStatuePlaced(S_j1);
             game.getJoueur(1).SetStatuePlaced(S_j2);
             int oldpos = pos;
@@ -505,7 +530,6 @@ public class ManageFiles   {
                 {
                     pions[t_pion.ID]=t_pion;
                 }
-            DJgame.miseAJour();
 
         }
     }
@@ -587,24 +611,8 @@ public class ManageFiles   {
                 }
                 i++;
             }
-            if(j1+game.getJoueur(0).getNbPionsRestants() != NBPIONS/2)
-            if(j1+game.getJoueur(0).getNbPionsRestants() < NBPIONS/2)
-            {
-                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()+1);
-            }
-            else
-            {
-                game.getJoueur(0).SetNbPionsRestants(game.getJoueur(0).getNbPionsRestants()-1);
-            }
-            if(j2+game.getJoueur(1).getNbPionsRestants() != NBPIONS/2)
-            if(j2+game.getJoueur(1).getNbPionsRestants() < NBPIONS/2)
-            {
-                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()+1);
-            }
-            else
-            {
-                game.getJoueur(1).SetNbPionsRestants(game.getJoueur(1).getNbPionsRestants()-1);
-            }
+            game.getJoueur(0).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ1);
+            game.getJoueur(1).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ2);
 /*
             game.getJoueur(0).SetNbPionsRestants( NBPIONS/2-(j1)-(NBPIONS/2-(j1)-game.getJoueur(0).getNbPionsRestants()));
             game.getJoueur(1).SetNbPionsRestants( NBPIONS/2-(j2)-(NBPIONS/2-(j2)-game.getJoueur(1).getNbPionsRestants()));*/
@@ -700,7 +708,6 @@ public class ManageFiles   {
             {
                 pions[t_pion.ID]=t_pion;
             }
-            DJgame.miseAJour();
         }
 
     }
@@ -746,11 +753,11 @@ public class ManageFiles   {
         {
             if(DJgame.getPionActuel() != null)
             {
-                temp.add(new Grille(Grille.Clone(pions),t_etat,DJgame.getPionActuel().ID,game.joueurs[0].getFocus(),game.joueurs[1].getFocus()));
+                temp.add(new Grille(Grille.Clone(pions),t_etat,DJgame.getPionActuel().ID,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
             }
             else
             {
-                temp.add(new Grille(Grille.Clone(pions),t_etat,0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus()));
+                temp.add(new Grille(Grille.Clone(pions),t_etat,0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
             }
 
         }
@@ -758,16 +765,16 @@ public class ManageFiles   {
         {
             if(DJgame.getPionActuel() != null)
             {
-                temp.add(new Grille(Grille.Clone(pions),DJgame.getEtape(),DJgame.getPionActuel().ID,game.joueurs[0].getFocus(),game.joueurs[1].getFocus()));
+                temp.add(new Grille(Grille.Clone(pions),DJgame.getEtape(),DJgame.getPionActuel().ID,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
             }
             else
             {
-                temp.add(new Grille(Grille.Clone(pions),DJgame.getEtape(),0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus()));
+                temp.add(new Grille(Grille.Clone(pions),DJgame.getEtape(),0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
             }
         }
-
         Max_pos=temp.size();
         Actual_pos++;
+
     }
 
     public void UpdateLog(Pion be, Pion af)
@@ -778,7 +785,7 @@ public class ManageFiles   {
             ArrayList<Grille> tmp = new ArrayList<>();
             for(int i=0;i<Actual_pos;i++)
             {
-                tmp.add(new Grille(Grille.Clone(temp.get(i).GetCases()),temp.get(i).etat,temp.get(i).PionFocus, temp.get(i).FocusJ1, temp.get(i).FocusJ2));
+                tmp.add(new Grille(Grille.Clone(temp.get(i).GetCases()),temp.get(i).etat,temp.get(i).PionFocus, temp.get(i).FocusJ1, temp.get(i).FocusJ2,game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
             }
             ETAT t_etat= temp.get(Max_pos-1).etat;
             temp = tmp;
@@ -787,6 +794,19 @@ public class ManageFiles   {
             Actual_pos=Max_pos-1;
         }
             if (af != null) {
+                if(Actual_pos-1>=0 && temp.get(Actual_pos-1).GetCases()[af.ID] == null)
+                {
+                    if(af.getJoueur()==game.getJoueur(0))
+                    {
+                        temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
+                        temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants()-1;
+                    }
+                    else
+                    {
+                        temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
+                        temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants()-1;
+                    }
+                }
                 if (af instanceof PionBasique) {
 
                     pions[af.ID] = af.copy(af.getJoueur());
@@ -805,11 +825,19 @@ public class ManageFiles   {
                     temp.get(Actual_pos).GetCases()[be.ID] = null;
                     pions[be.ID] = null;
                 }
+                else
+                {
+                    temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
+                    temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
+                }
 
             }
 
             temp.get(Actual_pos).FocusJ1=game.joueurs[0].getFocus();
             temp.get(Actual_pos).FocusJ2=game.joueurs[1].getFocus();
+
+
+
 
             Max_pos=temp.size();
     }
@@ -839,67 +867,86 @@ public class ManageFiles   {
         int i=0;
         for(Grille t_grille : temp)
         {
+
             String tmp;
-            tmp = Integer.toString(i)+ " ";
+            tmp = i+ " ";
             if((t_grille.PionFocus>=NBPIONS/2))
             {
-                tmp.concat("Noir | ");
+
+                tmp= tmp +"Noir | ";
             }
             else
             {
-                tmp.concat("Blanc | ");
+                tmp= tmp +"Blanc | ";
             }
-            Point oldcoord = t_grille.GetPions()[t_grille.PionFocus].getCoordonnees();
-            Point coord =temp.get(i+1).GetPions()[t_grille.PionFocus].getCoordonnees();
 
-            if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.SELECT ||t_grille.etat == ETAT.IDLE)
+            if(i!=Max_pos-1)
             {
-                switch(t_grille.GetPions()[t_grille.PionFocus].getEpoque())
+                if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.IDLE||t_grille.etat == ETAT.SELECT)
                 {
-                    case 0:
-                        tmp.concat("Passé ");
-                        break;
-                    case 1:
-                        tmp.concat("Présent ");
-                        break;
-                    case 2:
-                        tmp.concat("Futur ");
-                        break;
-                }
-                tmp.concat(Integer.toString(oldcoord.getC()+oldcoord.getL())+" -> "+Integer.toString(coord.getC()+coord.getL())+" ");
-                switch(temp.get(i+1).GetPions()[t_grille.PionFocus].getEpoque())
-                {
-                    case 0:
-                        tmp.concat("Passé ");
-                        break;
-                    case 1:
-                        tmp.concat("Présent ");
-                        break;
-                    case 2:
-                        tmp.concat("Futur ");
-                        break;
-                }
+                    Point oldcoord = temp.get(i).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
+                    oldcoord = new Point(oldcoord.getL()+1,oldcoord.getC()+1);
+                    Point coord=null;
+                    if(temp.get(i+1) != null)
+                        coord =temp.get(i+1).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
+                    coord = new Point(coord.getL()+1,coord.getC()+1);
+                    switch(temp.get(i).GetCases()[t_grille.PionFocus].getEpoque())
+                    {
+                        case 0:
+                            tmp= tmp +"Passé ";
+                            break;
+                        case 1:
+                            tmp= tmp +"Présent ";
+                            break;
+                        case 2:
+                            tmp= tmp +"Futur ";
+                            break;
+                    }
+                    if(coord != null) {
+                        tmp = tmp + Integer.toString(oldcoord.getC() * oldcoord.getL()) + " -> " + Integer.toString(coord.getC() * coord.getL()) + " ";
+                        switch (temp.get(i + 1).GetCases()[t_grille.PionFocus].getEpoque()) {
+                            case 0:
+                                tmp = tmp + "Passé ";
+                                break;
+                            case 1:
+                                tmp = tmp + "Présent ";
+                                break;
+                            case 2:
+                                tmp = tmp + "Futur ";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        tmp = tmp + Integer.toString(oldcoord.getC() * oldcoord.getL()) + " -> MORT ";
+                    }
 
+                }
+                else
+                {
+                    tmp= tmp +"Selectionne Focus ";
+                }
             }
             else {
                 switch (t_grille.etat) {
                     case MOVE1:
-                        tmp.concat("Joue son deuxième coup ");
+                        tmp= tmp +"Joue son deuxième coup ";
                         break;
 
                     case SELECT:
                     case IDLE:
-                        tmp.concat("Joue son premier coup ");
+                        tmp= tmp +"Joue son premier coup ";
                         break;
                     case MOVE2:
-                        tmp.concat("Selectionne Focus ");
+                        tmp= tmp +"Selectionne Focus ";
                 }
             }
             if(Actual_pos == i)
-                tmp.concat("<-----");
+                tmp= tmp +"<-----";
             list[i] = tmp;
-        }
+            i++;
 
+        }
         return list;
     }
 }

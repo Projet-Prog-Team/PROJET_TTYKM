@@ -191,24 +191,15 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
                 "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
                 "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5"};
         JList historyList = new JList<>(categories);
-        historyList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                Commande tmpCom = new Commande("historique");
-                JList tmplist = (JList)e.getSource();
-                tmpCom.setSaveName(Integer.toString(tmplist.getSelectedIndex()));
-                controle.commande(tmpCom);
-            }
-        });
         JScrollPane historyPane = new JScrollPane(historyList);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         c.ipady = 150;
-        c.insets = new Insets(0,20,0,20);
-        lateralPane.add(historyPane, c);
         c.ipady = 0;
-
+        c.insets = new Insets(0,20,0,20);
+        Logs tlog = new Logs(historyList,jeu,controle);
+        lateralPane.add(historyPane, c);
         // Boutons annuler/refaire
         JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 

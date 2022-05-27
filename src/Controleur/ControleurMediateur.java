@@ -261,28 +261,33 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "save":
                 System.out.println(c.getSaveName());
                 dj.MemoryManager.Save(c.getSaveName());
+                dj.miseAJour();
                 break;
             case "load":
                 System.out.println(c.getSaveName());
                 dj.MemoryManager.Load(c.getSaveName());
+                dj.miseAJour();
                 break;
             case "annuler":
                 dj.MemoryManager.CTRLZ();
                 state.initPreview();
                 state.setPauseIA(true);
                 t.stop();
+                dj.miseAJour();
                 break;
             case "refaire":
                 dj.MemoryManager.CTRLY();
                 state.initPreview();
                 state.setPauseIA(true);
                 t.stop();
+                dj.miseAJour();
                 break;
             case "annulerTour":
                 dj.MemoryManager.CTRLTZ();
                 state.initPreview();
                 state.setPauseIA(true);
                 t.stop();
+                dj.miseAJour();
                 break;
             case "suggestion":
                 suggestion();
@@ -300,6 +305,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "newGame":
                 t.stop();
+                state.setPauseIA(false);
                 init();
                 inter.reset();
                 break;
@@ -318,6 +324,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "historique":
                 System.out.println(c.getSaveName());
+                state.setPauseIA(true);
+                t.stop();
+                dj.MemoryManager.IHMLogLoad(Integer.valueOf(c.getSaveName()));
+                dj.miseAJour();
                 break;
             default:
                 return false;
