@@ -1,6 +1,6 @@
 package Vue;
 
-import Modele.Jeu;
+import Modele.DeroulementJeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -8,22 +8,22 @@ import java.awt.*;
 
 public class LabelEtat implements Observateur {
 
-    Jeu jeu;
+    DeroulementJeu dj;
     JLabel label;
 
-    LabelEtat(String s, Jeu j){
+    LabelEtat(String s, DeroulementJeu djeu){
         label = new JLabel(s, SwingConstants.CENTER);
         label.setPreferredSize(new Dimension(280,20));
-        jeu = j;
-        jeu.ajouteObservateur(this);
+        dj = djeu;
+        dj.ajouteObservateur(this);
         metAJour();
     }
 
     @Override
     public void metAJour() {
         String state= "Joueur ";
-        state+=jeu.getJoueurActuel().getID()==1 ? "Blanc ":"Noir ";
-        switch (jeu.getState()){
+        state+=dj.getJoueurActuel().getID()==1 ? "Blanc ":"Noir ";
+        switch (dj.getState()){
             case "selection":
                 state+="sélectionne un pion";
                 break;
@@ -38,6 +38,7 @@ public class LabelEtat implements Observateur {
                 break;
             case "j1gagne":
                 state="Blanc a gagné";
+                break;
             case "j2gagne":
                 state="Noir a gagné";
                 break;

@@ -1,7 +1,7 @@
 package Controleur;
 
-import Modele.Jeu;
-import Modele.Pion;
+import Modele.*;
+import Structures.Couple;
 
 public class IAMoyenne extends IA{
 
@@ -10,12 +10,17 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public Pion selectPion() {
+    public PionBasique selectPion() {
         return null;
     }
 
     @Override
-    public Pion jouerCoup() {
+    public Couple<Integer, Emplacement> getCoup1() {
+        return null;
+    }
+
+    @Override
+    public Couple<Integer, Emplacement> getCoup2() {
         return null;
     }
 
@@ -25,7 +30,7 @@ public class IAMoyenne extends IA{
     }
 
     @Override
-    public int calculCoup(Jeu j, int horizon) {
+    public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut) {
         return 0;
     }
 }

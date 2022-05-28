@@ -2,9 +2,27 @@ package Modele;
 
 public class Joueur {
     int ID;
-    int nbPionsRestants = 4;
-    public int nbActionsRestantes = 2;
+    private boolean statuePlaced;
+    private int nbPionsRestants;
+    public int nbActionsRestantes;
     int focus;
+
+
+    public Joueur(int id,int nbpions) {
+        ID = id;
+        nbPionsRestants = nbpions;
+        statuePlaced = false;
+        nbActionsRestantes = 2;
+    }
+
+    public boolean isStatuePlaced() {
+        return statuePlaced;
+    }
+    public void SetStatuePlaced(boolean placed) {statuePlaced=placed;}
+
+    public void setStatuePlaced(boolean statuePlaced) {
+        this.statuePlaced = statuePlaced;
+    }
 
     public int getID() {
         return ID;
@@ -12,10 +30,6 @@ public class Joueur {
 
     public void setID(int ID) {
         this.ID = ID;
-    }
-
-    public Joueur(int id) {
-        ID = id;
     }
 
     public boolean peutSupprimerPion() {
@@ -44,16 +58,22 @@ public class Joueur {
                 ", nbPionsRestants=" + nbPionsRestants +
                 ", nbActionsRestantes=" + nbActionsRestantes +
                 ", focus=" + focus +
+                ", statuePlaced=" + statuePlaced +
                 '}';
     }
     public Joueur copy() {
-        Joueur j = new Joueur(getID());
-        j.nbPionsRestants = getNbPionsRestants();
+        Joueur j = new Joueur(getID(),nbPionsRestants);
         j.nbActionsRestantes = getNbActionsRestantes();
         j.setFocus(getFocus());
+        j.setStatuePlaced(statuePlaced);
         return j;
     }
     public int getNbPionsRestants() {
         return nbPionsRestants;
+    }
+
+    public void SetNbPionsRestants(int t_nb)
+    {
+        nbPionsRestants= t_nb;
     }
 }

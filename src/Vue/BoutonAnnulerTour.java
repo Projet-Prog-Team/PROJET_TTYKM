@@ -1,29 +1,29 @@
 package Vue;
 
 import Modele.DeroulementJeu;
-import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class BoutonAnnuler implements Observateur {
+public class BoutonAnnulerTour implements Observateur {
 
-    private DeroulementJeu dj;
     private JButton button;
+    private DeroulementJeu dj;
 
-    BoutonAnnuler(String s, DeroulementJeu dj) {
+    BoutonAnnulerTour(String s, DeroulementJeu dj) {
         button = new JButton(s);
-        this.dj = dj;
+        this.dj=dj;
         dj.ajouteObservateur(this);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFocusable(false);
+        button.setEnabled(false);
         metAJour();
     }
 
     @Override
     public void metAJour() {
-        if(dj.MemoryManager.CanCTRLZ())
+        if(dj.MemoryManager.CanCTRLTZ())
         {
             button.setEnabled(true);
         }

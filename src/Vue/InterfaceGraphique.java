@@ -1,7 +1,9 @@
 package Vue;
 
+import Modele.DeroulementJeu;
 import Modele.EPOQUE;
-import Modele.Jeu;
+import Modele.ETAT;
+import Modele.Emplacement;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -10,35 +12,65 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.net.URL;
 import java.util.Vector;
 
-public class InterfaceGraphique implements Runnable, Observateur {
+public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtilisateur {
 
-    private Jeu jeu;
+    private DeroulementJeu jeu;
     private CollecteurEvenements controle;
     private JFrame frame;
-    private PlateauSwing plateauPasse, plateauPresent, plateauFuture;
+    private PlateauSwing plateauPasse, plateauPresent, plateauFutur;
     private int frameWidth = 1600;
     private int frameHeight = 700;
+    ImageIcon victoryIcon;
+    JLabel victoryImage;
+    JLabel victoryLabel;
+    IHMState state;
 
-
-    public InterfaceGraphique(Jeu j, CollecteurEvenements c) {
-        jeu = j;
+    public InterfaceGraphique(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
+        this.jeu = jeu;
         jeu.ajouteObservateur(this);
+        this.state = state;
+        state.ajouteObservateur(this);
         controle = c;
+        c.fixerInterfaceUtilisateur(this);
+        URL in = ClassLoader.getSystemResource("Img/confetti3.gif");
+        victoryIcon = new ImageIcon(in);
     }
 
     @Override
     public void metAJour() {
         plateauPasse.repaint();
         plateauPresent.repaint();
-        plateauFuture.repaint();
+        plateauFutur.repaint();
+        if(jeu.getEtape()!= ETAT.END){
+            victoryImage.setVisible(false);
+            victoryLabel.setVisible(false);
+        }else{
+            victoryIcon.setImage(victoryIcon.getImage().getScaledInstance(frameWidth,frameHeight,Image.SCALE_DEFAULT));
+            victoryImage.setIcon(victoryIcon);
+            victoryImage.setVisible(true);
+            if(jeu.getState()=="j1gagne"){
+                if(state.getIA1()){
+                    victoryLabel.setText("L'IA 1 a gagné !");
+                }else{
+                    victoryLabel.setText("Le joueur 1 a gagné !");
+                }
+            }else{
+                if(state.getIA2()){
+                    victoryLabel.setText("l'IA 2 a gagné !");
+                }else{
+                    victoryLabel.setText("Le joueur 2 a gagné !");
+                }
+            }
+            victoryLabel.setVisible(true);
+        }
     }
 
-    public static void demarrer(Jeu j, CollecteurEvenements c) {
-        SwingUtilities.invokeLater(new InterfaceGraphique(j, c));
+    public static void demarrer(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
+        SwingUtilities.invokeLater(new InterfaceGraphique(jeu, c, state));
     }
 
     public JMenuItem createMenuItem(String s, String c){
@@ -55,6 +87,22 @@ public class InterfaceGraphique implements Runnable, Observateur {
     @Override
     public void run() {
         frame = new JFrame("That time you killed me");
+
+        JLayeredPane layeredPane = new JLayeredPane();
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        victoryImage = new JLabel(victoryIcon);
+        victoryImage.setVisible(false);
+        layeredPane.add(victoryImage, Integer.valueOf(1));
+
+        victoryLabel = new JLabel("Joueur 1 gagne !");
+        victoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        victoryLabel.setForeground(Color.white);
+        Font font = victoryLabel.getFont();
+        victoryLabel.setFont(new Font(font.getFontName(),Font.BOLD,80));
+        victoryLabel.setVisible(false);
+        layeredPane.add(victoryLabel, Integer.valueOf(2));
 
         // Menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -82,9 +130,7 @@ public class InterfaceGraphique implements Runnable, Observateur {
             public void actionPerformed(ActionEvent e) {
                 // TODO: Fonction permettant de récupérer les noms des fichiers de save disponibles
                 Vector<String> saveNames = new Vector<>();
-                saveNames.add("Test1");
-                saveNames.add("Test2");
-                saveNames.add("Test3");
+                saveNames=jeu.MemoryManager.GetFiles();
                 LoadDialog loadDialog = new LoadDialog(controle, saveNames);
             }
         });
@@ -95,16 +141,16 @@ public class InterfaceGraphique implements Runnable, Observateur {
         // Config Menu
         JMenu ConfigMenu = new JMenu("Configuration");
 
-        IAMenu IA1DifficultyMenu = new IAMenu(1, controle);
+        IAMenu IA1DifficultyMenu = new IAMenu(1, controle, state);
         ConfigMenu.add(IA1DifficultyMenu.getMenu());
 
-        IAMenu IA2DifficultyMenu = new IAMenu(2, controle);
+        IAMenu IA2DifficultyMenu = new IAMenu(2, controle, state);
         ConfigMenu.add(IA2DifficultyMenu.getMenu());
 
-        ActiverIA toggleIA1 = new ActiverIA(jeu, controle,1,"toggleIA1");
+        ActiverIA toggleIA1 = new ActiverIA(controle,1,"toggleIA1", state);
         ConfigMenu.add(toggleIA1.getMenuItem());
 
-        ActiverIA toggleIA2 = new ActiverIA(jeu, controle,2,"toggleIA2");
+        ActiverIA toggleIA2 = new ActiverIA(controle,2,"toggleIA2", state);
         ConfigMenu.add(toggleIA2.getMenuItem());
 
         JLabel IASpeedLabel = new JLabel("Vitesse IA : 1000ms");
@@ -134,55 +180,53 @@ public class InterfaceGraphique implements Runnable, Observateur {
 
         // Historique
         //TODO: avoir le vrai historique
-        String categories[] = { "Noir Présent 5 -> Passé 5", "Blanc Présent 5 -> Passé 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 4 -> Présent 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5",
-                "Noir Présent 5 -> Passé 5","Blanc Présent 5 -> Passé 5"};
+        String[] categories = { "Blanc | Joue son premier coup <----"};
         JList historyList = new JList<>(categories);
-        historyList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                controle.commande(new Commande("historique"));
-            }
-        });
         JScrollPane historyPane = new JScrollPane(historyList);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         c.ipady = 150;
-        c.insets = new Insets(0,20,0,20);
-        lateralPane.add(historyPane, c);
         c.ipady = 0;
-
+        c.insets = new Insets(0,20,0,20);
+        Logs tlog = new Logs(historyList,jeu,controle);
+        lateralPane.add(historyPane, c);
         // Boutons annuler/refaire
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler", jeu);
+        BoutonAnnulerTour boutonAnnulerTour = new BoutonAnnulerTour("Annuler le tour",jeu);
+        boutonAnnulerTour.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annulerTour")));
+        buttonPanel1.add(boutonAnnulerTour.getButton());
+
+        BoutonAnnuler boutonAnnuler = new BoutonAnnuler("Annuler",jeu);
         boutonAnnuler.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("annuler")));
-        buttonPanel.add(boutonAnnuler.getButton());
+        buttonPanel1.add(boutonAnnuler.getButton());
 
-        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire", jeu);
+        BoutonRefaire boutonRefaire = new BoutonRefaire("Refaire",jeu);
         boutonRefaire.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("refaire")));
-        buttonPanel.add(boutonRefaire.getButton());
+        buttonPanel1.add(boutonRefaire.getButton());
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
-        lateralPane.add(buttonPanel, c);
+        lateralPane.add(buttonPanel1, c);
+
+        // Bouton suggestion/reprendre
+        JPanel buttonPanel2 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        BoutonReprendre boutonReprendre = new BoutonReprendre("Relancer IA", state);
+        boutonReprendre.getButton().addActionListener(new AdaptateurCommande(controle, new Commande("reprendre")));
+        buttonPanel2.add(boutonReprendre.getButton());
 
         JButton boutonSuggestion = new JButton("Suggestion");
         boutonSuggestion.addActionListener(new AdaptateurCommande(controle, new Commande("suggestion")));
         boutonSuggestion.setFocusable(false);
+        buttonPanel2.add(boutonSuggestion);
+
         c.fill = GridBagConstraints.NONE;
         c.gridx = 0;
         c.gridy = 2;
-        lateralPane.add(boutonSuggestion, c);
+        lateralPane.add(buttonPanel2, c);
 
         // Label etat du jeu
         LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
@@ -191,42 +235,107 @@ public class InterfaceGraphique implements Runnable, Observateur {
         c.gridy = 3;
         lateralPane.add(labelEtat.getLabel(), c);
 
-        frame.add(lateralPane, BorderLayout.EAST);
+        mainPanel.add(lateralPane, BorderLayout.EAST);
 
         // Inventaire joueur 1
-        Inventory inv1 = new Inventory(1, jeu);
-        frame.add(inv1.getPanel(), BorderLayout.NORTH);
+        Inventory inv1 = new Inventory(1, jeu, state, controle);
+        mainPanel.add(inv1.getPanel(), BorderLayout.NORTH);
 
         // Plateaux
         Box plateauBox = Box.createHorizontalBox();
 
-        plateauPasse = new PlateauSwing(EPOQUE.PASSE, jeu);
+        plateauPasse = new PlateauSwing(EPOQUE.Convert(EPOQUE.PASSE), jeu, state);
         AdaptateurSouris a1 = new AdaptateurSouris(plateauPasse, controle);
         plateauPasse.addMouseMotionListener(a1);
         plateauPasse.addMouseListener(a1);
         plateauBox.add(plateauPasse);
 
-        plateauPresent = new PlateauSwing(EPOQUE.PRESENT, jeu);
+        plateauPresent = new PlateauSwing(EPOQUE.Convert(EPOQUE.PRESENT), jeu, state);
         AdaptateurSouris a2 = new AdaptateurSouris(plateauPresent, controle);
         plateauPresent.addMouseMotionListener(a2);
         plateauPresent.addMouseListener(a2);
         plateauBox.add(plateauPresent);
 
-        plateauFuture = new PlateauSwing(EPOQUE.FUTUR, jeu);
-        AdaptateurSouris a3 = new AdaptateurSouris(plateauFuture, controle);
-        plateauFuture.addMouseMotionListener(a3);
-        plateauFuture.addMouseListener(a3);
-        plateauBox.add(plateauFuture);
+        plateauFutur = new PlateauSwing(EPOQUE.Convert(EPOQUE.FUTUR), jeu, state);
+        AdaptateurSouris a3 = new AdaptateurSouris(plateauFutur, controle);
+        plateauFutur.addMouseMotionListener(a3);
+        plateauFutur.addMouseListener(a3);
+        plateauBox.add(plateauFutur);
 
-        frame.add(plateauBox, BorderLayout.CENTER);
+        mainPanel.add(plateauBox, BorderLayout.CENTER);
 
         // Inventaire joueur 2
-        Inventory inv2 = new Inventory(2, jeu);
-        frame.add(inv2.getPanel(), BorderLayout.SOUTH);
+        Inventory inv2 = new Inventory(2, jeu, state, controle);
+        mainPanel.add(inv2.getPanel(), BorderLayout.SOUTH);
 
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                frameWidth = frame.getWidth();
+                frameHeight = frame.getHeight();
+                mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
+                victoryImage.setBounds(0,0,frameWidth,frameHeight);
+                victoryLabel.setBounds(0,0,frameWidth, frameHeight);
+            }
+        });
+
+        frame.addWindowStateListener(new WindowAdapter() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                super.windowStateChanged(e);
+                frameWidth = frame.getWidth();
+                frameHeight = frame.getHeight();
+                mainPanel.setBounds(0,0,frameWidth, frameHeight-inv2.getPanel().getHeight());
+                victoryImage.setBounds(0,0,frameWidth,frameHeight);
+                victoryLabel.setBounds(0,0,frameWidth, frameHeight);
+            }
+        });
+
+        layeredPane.add(mainPanel,Integer.valueOf(0));
+
+        Timer time = new Timer(16, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controle.ticAnim();
+            }
+        });
+        time.start();
+
+        frame.setFocusable(true);
+        frame.addKeyListener(new AdaptateurClavier(controle));
+        frame.add(layeredPane);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
     }
 
+    @Override
+    public void decale(double dL, double dC, int l, int c, int epoque) {
+        switch (epoque){
+            case 0:
+                plateauPasse.decale(dL,dC,l,c);
+                break;
+            case 1:
+                plateauPresent.decale(dL,dC,l,c);
+                break;
+            case 2:
+                plateauFutur.decale(dL,dC,l,c);
+                break;
+        }
+    }
+
+    @Override
+    public void tp(Emplacement depart, Emplacement arrive, double alphaDep, double alphaArr) {
+        plateauPasse.tp(depart, arrive, alphaDep, alphaArr);
+        plateauPresent.tp(depart, arrive, alphaDep, alphaArr);
+        plateauFutur.tp(depart, arrive, alphaDep, alphaArr);
+    }
+
+    @Override
+    public void reset() {
+        plateauFutur.reset();
+        plateauPasse.reset();
+        plateauPresent.reset();
+    }
 }

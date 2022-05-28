@@ -6,9 +6,7 @@ public interface CollecteurEvenements {
     void clicSouris(int l, int c, int epoque);
     boolean commande(Commande c);
     void tic();
+    void ticAnim();
+    void fixerInterfaceUtilisateur(InterfaceUtilisateur i);
     void enablePreview(int l, int c, int epoque);
-    void setPreviewFocus1(int epoque);
-    void setPreviewFocus2(int epoque);
-    boolean isEnabledIA1();
-    boolean isEnabledIA2();
 }

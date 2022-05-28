@@ -36,7 +36,7 @@ public class LoadDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Commande com = new Commande("load");
-                com.setSaveName(combo.getSelectedItem().toString()+".sav");
+                com.setSaveName(combo.getSelectedItem().toString()+".TTYKM");
                 controle.commande(com);
                 dialog.dispose();
             }

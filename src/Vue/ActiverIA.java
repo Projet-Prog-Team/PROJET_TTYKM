@@ -1,6 +1,5 @@
 package Vue;
 
-import Modele.Jeu;
 import Patterns.Observateur;
 
 import javax.swing.*;
@@ -9,16 +8,16 @@ import java.awt.event.ActionListener;
 
 public class ActiverIA implements Observateur {
 
-    private Jeu jeu;
     private CollecteurEvenements controleur;
     private JMenuItem menuItem;
     private int ia;
+    IHMState state;
 
-    ActiverIA(Jeu j, CollecteurEvenements c, int ia, String commande){
-        jeu = j;
-        jeu.ajouteObservateur(this);
+    ActiverIA(CollecteurEvenements c, int ia, String commande, IHMState state){
+        this.controleur = c;
         this.ia = ia;
-        controleur = c;
+        this.state = state;
+        state.ajouteObservateur(this);
         menuItem = new JMenuItem("Activer IA "+ia);
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -26,18 +25,19 @@ public class ActiverIA implements Observateur {
                 controleur.commande(new Commande(commande));
             }
         });
+        metAJour();
     }
 
     @Override
     public void metAJour() {
         if (ia==1){
-            if (controleur.isEnabledIA1()){
+            if (state.getIA1()){
                 menuItem.setText("Desactiver IA 1");
             }else{
                 menuItem.setText("Activer IA 1");
             }
         }else{
-            if (controleur.isEnabledIA2()){
+            if (state.getIA2()){
                 menuItem.setText("Desactiver IA 2");
             }else{
                 menuItem.setText("Activer IA 2");
