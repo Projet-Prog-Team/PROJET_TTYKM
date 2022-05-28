@@ -21,7 +21,6 @@ public class Main {
             DeroulementJeu dj = new DeroulementJeu(j,false,null);
             IHMState state = new IHMState();
             ControleurMediateur c = new ControleurMediateur(dj,1, state);
-            System.out.println("heyyyy3");
             dj.init(c);
             c.desactiverIA(1);
             c.activerIA(0, dif1, heuristique1);

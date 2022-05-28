@@ -20,10 +20,13 @@ public class Logs implements Observateur {
         t_list.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                Commande tmpCom = new Commande("historique");
-                JList tmplist = (JList)e.getSource();
-                tmpCom.setSaveName(Integer.toString(tmplist.getSelectedIndex()));
-                t_control.commande(tmpCom);
+                if(!e.getValueIsAdjusting()) {
+                    Commande tmpCom = new Commande("historique");
+                    JList tmplist = (JList) e.getSource();
+                    tmpCom.setSaveName(Integer.toString(tmplist.getSelectedIndex()));
+                    if(tmplist.getSelectedIndex() != -1)
+                    t_control.commande(tmpCom);
+                }
             }
         });
     }

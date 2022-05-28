@@ -175,7 +175,7 @@ public class ManageFiles   {
 
     public void IHMLogLoad(int i)
     {
-        System.out.println("i: "+i);
+        System.out.println("nouvelle appel: "+i);
         tmpIHM=i;
         while(tmpIHM!=Actual_pos && tmpIHM !=-1)
         {
@@ -189,6 +189,7 @@ public class ManageFiles   {
             }
             System.out.println("i: "+tmpIHM);
             System.out.println("AP: "+Actual_pos);
+            System.out.println("________________________");
         }
 
     }
@@ -884,25 +885,31 @@ public class ManageFiles   {
             {
                 if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.IDLE||t_grille.etat == ETAT.SELECT)
                 {
-                    Point oldcoord = temp.get(i).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
+                    Point oldcoord=null;
+                    if(temp.get(i) != null)
+                        oldcoord = temp.get(i).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
                     oldcoord = new Point(oldcoord.getL()+1,oldcoord.getC()+1);
                     Point coord=null;
                     if(temp.get(i+1) != null)
                         coord =temp.get(i+1).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
-                    coord = new Point(coord.getL()+1,coord.getC()+1);
-                    switch(temp.get(i).GetCases()[t_grille.PionFocus].getEpoque())
-                    {
-                        case 0:
-                            tmp= tmp +"Passé ";
-                            break;
-                        case 1:
-                            tmp= tmp +"Présent ";
-                            break;
-                        case 2:
-                            tmp= tmp +"Futur ";
-                            break;
-                    }
                     if(coord != null) {
+                        coord = new Point(coord.getL() + 1, coord.getC() + 1);
+                        switch (temp.get(i).GetCases()[t_grille.PionFocus].getEpoque()) {
+                            case 0:
+                                tmp = tmp + "Passé ";
+                                break;
+                            case 1:
+                                tmp = tmp + "Présent ";
+                                break;
+                            case 2:
+                                tmp = tmp + "Futur ";
+                                break;
+                        }
+                    }
+                    else {
+                        tmp = tmp + "MORT ";
+                    }
+                    if(oldcoord != null) {
                         tmp = tmp + Integer.toString(oldcoord.getC() * oldcoord.getL()) + " -> " + Integer.toString(coord.getC() * coord.getL()) + " ";
                         switch (temp.get(i + 1).GetCases()[t_grille.PionFocus].getEpoque()) {
                             case 0:
@@ -918,7 +925,7 @@ public class ManageFiles   {
                     }
                     else
                     {
-                        tmp = tmp + Integer.toString(oldcoord.getC() * oldcoord.getL()) + " -> MORT ";
+                        tmp = tmp + " -> MORT ";
                     }
 
                 }
