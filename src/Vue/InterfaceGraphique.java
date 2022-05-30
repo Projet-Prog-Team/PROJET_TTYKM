@@ -128,7 +128,6 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         loadMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: Fonction permettant de récupérer les noms des fichiers de save disponibles
                 Vector<String> saveNames = new Vector<>();
                 saveNames=jeu.MemoryManager.GetFiles();
                 LoadDialog loadDialog = new LoadDialog(controle, saveNames);
@@ -179,18 +178,15 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         GridBagConstraints c = new GridBagConstraints();
 
         // Historique
-        //TODO: avoir le vrai historique
-        String[] categories = {};
-        JList historyList = new JList<>(categories);
-        JScrollPane historyPane = new JScrollPane(historyList);
+        Historique historique = new Historique(jeu,controle);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         c.ipady = 150;
         c.ipady = 0;
         c.insets = new Insets(0,20,0,20);
-        Logs tlog = new Logs(historyList,jeu,controle);
-        lateralPane.add(historyPane, c);
+        lateralPane.add(historique.getPane(), c);
+
         // Boutons annuler/refaire
         JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
