@@ -6,8 +6,8 @@ import Patterns.Observateur;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Historique implements Observateur {
 
@@ -15,7 +15,7 @@ public class Historique implements Observateur {
     private JList list;
     DeroulementJeu dj;
 
-    Historique(DeroulementJeu dj, CollecteurEvenements controle){
+    Historique(DeroulementJeu dj, CollecteurEvenements controle, IHMState state){
         dj.ajouteObservateur(this);
         list = new JList();
         this.dj=dj;
@@ -31,9 +31,15 @@ public class Historique implements Observateur {
             }
         });
         pane = new JScrollPane(list);
-        pane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-            public void adjustmentValueChanged(AdjustmentEvent e) {
-                e.getAdjustable().setValue(e.getAdjustable().getMaximum());
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                state.setPasseNum(true);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                state.setPasseNum(false);
             }
         });
     }
@@ -50,5 +56,6 @@ public class Historique implements Observateur {
         for(String t_action : actionlist)
             listModel.addElement(t_action);
         list.setModel(listModel);
+        list.ensureIndexIsVisible(list.getModel().getSize() -1);
     }
 }

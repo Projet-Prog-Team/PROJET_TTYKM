@@ -13,6 +13,7 @@ import java.io.InputStream;
 public class PlateauSwing extends JComponent implements Plateau {
 
     Image bg;
+    Image bgNum;
     Image focusBlanc;
     Image focusNoir;
     Image pionBlanc;
@@ -36,21 +37,28 @@ public class PlateauSwing extends JComponent implements Plateau {
 
         vue = new VuePlateau(j,this);
 
+        try {
         InputStream in = null;
         switch(EPOQUE.Convert(epoque)){
             case PASSE:
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/passe.png");
+                bg = ImageIO.read(in);
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/passeNum.png");
+                bgNum = ImageIO.read(in);
                 break;
             case PRESENT:
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/present.png");
+                bg = ImageIO.read(in);
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/presentNum.png");
+                bgNum = ImageIO.read(in);
                 break;
             case FUTUR:
                 in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/futur.png");
+                bg = ImageIO.read(in);
+                in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/futurNum.png");
+                bgNum = ImageIO.read(in);
                 break;
         }
-
-        try {
-            bg = ImageIO.read(in);
 
             in = ClassLoader.getSystemClassLoader().getResourceAsStream("Img/focusBlanc.png");
             focusBlanc = ImageIO.read(in);
@@ -86,7 +94,12 @@ public class PlateauSwing extends JComponent implements Plateau {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawable = (Graphics2D) g;
-        drawable.drawImage(bg,xOffset,yOffset,getWidth()-2*xOffset,getHeight()-2*yOffset,this);
+        if(state.getPasseNum()){
+            drawable.drawImage(bgNum,xOffset,yOffset,getWidth()-2*xOffset,getHeight()-2*yOffset,this);
+        }else{
+            drawable.drawImage(bg,xOffset,yOffset,getWidth()-2*xOffset,getHeight()-2*yOffset,this);
+        }
+
         vue.dessinerPlateau();
     }
 

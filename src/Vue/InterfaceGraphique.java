@@ -178,7 +178,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         GridBagConstraints c = new GridBagConstraints();
 
         // Historique
-        Historique historique = new Historique(jeu,controle);
+        Historique historique = new Historique(jeu,controle,state);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
