@@ -30,12 +30,10 @@ public class ControleurMediateur implements CollecteurEvenements {
     Emplacement previewEmp;
     Boolean animationsActives=true;
 
-    String heuristique = "Heuristique";
-
     public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
         dj = djeu;
         this.state = state;
-        suggestion = IA.nouvelle(new CalculJeu(dj), "difficile", heuristique);
+        suggestion = IA.nouvelle(new CalculJeu(dj), "difficile");
         speed = temps;
         init();
     }
@@ -59,7 +57,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         state.setDifficultyIA1(difficulty1);
         state.setDifficultyIA2(difficulty2);
         state.setPauseIA(false);
-        activerIA(1, difficulty2, heuristique);
+        activerIA(1, difficulty2);
     }
 
     @Override
@@ -305,10 +303,10 @@ public class ControleurMediateur implements CollecteurEvenements {
                 animationsActives = !animationsActives;
                 break;
             case "toggleIA1":
-                activerIA(0, difficulty1, heuristique);
+                activerIA(0, difficulty1);
                 break;
             case "toggleIA2":
-                activerIA(1, difficulty2, heuristique);
+                activerIA(1, difficulty2);
                 break;
             case "setDifficulty":
                 System.out.println(c.getDifficulty());
@@ -330,13 +328,13 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     // Fonctions appelés lors d'un clique sur un bouton
-    public void activerIA(int j, String type, String heuristique) {
+    public void activerIA(int j, String type) {
         joueurs[j] = (joueurs[j] + 1) % 2;
         if (j == 0) {
-            joueur1 = IA.nouvelle(new CalculJeu(dj), type, heuristique);
+            joueur1 = IA.nouvelle(new CalculJeu(dj), type);
             state.setIA1(joueurs[j]==1);
         } else {
-            joueur2 = IA.nouvelle(new CalculJeu(dj), type, heuristique);
+            joueur2 = IA.nouvelle(new CalculJeu(dj), type);
             state.setIA2(joueurs[j]==1);
         }
         dj.miseAJour();
@@ -358,14 +356,14 @@ public class ControleurMediateur implements CollecteurEvenements {
             difficulty1 = difficulty;
             if (joueurs[0] == 1) {
                 desactiverIA(0); //désactiver
-                activerIA(0, difficulty1, heuristique);
+                activerIA(0, difficulty1);
             }
             state.setDifficultyIA1(difficulty);
         } else {
             difficulty2 = difficulty;
             if (joueurs[1] == 1) {
                 desactiverIA(1); //désactiver
-                activerIA(1, difficulty2, heuristique);
+                activerIA(1, difficulty2);
             }
             state.setDifficultyIA2(difficulty);
         }

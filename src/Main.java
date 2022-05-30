@@ -13,7 +13,7 @@ import java.net.InterfaceAddress;
 
 public class Main {
 
-    public static void test(int nbParties, String dif1, String dif2, String heuristique1, String heuristique2) {
+    public static void test(int nbParties, String dif1, String dif2) {
         int cpt0 = 0;
         int cpt1 = 0;
         for(int i = 0; i < nbParties; i++) {
@@ -23,8 +23,8 @@ public class Main {
             ControleurMediateur c = new ControleurMediateur(dj,1, state);
             dj.init(c);
             c.desactiverIA(1);
-            c.activerIA(0, dif1, heuristique1);
-            c.activerIA(1, dif2, heuristique2);
+            c.activerIA(0, dif1);
+            c.activerIA(1, dif2);
             System.out.println(i);
 //            int finalI = i;
             Timer time = new javax.swing.Timer(10000, new ActionListener() {
@@ -66,7 +66,7 @@ public class Main {
                     classique();
                     break;
                 case "test":
-                    test(Integer.parseInt(args[1]), args[2], args[3], args[4], args[5]);
+                    test(Integer.parseInt(args[1]), args[2], args[3]);
                     break;
             }
         }

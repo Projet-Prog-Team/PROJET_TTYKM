@@ -3,28 +3,20 @@ package Controleur;
 import Modele.*;
 import Structures.Couple;
 
-import java.lang.reflect.Method;
-
 public abstract class IA {
     CalculJeu calcul;
-    public static IA nouvelle(CalculJeu c, String type, String heuristique) {
+    public static IA nouvelle(CalculJeu c, String type) {
         IA resultat = null;
         // Méthode de fabrication pour l'IA, qui crée le bon objet selon la config
         switch (type) {
             case "facile":
-                resultat = new IAFacile();
+                resultat = new IAMinMax(1);
                 break;
             case "moyenne":
-                resultat = new IAMoyenne();
+                resultat = new IAMinMax(2);
                 break;
             case "difficile":
-                Method method = null;
-                try {
-                    method = CalculJeu.class.getMethod(heuristique);
-                } catch (NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-                resultat = new IADifficile(method);
+                resultat = new IAMinMax(4);
                 break;
             default:
                 System.out.println("IA non reconnue");
