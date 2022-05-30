@@ -327,6 +327,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 state.setPauseIA(true);
                 t.stop();
                 dj.MemoryManager.IHMLogLoad(Integer.valueOf(c.getSaveName()));
+                state.initPreview();
+                previewAnim = null;
+                previewEmp = null;
                 dj.miseAJour();
                 break;
             default:

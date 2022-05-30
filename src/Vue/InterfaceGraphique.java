@@ -180,7 +180,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
 
         // Historique
         //TODO: avoir le vrai historique
-        String[] categories = { "Blanc | Joue son premier coup <----"};
+        String[] categories = {};
         JList historyList = new JList<>(categories);
         JScrollPane historyPane = new JScrollPane(historyList);
         c.fill = GridBagConstraints.HORIZONTAL;
