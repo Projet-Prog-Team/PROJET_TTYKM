@@ -172,7 +172,6 @@ public class DeroulementJeu extends Observable implements Comparable  {
             getJeu().getPions().add(tmp_statue);
             if(real) {
                 MemoryManager.UpdateLog(null, tmp_statue);
-                System.out.println("hey");
             }
             coup.deplace(null, e.copy());
             for (int i = pionActuel.getEpoque(); i < 2; i++) {

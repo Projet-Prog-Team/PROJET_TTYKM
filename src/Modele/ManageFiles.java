@@ -832,9 +832,7 @@ public class ManageFiles   {
                 else
                 {
                     temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
-                    System.out.println(temp.get(Actual_pos).nbrestantJ1);
                     temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
-                    System.out.println(temp.get(Actual_pos).nbrestantJ2);
                 }
 
             }

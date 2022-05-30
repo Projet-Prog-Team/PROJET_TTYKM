@@ -25,18 +25,10 @@ public class Main {
             c.desactiverIA(1);
             c.activerIA(0, dif1);
             c.activerIA(1, dif2);
+            c.animationsActives = false;
             System.out.println(i);
-//            int finalI = i;
-            Timer time = new javax.swing.Timer(10000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    InterfaceGraphique.demarrer(dj, c, state);
-                }
-            });
-            time.start();
             while(!dj.estTermine()) {
             }
-            time.stop();
             if (j.joueurAGagne(j.joueurs[0])) {
                 cpt0++;
             } else {

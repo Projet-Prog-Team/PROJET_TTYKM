@@ -5,6 +5,8 @@ import Structures.Couple;
 import Structures.Tour;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class IAMinMax extends IA{
 
@@ -30,8 +32,8 @@ public class IAMinMax extends IA{
             ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
             Integer minMax = null;
             int valFils;
-            Tour tourMinMax = null;
             boolean cut = false;
+            ArrayList<Couple<Integer, Tour>> lesTours = new ArrayList<>();
             for (Couple<DeroulementJeu, Tour> couple : branchements) {
                 if (minMax == null) {
                     valFils = calculCoup(couple.getFirst(), horizon - 1, !joueur, null);
@@ -46,14 +48,30 @@ public class IAMinMax extends IA{
                 }
                 if (minMax == null || (joueur && valFils > minMax) || (!joueur && valFils < minMax)) {
                     minMax = valFils;
-                    tourMinMax = couple.getSecond();
                 }
+                lesTours.add(new Couple(valFils, couple.getSecond()));
                 if (cut) {
                     break;
                 }
             }
-            tour = tourMinMax;
-            return minMax;
+
+            if (horizon == this.horizon) {  // Choix aléatoire pour la configuration initiale
+                Random r = new Random();
+                int x = r.nextInt(100)+1;
+                while (x > 90 && lesTours.size() > 1) { // 10% de chance à chaque itération de prendre le suivant
+                    if (joueur) {
+                        lesTours.remove(Collections.max(lesTours));
+                    } else {
+                        lesTours.remove(Collections.min(lesTours));
+                    }
+                    x = r.nextInt(100)+1;
+                }
+            }
+
+            int index = joueur ? lesTours.indexOf(Collections.max(lesTours)) : lesTours.indexOf(Collections.min(lesTours));
+
+            tour = lesTours.get(index).getSecond();
+            return lesTours.get(index).getFirst();
         }
     }
 
