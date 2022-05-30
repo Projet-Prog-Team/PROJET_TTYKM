@@ -28,7 +28,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     Animation mouvement;
     Animation previewAnim;
     Emplacement previewEmp;
-    Boolean animationsActives=true;
+    public Boolean animationsActives=true;
 
     public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
         dj = djeu;
@@ -249,7 +249,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                 }
                 break;
             case "clicStatue":
-                System.out.println(c.getJoueur());
                 if(c.getJoueur()==dj.getJoueurActuel().getID()){
                     dj.switchStatue();
                 }
