@@ -19,31 +19,31 @@ public class CalculJeu {
     }
 
     // -------HEURISTIQUES-------
-    public int Heuristique() {
-        if (dj.getJeu().joueurAGagne(dj.joueurActuel)) { // Si le joueur adverse perd
+    public int Heuristique(DeroulementJeu djeu, Joueur joueur) {
+        if (djeu.getJeu().joueurAGagne(joueur)) { // Si le joueur gagne
+            return 10000;
+        } else if (djeu.getJeu().joueurAGagne(djeu.getJeu().getJoueur(joueur.getID()%2)))  { // Si le joueur adverse gagne
             return -10000;
-        } else if (!dj.getJeu().joueurAGagne(dj.getJeu().getJoueur(dj.joueurActuel.getID() % 2))) { // Si on ne perd pas
+        } else {
             int diffMains;
             int diffPlateaux;
             int pionsJoueur1 = 0;
             int pionsJoueur2 = 0;
 
             for (int i = 0; i < 3; i++) {
-                pionsJoueur1 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(0)).size();
+                pionsJoueur1 += djeu.getJeu().pionsFocusJoueur(i, djeu.getJeu().getJoueur(0)).size();
             }
             for (int i = 0; i < 3; i++) {
-                pionsJoueur2 += dj.getJeu().pionsFocusJoueur(i, dj.getJeu().getJoueur(1)).size();
+                pionsJoueur2 += djeu.getJeu().pionsFocusJoueur(i, djeu.getJeu().getJoueur(1)).size();
             }
-            if (dj.joueurActuel.getID() == 1) {
-                diffMains = dj.getJeu().getJoueur(1).getNbPionsRestants() - dj.getJeu().getJoueur(0).getNbPionsRestants();
+            if (joueur.getID() == 2) {
+                diffMains = djeu.getJeu().getJoueur(1).getNbPionsRestants() - djeu.getJeu().getJoueur(0).getNbPionsRestants();
                 diffPlateaux = pionsJoueur2 - pionsJoueur1;
             } else {
-                diffMains = dj.getJeu().getJoueur(0).getNbPionsRestants() - dj.getJeu().getJoueur(1).getNbPionsRestants();
+                diffMains = djeu.getJeu().getJoueur(0).getNbPionsRestants() - djeu.getJeu().getJoueur(1).getNbPionsRestants();
                 diffPlateaux = pionsJoueur1 - pionsJoueur2;
             }
             return diffMains + diffPlateaux;
-        } else { // Si on gagne
-            return 10000;
         }
     }
 
@@ -66,17 +66,22 @@ public class CalculJeu {
         ArrayList<Emplacement> casesDispo = djeu.getJeu().casesDispo(djeu.getJoueurActuel(), djeu.getPionActuel());
         ArrayList<Emplacement> casesDispoStatue = djeu.getJeu().casesDispoStatue(djeu.getPionActuel());
         for (Emplacement caseDispo : casesDispo) {
-            DeroulementJeu jeuCoup = djeu.copy();   // Déplacement
-            jeuCoup.jouerCoup(caseDispo,false);
-            Tour t = new Tour();
-            if (djeu.getJoueurActuel().getNbActionsRestantes() == 2) {
-                t.setTypeCoup1(1);
-                t.setCoup1(caseDispo);
+            Pion p = djeu.getJeu().getPion(caseDispo);
+            if (p instanceof PionBasique && p.getJoueur().equals(djeu.getPionActuel().getJoueur())) { // Si la case disponible est un de ses propres pions
+                // On ne fais pas le branchement, on ne veut pas qu'une IA se suicide deux pions
             } else {
-                t.setTypeCoup2(1);
-                t.setCoup2(caseDispo);
+                DeroulementJeu jeuCoup = djeu.copy();   // Déplacement
+                jeuCoup.jouerCoup(caseDispo, false);
+                Tour t = new Tour();
+                if (djeu.getJoueurActuel().getNbActionsRestantes() == 2) {
+                    t.setTypeCoup1(1);
+                    t.setCoup1(caseDispo);
+                } else {
+                    t.setTypeCoup2(1);
+                    t.setCoup2(caseDispo);
+                }
+                jeux.add(new Couple(jeuCoup, t));
             }
-            jeux.add(new Couple(jeuCoup, t));
         }
         for (Emplacement caseDispoS : casesDispoStatue) {
             if (djeu.getJeu().getPion(caseDispoS) == null && !djeu.getJoueurActuel().isStatuePlaced()) { // Si on peut y créer une statue

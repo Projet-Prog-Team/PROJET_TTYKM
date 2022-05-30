@@ -4,60 +4,54 @@ import Modele.*;
 import Structures.Couple;
 import Structures.Tour;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-import java.lang.reflect.Method;
 
-public class IADifficile extends IA{
+public class IAMinMax extends IA{
 
     Tour tour;
     int horizon;
     int cpt;
-    Method method;
-    public IADifficile(Method method) {
+
+    public IAMinMax(int horizon) {
         tour = new Tour();
-        this.horizon = 3;
-        this.method = method;
+        this.horizon = horizon;
     }
 
     public int calculCoup(DeroulementJeu dj, int horizon, boolean joueur, Integer borneCut) {     // joueur = true <=> calculCoup_Joueur_A
         cpt++;
         CalculJeu c = new CalculJeu(dj);
         if (dj.getEtape() == ETAT.END || horizon == 0) {   // Si horizon atteint ou jeu terminé, on retourne l'évaluation de jeu
-            try {
-                int heuristique = (int) method.invoke(c, null);
-                return heuristique;
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
+            if (joueur) {
+                return calcul.Heuristique(dj, dj.getJoueurActuel());
+            } else {
+                return calcul.Heuristique(dj, dj.getJeu().getJoueur(dj.getJoueurActuel().getID() % 2));
             }
         } else {                                // Sinon, on descend dans l'arbre
             ArrayList<Couple<DeroulementJeu, Tour>> branchements = c.Branchements();
             Integer minMax = null;
             int valFils;
             Tour tourMinMax = null;
+            boolean cut = false;
             for (Couple<DeroulementJeu, Tour> couple : branchements) {
                 if (minMax == null) {
                     valFils = calculCoup(couple.getFirst(), horizon - 1, !joueur, null);
                 } else {
                     valFils = calculCoup(couple.getFirst(), horizon - 1, !joueur, minMax);
-                    /*
+
                     if (borneCut != null) {
                         if ((joueur && borneCut <= valFils) || (!joueur && borneCut >= valFils)) {
-                            break;
+                            cut = true;
                         }
-                    }*/
+                    }
                 }
                 if (minMax == null || (joueur && valFils > minMax) || (!joueur && valFils < minMax)) {
                     minMax = valFils;
                     tourMinMax = couple.getSecond();
                 }
-                //System.out.println(valFils);
+                if (cut) {
+                    break;
+                }
             }
-            //System.out.println("CHOISIE : " + minMax);
             tour = tourMinMax;
             return minMax;
         }
