@@ -53,9 +53,16 @@ public class Historique implements Observateur {
         list.removeAll();
         String [] actionlist = dj.MemoryManager.ListAction();
         DefaultListModel listModel= new DefaultListModel();
-        for(String t_action : actionlist)
+        int curr_pos = 0;
+        int i=0;
+        for(String t_action : actionlist){
             listModel.addElement(t_action);
+            if(t_action.contains("<-----")){
+                curr_pos = i;
+            }
+            i++;
+        }
         list.setModel(listModel);
-        list.ensureIndexIsVisible(list.getModel().getSize() -1);
+        list.ensureIndexIsVisible(curr_pos);
     }
 }

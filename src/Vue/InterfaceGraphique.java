@@ -71,9 +71,9 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
             victoryLabel.setVisible(true);
         }
         if(state.getPauseIA()){
-            suggestionGif.setVisible(true);
+            suggestionGif.setIcon(suggestionIcon);
         }else{
-            suggestionGif.setVisible(false);
+            suggestionGif.setIcon(null);
         }
     }
 
@@ -235,8 +235,8 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         c.fill = GridBagConstraints.NONE;
         c.gridx = 0;
         c.gridy = 3;
-        suggestionGif = new JLabel(suggestionIcon);
-        suggestionGif.setVisible(false);
+        suggestionGif = new JLabel();
+        suggestionGif.setPreferredSize(new Dimension(100,100));
         lateralPane.add(suggestionGif, c);
 
         // Label etat du jeu
