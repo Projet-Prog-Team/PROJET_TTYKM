@@ -21,7 +21,7 @@ public class ControleurMediateur implements CollecteurEvenements {
     public int [] joueurs;
     String difficulty1 = "facile", difficulty2 = "facile";
     public IHMState state;
-    Timer t;
+    public Timer t;
     int speed;
     ArrayList<Animation> animations;
     InterfaceUtilisateur inter;
@@ -269,31 +269,26 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "annuler":
                 dj.MemoryManager.CTRLZ();
                 state.initPreview();
-                state.setPauseIA(true);
-                t.stop();
+                SetPauseIA(true);
                 dj.miseAJour();
                 break;
             case "refaire":
                 dj.MemoryManager.CTRLY();
                 state.initPreview();
-                state.setPauseIA(true);
-                t.stop();
+                SetPauseIA(true);
                 dj.miseAJour();
                 break;
             case "annulerTour":
                 dj.MemoryManager.CTRLTZ();
                 state.initPreview();
-                state.setPauseIA(true);
-                t.stop();
+                SetPauseIA(true);
                 dj.miseAJour();
                 break;
             case "suggestion":
                 suggestion();
                 break;
             case "reprendre":
-                t = new Timer(speed, new AdaptateurTemps(this));
-                t.start();
-                state.setPauseIA(false);
+                SetPauseIA(false);
                 break;
             case "IASpeed":
                 t.stop();
@@ -302,8 +297,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 t.start();
                 break;
             case "newGame":
-                t.stop();
-                state.setPauseIA(false);
+                SetPauseIA(true);
                 init();
                 inter.reset();
                 break;
@@ -322,8 +316,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "historique":
                 System.out.println(c.getSaveName());
-                state.setPauseIA(true);
-                t.stop();
+                SetPauseIA(true);
                 dj.MemoryManager.IHMLogLoad(Integer.valueOf(c.getSaveName()));
                 state.initPreview();
                 previewAnim = null;
@@ -404,5 +397,20 @@ public class ControleurMediateur implements CollecteurEvenements {
     public boolean joueurActuelEstIA(){
         int id = dj.getJoueurActuel().getID()-1;
         return joueurs[id] == 1;
+    }
+
+    public void SetPauseIA(boolean etat)
+    {
+        if(etat)
+        {
+            t.stop();
+            state.setPauseIA(true);
+        }
+        else
+        {
+            t = new Timer(speed, new AdaptateurTemps(this));
+            t.start();
+            state.setPauseIA(false);
+        }
     }
 }

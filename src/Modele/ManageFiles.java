@@ -577,8 +577,6 @@ public class ManageFiles   {
             if(DJgame.getConstructionStatue())
                 DJgame.switchStatue();
             Actual_pos++;
-            DJgame.aGagne=temp.get(Actual_pos).win;
-            System.out.println(DJgame.aGagne);
             ETAT t_etat = temp.get(Actual_pos).etat;
             int pred_focus=-1;
             int pos=temp.get(Actual_pos).PionFocus;
@@ -709,6 +707,11 @@ public class ManageFiles   {
             {
                 pions[t_pion.ID]=t_pion;
             }
+            if (game.joueurAGagne(DJgame.joueurActuel)) {
+                DJgame.aGagne = DJgame.joueurActuel.getID();
+            } else if (game.joueurAGagne(game.joueurs[(DJgame.joueurActuel.getID()) % 2]) && DJgame.joueurActuel.nbActionsRestantes == 0) {
+                DJgame.aGagne = game.joueurs[(DJgame.joueurActuel.getID()) % 2].getID();
+            }
         }
 
     }
@@ -838,7 +841,6 @@ public class ManageFiles   {
 
             temp.get(Actual_pos).FocusJ1=game.joueurs[0].getFocus();
             temp.get(Actual_pos).FocusJ2=game.joueurs[1].getFocus();
-            temp.get(Actual_pos).win=DJgame.aGagne;
             Max_pos=temp.size();
     }
     

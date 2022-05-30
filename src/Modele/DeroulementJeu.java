@@ -3,7 +3,9 @@ package Modele;
 import Controleur.ControleurMediateur;
 import Patterns.Observable;
 import Structures.Point;
+import Vue.AdaptateurTemps;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class DeroulementJeu extends Observable implements Comparable  {
@@ -241,7 +243,11 @@ public class DeroulementJeu extends Observable implements Comparable  {
         //System.out.println(getPionActuel() + " etape + " + getEtape() + "joueur act" + joueurActuel);
         Coup coup = new Coup();
         ArrayList<Emplacement> cases = getJeu().casesDispo(joueurActuel,pionActuel);
+        if(real && MemoryManager.getControlleur().state.getPauseIA())
+            MemoryManager.getControlleur().SetPauseIA(false);
+
         if (cases.contains(e)) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup
+
             if(real) {
                 MemoryManager.AddLog(null);
             }
