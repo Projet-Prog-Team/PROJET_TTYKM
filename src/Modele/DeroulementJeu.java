@@ -243,7 +243,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         //System.out.println(getPionActuel() + " etape + " + getEtape() + "joueur act" + joueurActuel);
         Coup coup = new Coup();
         ArrayList<Emplacement> cases = getJeu().casesDispo(joueurActuel,pionActuel);
-        if(real && MemoryManager.getControlleur().state.getPauseIA())
+        if(real && MemoryManager.getControlleur().state.getPauseIA() && MemoryManager.getControlleur().joueurs[joueurActuel.getID()-1]==0)
             MemoryManager.getControlleur().SetPauseIA(false);
 
         if (cases.contains(e)) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup

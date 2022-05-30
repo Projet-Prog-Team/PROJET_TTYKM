@@ -411,14 +411,14 @@ public class ManageFiles   {
                 DJgame.switchStatue();
             Actual_pos--;
             ETAT t_etat = temp.get(Actual_pos).etat;
-            switch(temp.get(Actual_pos+1).etat)
+            /*switch(temp.get(Actual_pos+1).etat)
             {
                 case MOVE1:
                     if(game.pionsFocusJoueur(DJgame.getPionActuel().getEpoque(),DJgame.getJoueurActuel()).size()!=1)
                     {
                         t_etat=ETAT.SELECT;
                     }break;
-            }
+            }*/
             int pred_focus=-1;
             int pos=temp.get(Actual_pos).PionFocus;
             Pion[] temp0=temp.get(Actual_pos).GetCases();

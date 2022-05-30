@@ -17,7 +17,8 @@ public class Historique implements Observateur {
 
     Historique(DeroulementJeu dj, CollecteurEvenements controle, IHMState state){
         dj.ajouteObservateur(this);
-        list = new JList();
+        String [] tmp = {"Initialisation"};
+        list = new JList(tmp);
         this.dj=dj;
         list.addListSelectionListener(new ListSelectionListener() {
             @Override

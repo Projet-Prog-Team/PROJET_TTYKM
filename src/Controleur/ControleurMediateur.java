@@ -103,7 +103,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         if (joueurs[id] == 1) {
             IA j;
             if (id == 0) {
-               j = joueur1;
+                j = joueur1;
             } else {
                 j = joueur2;
             }
@@ -401,8 +401,9 @@ public class ControleurMediateur implements CollecteurEvenements {
     {
         if(etat)
         {
-            t.stop();
             state.setPauseIA(true);
+            t.stop();
+            System.out.println("pause");
         }
         else
         {
