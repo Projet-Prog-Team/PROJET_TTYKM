@@ -72,10 +72,8 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         }
         if(state.getPauseIA()){
             suggestionGif.setVisible(true);
-            suggestionGif.repaint();
         }else{
             suggestionGif.setVisible(false);
-            suggestionGif.repaint();
         }
     }
 
@@ -238,6 +236,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         c.gridx = 0;
         c.gridy = 3;
         suggestionGif = new JLabel(suggestionIcon);
+        suggestionGif.setVisible(false);
         lateralPane.add(suggestionGif, c);
 
         // Label etat du jeu
