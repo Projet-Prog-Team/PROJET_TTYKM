@@ -175,7 +175,6 @@ public class ManageFiles   {
 
     public void IHMLogLoad(int i)
     {
-        System.out.println("nouvelle appel: "+i);
         tmpIHM=i;
         while(tmpIHM!=Actual_pos && tmpIHM !=-1)
         {
@@ -187,9 +186,6 @@ public class ManageFiles   {
             {
                 CTRLZ();
             }
-            System.out.println("i: "+tmpIHM);
-            System.out.println("AP: "+Actual_pos);
-            System.out.println("________________________");
         }
 
     }
@@ -410,6 +406,7 @@ public class ManageFiles   {
     {
         if(Actual_pos>0)
         {
+            DJgame.aGagne=0;
             if(DJgame.getConstructionStatue())
                 DJgame.switchStatue();
             Actual_pos--;
@@ -576,9 +573,12 @@ public class ManageFiles   {
     {
         if(Actual_pos<Max_pos)
         {
+
             if(DJgame.getConstructionStatue())
                 DJgame.switchStatue();
             Actual_pos++;
+            DJgame.aGagne=temp.get(Actual_pos).win;
+            System.out.println(DJgame.aGagne);
             ETAT t_etat = temp.get(Actual_pos).etat;
             int pred_focus=-1;
             int pos=temp.get(Actual_pos).PionFocus;
@@ -829,17 +829,16 @@ public class ManageFiles   {
                 else
                 {
                     temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
+                    System.out.println(temp.get(Actual_pos).nbrestantJ1);
                     temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
+                    System.out.println(temp.get(Actual_pos).nbrestantJ2);
                 }
 
             }
 
             temp.get(Actual_pos).FocusJ1=game.joueurs[0].getFocus();
             temp.get(Actual_pos).FocusJ2=game.joueurs[1].getFocus();
-
-
-
-
+            temp.get(Actual_pos).win=DJgame.aGagne;
             Max_pos=temp.size();
     }
     
@@ -865,10 +864,10 @@ public class ManageFiles   {
     public String [] ListAction()
     {
         String [] list = new String[Max_pos];
-        int i=0;
-        for(Grille t_grille : temp)
+        list[0]="Initialisation";
+        for(int i=1;i<temp.size();i++)
         {
-
+            Grille t_grille = temp.get(i);
             String tmp;
             tmp = i+ " ";
             if((t_grille.PionFocus>=NBPIONS/2))
@@ -881,19 +880,37 @@ public class ManageFiles   {
                 tmp= tmp +"Blanc | ";
             }
 
-            if(i!=Max_pos-1)
-            {
-                if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.IDLE||t_grille.etat == ETAT.SELECT)
+                if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.MOVE2)
                 {
                     Point oldcoord=null;
-                    if(temp.get(i) != null)
-                        oldcoord = temp.get(i).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
-                    oldcoord = new Point(oldcoord.getL()+1,oldcoord.getC()+1);
+                    if(temp.get(i-1).GetCases()[t_grille.PionFocus] != null)
+                        oldcoord = temp.get(i-1).GetCases()[t_grille.PionFocus].getCoordonnees().copy();
+
                     Point coord=null;
-                    if(temp.get(i+1) != null)
-                        coord =temp.get(i+1).GetCases()[temp.get(i).PionFocus].getCoordonnees().copy();
+                    if(t_grille.GetCases()[t_grille.PionFocus] != null)
+                        coord =t_grille.GetCases()[t_grille.PionFocus].getCoordonnees().copy();
+                    if(oldcoord != null) {
+                        oldcoord = new Point(oldcoord.getL(),oldcoord.getC()+1);
+                        switch (temp.get(i-1).GetCases()[t_grille.PionFocus].getEpoque()) {
+                            case 0:
+                                tmp = tmp + "Passé ";
+                                break;
+                            case 1:
+                                tmp = tmp + "Présent ";
+                                break;
+                            case 2:
+                                tmp = tmp + "Futur ";
+                                break;
+                        }
+                        tmp = tmp + " ";
+                        tmp = tmp + Integer.toString(oldcoord.getC()+ 4 * oldcoord.getL()) + " -> ";
+                    }
+                    else
+                    {
+                        tmp = tmp + "MORT -> ";
+                    }
                     if(coord != null) {
-                        coord = new Point(coord.getL() + 1, coord.getC() + 1);
+                        coord = new Point(coord.getL() , coord.getC() + 1);
                         switch (temp.get(i).GetCases()[t_grille.PionFocus].getEpoque()) {
                             case 0:
                                 tmp = tmp + "Passé ";
@@ -905,53 +922,23 @@ public class ManageFiles   {
                                 tmp = tmp + "Futur ";
                                 break;
                         }
+                        tmp = tmp + Integer.toString(coord.getC()+4 * coord.getL()) + " ";
                     }
                     else {
                         tmp = tmp + "MORT ";
                     }
-                    if(oldcoord != null) {
-                        tmp = tmp + Integer.toString(oldcoord.getC() * oldcoord.getL()) + " -> " + Integer.toString(coord.getC() * coord.getL()) + " ";
-                        switch (temp.get(i + 1).GetCases()[t_grille.PionFocus].getEpoque()) {
-                            case 0:
-                                tmp = tmp + "Passé ";
-                                break;
-                            case 1:
-                                tmp = tmp + "Présent ";
-                                break;
-                            case 2:
-                                tmp = tmp + "Futur ";
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        tmp = tmp + " -> MORT ";
-                    }
+
 
                 }
                 else
                 {
                     tmp= tmp +"Selectionne Focus ";
                 }
-            }
-            else {
-                switch (t_grille.etat) {
-                    case MOVE1:
-                        tmp= tmp +"Joue son deuxième coup ";
-                        break;
 
-                    case SELECT:
-                    case IDLE:
-                        tmp= tmp +"Joue son premier coup ";
-                        break;
-                    case MOVE2:
-                        tmp= tmp +"Selectionne Focus ";
-                }
-            }
+
             if(Actual_pos == i)
                 tmp= tmp +"<-----";
             list[i] = tmp;
-            i++;
 
         }
         return list;

@@ -25,7 +25,7 @@ public class Logs implements Observateur {
                     JList tmplist = (JList) e.getSource();
                     tmpCom.setSaveName(Integer.toString(tmplist.getSelectedIndex()));
                     if(tmplist.getSelectedIndex() != -1)
-                    t_control.commande(tmpCom);
+                        t_control.commande(tmpCom);
                 }
             }
         });
