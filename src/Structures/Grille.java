@@ -13,6 +13,7 @@ public class Grille {
     private Pion[] result;
     public ETAT etat;
 
+    public int win = 0;
     public int nbrestantJ1=0;
     public int nbrestantJ2=0;
     public int PionFocus;

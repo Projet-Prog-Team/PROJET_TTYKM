@@ -435,16 +435,17 @@ public class DeroulementJeu extends Observable implements Comparable  {
         if (pionInFocus.size() == 1) {
             // forcer la sélection
             setPionActuel(pionInFocus.get(0));
-            MemoryManager.AddLog(ETAT.IDLE);
+            if(real)
+                MemoryManager.AddLog(ETAT.IDLE);
         } else if (pionInFocus.size() == 0){
             setPionActuel(new PionBasique(new Emplacement(new Point(-1, -1), joueurActuel.getFocus()), joueurActuel));
             joueurActuel.nbActionsRestantes=0;
-            MemoryManager.AddLog(ETAT.MOVE2);
-            System.out.println("switch");
+            if(real)
+                MemoryManager.AddLog(ETAT.MOVE2);
         } else {
             setPionActuel(null);
-
-            MemoryManager.AddLog(ETAT.SELECT);
+            if(real)
+                MemoryManager.AddLog(ETAT.SELECT);
         }
         miseAJour();
     }
