@@ -30,9 +30,7 @@ public class Main {
             Timer time = new javax.swing.Timer(10000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println("---------------------------");
                     InterfaceGraphique.demarrer(dj, c, state);
-                    System.out.println("---------------------------");
                 }
             });
             time.start();
@@ -56,15 +54,6 @@ public class Main {
         IHMState state = new IHMState();
         ControleurMediateur c = new ControleurMediateur(dj,1000, state);
         dj.init(c);
-        /*ArrayList<Couple<DeroulementJeu, Tour>> liste = gros.Branchements();
-        for (Couple<DeroulementJeu, Tour> lalala : liste) {
-            InterfaceGraphique.demarrer(lalala.getFirst(), c, state);
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }*/
         InterfaceGraphique.demarrer(dj, c, state);
     }
 

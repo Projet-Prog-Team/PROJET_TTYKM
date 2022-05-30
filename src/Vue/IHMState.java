@@ -21,6 +21,7 @@ public class IHMState extends Observable {
     private Emplacement suggestionSource;
     private Emplacement suggestionDestination;
     private int suggestionFocus;
+    private boolean passeNum;
 
     public IHMState(){
     }
@@ -57,6 +58,15 @@ public class IHMState extends Observable {
             this.previewFocus1 = previewFocus1;
             miseAJour();
         }
+    }
+
+    public boolean getPasseNum() {
+        return passeNum;
+    }
+
+    public void setPasseNum(boolean passeNum) {
+        this.passeNum = passeNum;
+        miseAJour();
     }
 
     public int getPreviewFocus2() {

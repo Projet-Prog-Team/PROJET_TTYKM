@@ -130,8 +130,6 @@ public class ControleurMediateur implements CollecteurEvenements {
                     } else if (c.getFirst() == 2){
                         dj.MemoryManager.AddLog(ETAT.MOVE1);
                         creerStatue(c.getSecond());
-
-
                     }
                     state.initPreview();
                     break;
@@ -327,6 +325,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                 state.setPauseIA(true);
                 t.stop();
                 dj.MemoryManager.IHMLogLoad(Integer.valueOf(c.getSaveName()));
+                state.initPreview();
+                previewAnim = null;
+                previewEmp = null;
                 dj.miseAJour();
                 break;
             default:
@@ -391,11 +392,9 @@ public class ControleurMediateur implements CollecteurEvenements {
                     previewEmp = e;
                     previewAnim = new AnimationPreview(preview.getCoup(), inter);
                     animations.add(previewAnim);
-                    //state.setPreview(preview.getPlateau());
                 }else {
                     previewEmp = null;
                     previewAnim = null;
-                    //state.setPreview(null);
                     inter.reset();
                 }
             }

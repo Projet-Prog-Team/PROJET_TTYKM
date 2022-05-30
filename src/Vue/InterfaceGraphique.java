@@ -9,8 +9,6 @@ import Patterns.Observateur;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
@@ -28,6 +26,8 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
     JLabel victoryImage;
     JLabel victoryLabel;
     IHMState state;
+    JLabel suggestionGif;
+    ImageIcon suggestionIcon;
 
     public InterfaceGraphique(DeroulementJeu jeu, CollecteurEvenements c, IHMState state) {
         this.jeu = jeu;
@@ -38,6 +38,9 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         c.fixerInterfaceUtilisateur(this);
         URL in = ClassLoader.getSystemResource("Img/confetti3.gif");
         victoryIcon = new ImageIcon(in);
+        in = ClassLoader.getSystemResource("Img/suggestion.gif");
+        suggestionIcon = new ImageIcon(in);
+        suggestionIcon.setImage(suggestionIcon.getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT));
     }
 
     @Override
@@ -66,6 +69,11 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
                 }
             }
             victoryLabel.setVisible(true);
+        }
+        if(state.getPauseIA()){
+            suggestionGif.setVisible(true);
+        }else{
+            suggestionGif.setVisible(false);
         }
     }
 
@@ -128,7 +136,6 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         loadMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: Fonction permettant de récupérer les noms des fichiers de save disponibles
                 Vector<String> saveNames = new Vector<>();
                 saveNames=jeu.MemoryManager.GetFiles();
                 LoadDialog loadDialog = new LoadDialog(controle, saveNames);
@@ -179,18 +186,14 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         GridBagConstraints c = new GridBagConstraints();
 
         // Historique
-        //TODO: avoir le vrai historique
-        String[] categories = { "Blanc | Joue son premier coup <----"};
-        JList historyList = new JList<>(categories);
-        JScrollPane historyPane = new JScrollPane(historyList);
+        Historique historique = new Historique(jeu,controle,state);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
-        c.ipady = 150;
         c.ipady = 0;
         c.insets = new Insets(0,20,0,20);
-        Logs tlog = new Logs(historyList,jeu,controle);
-        lateralPane.add(historyPane, c);
+        lateralPane.add(historique.getPane(), c);
+
         // Boutons annuler/refaire
         JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
@@ -228,11 +231,19 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
         c.gridy = 2;
         lateralPane.add(buttonPanel2, c);
 
+        // Gif pour le bouton relancer IA
+        c.fill = GridBagConstraints.NONE;
+        c.gridx = 0;
+        c.gridy = 3;
+        suggestionGif = new JLabel(suggestionIcon);
+        suggestionGif.setVisible(false);
+        lateralPane.add(suggestionGif, c);
+
         // Label etat du jeu
         LabelEtat labelEtat = new LabelEtat("Joueur 1 effectue son premier mouvement", jeu);
         c.fill = GridBagConstraints.NONE ;
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 4;
         lateralPane.add(labelEtat.getLabel(), c);
 
         mainPanel.add(lateralPane, BorderLayout.EAST);
