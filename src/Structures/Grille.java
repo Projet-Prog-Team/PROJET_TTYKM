@@ -12,6 +12,10 @@ public class Grille {
     private Statue[] statues;
     private Pion[] result;
     public ETAT etat;
+
+    public int win = 0;
+    public int nbrestantJ1=0;
+    public int nbrestantJ2=0;
     public int PionFocus;
     public int FocusJ1;
     public int FocusJ2;

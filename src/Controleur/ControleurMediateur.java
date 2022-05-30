@@ -28,8 +28,9 @@ public class ControleurMediateur implements CollecteurEvenements {
     Animation mouvement;
     Animation previewAnim;
     Emplacement previewEmp;
+    Boolean animationsActives=true;
 
-    String heuristique = "Heuristique4";
+    String heuristique = "Heuristique";
 
     public ControleurMediateur (DeroulementJeu djeu, int temps, IHMState state) {
         dj = djeu;
@@ -49,6 +50,7 @@ public class ControleurMediateur implements CollecteurEvenements {
         joueurs = new int[2];
         joueurs[0] = 0;
         joueurs[1] = 0;
+        dj.getJeu().init();
         dj.init(this);
 
         state.initPreview();
@@ -112,22 +114,31 @@ public class ControleurMediateur implements CollecteurEvenements {
                     dj.selectPion(j.selectPion().getEmplacement());
                     break;
                 case MOVE1:
-                case MOVE2:
-                    Couple<Integer, Emplacement> c = j.jouerCoup();
+                    Couple<Integer, Emplacement> c = j.getCoup1();
                     if (c.getFirst() == 1) {
                         deplace(c.getSecond(),true);
                     } else if (c.getFirst() == 2){
                         dj.MemoryManager.AddLog(ETAT.MOVE1);
-                        dj.creerStatue(c.getSecond());
-
-
+                        creerStatue(c.getSecond());
+                    }
+                    state.initPreview();
+                    break;
+                case MOVE2:
+                    c = j.getCoup2();
+                    if (c.getFirst() == 1) {
+                        deplace(c.getSecond(),true);
+                    } else if (c.getFirst() == 2){
+                        dj.MemoryManager.AddLog(ETAT.MOVE1);
+                        creerStatue(c.getSecond());
                     }
                     state.initPreview();
                     break;
                 case FOCUS:
                     dj.getPionActuel().focused=false;
+
                     int focus = j.choixFocus();
                     dj.getJoueurActuel().setFocus(focus);
+                    dj.MemoryManager.UpdateLog(null,null);
                     dj.switchPlayer();
                     state.initPreview();
                     break;
@@ -139,17 +150,19 @@ public class ControleurMediateur implements CollecteurEvenements {
 
     @Override
     public void ticAnim() {
-        ArrayList<Animation> remove = new ArrayList<>();
-        for (Animation animation : animations) {
-            animation.tic();
-            if(animation.estTermine()){
-                remove.add(animation);
-                if(animation == mouvement){
-                    mouvement = null;
+        if(animationsActives || mouvement != null){
+            ArrayList<Animation> remove = new ArrayList<>();
+            for (Animation animation : animations) {
+                animation.tic();
+                if(animation.estTermine()){
+                    remove.add(animation);
+                    if(animation == mouvement){
+                        mouvement = null;
+                    }
                 }
             }
+            animations.removeAll(remove);
         }
-        animations.removeAll(remove);
     }
 
     void deplace(Emplacement e, boolean real){
@@ -157,7 +170,7 @@ public class ControleurMediateur implements CollecteurEvenements {
             Coup cp = dj.jouerCoup(e, real);
             state.initPreview();
             animations.remove(previewAnim);
-            if (cp!=null){
+            if (cp!=null && animationsActives){
                 mouvement = new AnimationCoup(cp, inter);
                 animations.add(mouvement);
             }
@@ -169,7 +182,7 @@ public class ControleurMediateur implements CollecteurEvenements {
             Coup cp = dj.creerStatue(e);
             state.initPreview();
             animations.remove(previewAnim);
-            if (cp!=null){
+            if (cp!=null && animationsActives){
                 mouvement = new AnimationCoup(cp, inter);
                 animations.add(mouvement);
             }
@@ -177,25 +190,33 @@ public class ControleurMediateur implements CollecteurEvenements {
     }
 
     public void suggestion () {
-        suggestion.calculCoup(dj, 10, true);
+        suggestion.calculCoup(dj, 3, true, null);
         switch(dj.getEtape()) {
             case SELECT:
                 state.setSuggestionSource(suggestion.selectPion().getEmplacement());
 
-                Couple<Integer, Emplacement> c = suggestion.jouerCoup();
+                Couple<Integer, Emplacement> c = suggestion.getCoup1();
                 if (c.getFirst() == 1) {
                     state.setSuggestionDestination(c.getSecond());
                 }
                 break;
             case MOVE1:
-            case MOVE2:
-                state.setSuggestionSource(dj.getPionActuel().getEmplacement());
-
-                c = suggestion.jouerCoup();
+                c = suggestion.getCoup1();
                 if (c.getFirst() == 1) {
+                    state.setSuggestionSource(dj.getPionActuel().getEmplacement());
                     state.setSuggestionDestination(c.getSecond());
                 } else if (c.getFirst() == 2){
-                    // TODO : voir quoi faire pr suggestion création de statue
+                    state.setSuggestionSource(null);
+                    state.setSuggestionDestination(c.getSecond());
+                }
+                break;
+            case MOVE2:
+                c = suggestion.getCoup2();
+                if (c.getFirst() == 1) {
+                    state.setSuggestionSource(dj.getPionActuel().getEmplacement());
+                    state.setSuggestionDestination(c.getSecond());
+                } else if (c.getFirst() == 2){
+                    state.setSuggestionSource(null);
                     state.setSuggestionDestination(c.getSecond());
                 }
                 break;
@@ -238,28 +259,33 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "save":
                 System.out.println(c.getSaveName());
                 dj.MemoryManager.Save(c.getSaveName());
+                dj.miseAJour();
                 break;
             case "load":
                 System.out.println(c.getSaveName());
                 dj.MemoryManager.Load(c.getSaveName());
+                dj.miseAJour();
                 break;
             case "annuler":
                 dj.MemoryManager.CTRLZ();
                 state.initPreview();
                 state.setPauseIA(true);
                 t.stop();
+                dj.miseAJour();
                 break;
             case "refaire":
                 dj.MemoryManager.CTRLY();
                 state.initPreview();
                 state.setPauseIA(true);
                 t.stop();
+                dj.miseAJour();
                 break;
             case "annulerTour":
                 dj.MemoryManager.CTRLTZ();
                 state.initPreview();
                 state.setPauseIA(true);
                 t.stop();
+                dj.miseAJour();
                 break;
             case "suggestion":
                 suggestion();
@@ -277,8 +303,12 @@ public class ControleurMediateur implements CollecteurEvenements {
                 break;
             case "newGame":
                 t.stop();
+                state.setPauseIA(false);
                 init();
                 inter.reset();
+                break;
+            case "anim":
+                animationsActives = !animationsActives;
                 break;
             case "toggleIA1":
                 activerIA(0, difficulty1, heuristique);
@@ -289,6 +319,16 @@ public class ControleurMediateur implements CollecteurEvenements {
             case "setDifficulty":
                 System.out.println(c.getDifficulty());
                 setDifficultyIA(c.getIA(), c.getDifficulty());
+                break;
+            case "historique":
+                System.out.println(c.getSaveName());
+                state.setPauseIA(true);
+                t.stop();
+                dj.MemoryManager.IHMLogLoad(Integer.valueOf(c.getSaveName()));
+                state.initPreview();
+                previewAnim = null;
+                previewEmp = null;
+                dj.miseAJour();
                 break;
             default:
                 return false;
@@ -348,7 +388,7 @@ public class ControleurMediateur implements CollecteurEvenements {
                 // Si le coup est possible
                 Preview preview = dj.getPreview(e);
                 state.setPreview(preview.getPlateau());
-                if (!preview.getCoup().deplacements().isEmpty()) {
+                if (!preview.getCoup().deplacements().isEmpty() && animationsActives) {
                     previewEmp = e;
                     previewAnim = new AnimationPreview(preview.getCoup(), inter);
                     animations.add(previewAnim);

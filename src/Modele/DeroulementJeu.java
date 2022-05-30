@@ -3,6 +3,7 @@ package Modele;
 import Controleur.ControleurMediateur;
 import Patterns.Observable;
 import Structures.Point;
+import com.sun.security.auth.module.NTSystem;
 
 import java.util.ArrayList;
 
@@ -34,8 +35,8 @@ public class DeroulementJeu extends Observable implements Comparable  {
         }
         else
         {
-            if(real)
-                MemoryManager= new ManageFiles(controleur,"./Saves/");
+
+            MemoryManager= new ManageFiles(controleur,"./saves/");
         }
 
         constructionStatue = false;
@@ -145,7 +146,6 @@ public class DeroulementJeu extends Observable implements Comparable  {
                     j.getPions().add(tmp);
                     coup.deplace(null, tmp.getEmplacement().copy());
                     if(real) {
-                        MemoryManager.move=false;
                         MemoryManager.UpdateLog(null, tmp);
                     }
                     //ne supprime pas un pion du plateau mais du nombre total encore disponible à placer
@@ -240,8 +240,6 @@ public class DeroulementJeu extends Observable implements Comparable  {
 
     public Coup jouerCoup(Emplacement e, boolean real) {
         //System.out.println(getPionActuel() + " etape + " + getEtape() + "joueur act" + joueurActuel);
-        if(real)
-            System.out.println("coup");
         Coup coup = new Coup();
         ArrayList<Emplacement> cases = getJeu().casesDispo(joueurActuel,pionActuel);
         if (cases.contains(e)) {    // Si l'emplacement en paramètre est un emplacement sur lequel on peut jouer un coup
@@ -423,6 +421,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
     }
 
     public void switchPlayer() {
+        constructionStatue = false;
         // Inversion du joueurActuel
         if(joueurActuel == getJeu().joueurs[0]) {
             joueurActuel=getJeu().joueurs[1];
@@ -437,14 +436,17 @@ public class DeroulementJeu extends Observable implements Comparable  {
         if (pionInFocus.size() == 1) {
             // forcer la sélection
             setPionActuel(pionInFocus.get(0));
-            MemoryManager.AddLog(ETAT.IDLE);
+            if(real)
+                MemoryManager.AddLog(ETAT.IDLE);
         } else if (pionInFocus.size() == 0){
             setPionActuel(new PionBasique(new Emplacement(new Point(-1, -1), joueurActuel.getFocus()), joueurActuel));
             joueurActuel.nbActionsRestantes=0;
-            MemoryManager.AddLog(ETAT.MOVE2);
+            if(real)
+                MemoryManager.AddLog(ETAT.MOVE2);
         } else {
             setPionActuel(null);
-            MemoryManager.AddLog(ETAT.SELECT);
+            if(real)
+                MemoryManager.AddLog(ETAT.SELECT);
         }
         miseAJour();
     }

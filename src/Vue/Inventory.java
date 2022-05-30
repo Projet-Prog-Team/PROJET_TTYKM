@@ -89,10 +89,10 @@ public class Inventory implements Observateur {
     @Override
     public void metAJour() {
         //Affiche les pions du joueur
-        for(int i=jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i<4; i++){
+        for(int i=jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i>=0&&i<4; i++){
             pionBasiques.get(i).setVisible(false);
         }
-        for(int i=0; i<jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i++){
+        for(int i=0; i>=0&&i<jeu.getJeu().getJoueurs()[joueur-1].getNbPionsRestants(); i++){
             pionBasiques.get(i).setVisible(true);
         }
 
