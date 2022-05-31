@@ -4,7 +4,6 @@ import Structures.Grille;
 import Structures.Point;
 
 import java.io.*;
-import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -50,14 +49,30 @@ public class ManageFiles   {
         temp.add(new Grille(Grille.Clone(pions), ETAT.IDLE, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
         try
         {
+            File root = new File("./");
+            path = root.getCanonicalPath();
+            File [] list = root.listFiles();
+            if(list != null)
+            {
+                for(File tmpfile : list)
+                {
+
+                    if(tmpfile.isDirectory() && tmpfile.getName().equals("saves"))
+                        path=tmpfile.getCanonicalPath();
+                }
+            }
 
             if(System.getProperty("os.name").toLowerCase().contains("win"))
             {
-                path = new File(absolutepath).getCanonicalPath() + "\\";
+                if(path == root.getCanonicalPath())
+                    new File(path+"\\saves\\").mkdir();
+                path = path+"\\";
             }
             else
             {
-                path = new File(absolutepath).getCanonicalPath() + "/";
+                if(path == root.getCanonicalPath())
+                    new File(path+"/saves/").mkdir();
+                path = path + "/";
             }
 
         }
