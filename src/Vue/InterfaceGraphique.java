@@ -70,7 +70,7 @@ public class InterfaceGraphique implements Runnable, Observateur, InterfaceUtili
             }
             victoryLabel.setVisible(true);
         }
-        if(state.getPauseIA()){
+        if(state.getPauseIA() && ((jeu.getJoueurActuel().getID()==1 && state.getIA1()) ||  (jeu.getJoueurActuel().getID()==2 && state.getIA2()))){
             suggestionGif.setIcon(suggestionIcon);
         }else{
             suggestionGif.setIcon(null);
