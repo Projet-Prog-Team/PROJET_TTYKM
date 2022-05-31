@@ -887,9 +887,11 @@ public class ManageFiles   {
             Grille t_grille = temp.get(i);
             String tmp;
             tmp = i+ " ";
-            if((t_grille.PionFocus>=NBPIONS/2))
+            int joueur=t_grille.PionFocus;
+            if(t_grille.etat==ETAT.SELECT || t_grille.etat==ETAT.IDLE)
+                joueur=temp.get(i-1).PionFocus;
+            if(joueur>=NBPIONS/2)
             {
-
                 tmp= tmp +"Noir | ";
             }
             else
