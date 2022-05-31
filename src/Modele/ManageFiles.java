@@ -6,11 +6,10 @@ import Structures.Point;
 import java.io.*;
 import java.util.Scanner;
 import java.util.Vector;
-
 import java.util.ArrayList;
 
 public class ManageFiles   {
-    
+
     private ArrayList<Grille> temp;
     private DeroulementJeu DJgame;
     private Jeu game;
@@ -61,17 +60,19 @@ public class ManageFiles   {
                         path=tmpfile.getCanonicalPath();
                 }
             }
-
             if(System.getProperty("os.name").toLowerCase().contains("win"))
             {
-                if(path == root.getCanonicalPath())
-                    new File(path+"\\saves\\").mkdir();
+                if(path.equals(root.getCanonicalPath()))
+                {
+                    new File(path+"\\saves\\").mkdirs();
+                }
                 path = path+"\\";
             }
             else
             {
-                if(path == root.getCanonicalPath())
-                    new File(path+"/saves/").mkdir();
+                if(path.equals(root.getCanonicalPath())) {
+                    new File(path+"/saves/").mkdirs();
+                }
                 path = path + "/";
             }
 
@@ -277,146 +278,146 @@ public class ManageFiles   {
     }
     public void Load(String filepath)
     {
-            try
+        try
+        {
+            FileInputStream fis=new FileInputStream(path+filepath);
+            Scanner scan = new Scanner(fis);
+            String th = scan.nextLine();
+            char t_info [] = new char[th.length()];
+            th.getChars(0,th.length(),t_info,0);
+            int sinfo[]=new int[th.length()];
+            for (int k=0;k<th.length();k++)
+                sinfo[k]= Character.getNumericValue(t_info[k]);
+            controleur.joueurs[0]=sinfo[0];
+            controleur.joueurs[1]=sinfo[1];
+            controleur.state.setIA1(sinfo[0]==1);
+            controleur.state.setIA2(sinfo[1]==1);
+            String diff="";
+            switch(sinfo[2])
             {
-                FileInputStream fis=new FileInputStream(path+filepath);
-                Scanner scan = new Scanner(fis);
-                String th = scan.nextLine();
-                char t_info [] = new char[th.length()];
-                th.getChars(0,th.length(),t_info,0);
-                int sinfo[]=new int[th.length()];
-                for (int k=0;k<th.length();k++)
-                     sinfo[k]= Character.getNumericValue(t_info[k]);
-                controleur.joueurs[0]=sinfo[0];
-                controleur.joueurs[1]=sinfo[1];
-                controleur.state.setIA1(sinfo[0]==1);
-                controleur.state.setIA2(sinfo[1]==1);
-                String diff="";
-                switch(sinfo[2])
+                case 1:
+                    diff="facile";
+                    break;
+
+                case 2:
+                    diff="moyenne";
+                    break;
+
+                case 3:
+                    diff="difficile";
+                    break;
+            }
+            controleur.state.setDifficultyIA1(diff);
+            switch(sinfo[3])
+            {
+                case 1:
+                    diff="facile";
+                    break;
+
+                case 2:
+                    diff="moyenne";
+                    break;
+
+                case 3:
+                    diff="difficile";
+                    break;
+            }
+            controleur.state.setDifficultyIA2(diff);
+            int add=0;
+            if(sinfo.length==12)
+            {
+                Actual_pos= sinfo[5]+10*sinfo[4];
+                add++;
+            }
+            else
+            {
+                Actual_pos= sinfo[4];
+            }
+            if(sinfo.length>=11)
+            {
+                if(sinfo.length!=11)
                 {
-                    case 1:
-                        diff="facile";
-                        break;
-
-                    case 2:
-                        diff="moyenne";
-                        break;
-
-                    case 3:
-                        diff="difficile";
-                        break;
-                }
-                controleur.state.setDifficultyIA1(diff);
-                switch(sinfo[3])
-                {
-                    case 1:
-                        diff="facile";
-                        break;
-
-                    case 2:
-                        diff="moyenne";
-                        break;
-
-                    case 3:
-                        diff="difficile";
-                        break;
-                }
-                controleur.state.setDifficultyIA2(diff);
-                int add=0;
-                if(sinfo.length==12)
-                {
-                    Actual_pos= sinfo[5]+10*sinfo[4];
+                    Max_pos= sinfo[7]+10*sinfo[6];
                     add++;
                 }
                 else
                 {
-                    Actual_pos= sinfo[4];
+                    Max_pos= sinfo[6]+10*sinfo[5];
                 }
-                if(sinfo.length>=11)
-                {
-                    if(sinfo.length!=11)
-                    {
-                        Max_pos= sinfo[7]+10*sinfo[6];
-                        add++;
-                    }
-                    else
-                    {
-                        Max_pos= sinfo[6]+10*sinfo[5];
-                    }
 
+            }
+            else
+            {
+                Max_pos= sinfo[5];
+            }
+            game.getJoueur(0).SetNbPionsRestants(sinfo[6+add]);
+            game.getJoueur(1).SetNbPionsRestants(sinfo[7+add]);
+            game.getJoueur(0).setStatuePlaced(sinfo[8+add]==1);
+            game.getJoueur(1).setStatuePlaced(sinfo[9+add]==1);
+            Grille tmpgrille = null;
+            temp= new ArrayList<>();
+            byte[] info;
+            for(int i=0; i<Max_pos;i++)
+            {
+                info = scan.nextLine().getBytes();
+                if(tmpgrille != null)
+                {
+                    tmpgrille=new Grille(Grille.Clone(tmpgrille.GetCases()),tmpgrille.etat, tmpgrille.PionFocus,tmpgrille.FocusJ1, tmpgrille.FocusJ2,tmpgrille.nbrestantJ1,tmpgrille.nbrestantJ2);
                 }
                 else
                 {
-                    Max_pos= sinfo[5];
+                    tmpgrille= new Grille(new Pion[game.NBPIONS+ game.NBSTATUES]);
                 }
-                game.getJoueur(0).SetNbPionsRestants(sinfo[6+add]);
-                game.getJoueur(1).SetNbPionsRestants(sinfo[7+add]);
-                game.getJoueur(0).setStatuePlaced(sinfo[8+add]==1);
-                game.getJoueur(1).setStatuePlaced(sinfo[9+add]==1);
-                Grille tmpgrille = null;
-                temp= new ArrayList<>();
-                byte[] info;
-                for(int i=0; i<Max_pos;i++)
-                {
-                    info = scan.nextLine().getBytes();
-                    if(tmpgrille != null)
-                    {
-                        tmpgrille=new Grille(Grille.Clone(tmpgrille.GetCases()),tmpgrille.etat, tmpgrille.PionFocus,tmpgrille.FocusJ1, tmpgrille.FocusJ2,tmpgrille.nbrestantJ1,tmpgrille.nbrestantJ2);
-                    }
-                    else
-                    {
-                        tmpgrille= new Grille(new Pion[game.NBPIONS+ game.NBSTATUES]);
-                    }
 
-                    tmpgrille.FocusJ1=info[0];
-                    tmpgrille.FocusJ2=info[1];
-                    tmpgrille.PionFocus= info[2];
-                    tmpgrille.etat=ETAT.Convert(info[3]);
-                    tmpgrille.nbrestantJ1 = info[4];
-                    tmpgrille.nbrestantJ2 = info[5];
-                    do {
-                        String idtmp = scan.nextLine();
-                        int id = Integer.parseInt(idtmp);
-                        info = scan.nextLine().getBytes();
-                        if (info[0] != '\t') {
-                            int c = info[0];
-                            int l = info[1];
-                            int e = info[2];
-                            if(id>=NBPIONS)
+                tmpgrille.FocusJ1=info[0];
+                tmpgrille.FocusJ2=info[1];
+                tmpgrille.PionFocus= info[2];
+                tmpgrille.etat=ETAT.Convert(info[3]);
+                tmpgrille.nbrestantJ1 = info[4];
+                tmpgrille.nbrestantJ2 = info[5];
+                do {
+                    String idtmp = scan.nextLine();
+                    int id = Integer.parseInt(idtmp);
+                    info = scan.nextLine().getBytes();
+                    if (info[0] != '\t') {
+                        int c = info[0];
+                        int l = info[1];
+                        int e = info[2];
+                        if(id>=NBPIONS)
+                        {
+                            int color=0;
+                            if(id>=NBPIONS+3)
                             {
-                                int color=0;
-                                if(id>=NBPIONS+3)
-                                {
-                                    color = id>=NBPIONS+6 ? 2 : 1;
-                                }
-                                else
-                                {
-                                    color=3;
-                                }
-                                tmpgrille.GetCases()[id] = new Statue(new Emplacement(new Point(l, c), e), id, false,color);
+                                color = id>=NBPIONS+6 ? 2 : 1;
                             }
                             else
                             {
-                                tmpgrille.GetCases()[id] = new PionBasique(new Emplacement(new Point(l, c), e), game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, info[3] == 1);
+                                color=3;
                             }
-
-                        } else {
-                            tmpgrille.GetCases()[id] = null;
+                            tmpgrille.GetCases()[id] = new Statue(new Emplacement(new Point(l, c), e), id, false,color);
                         }
-                    }while(scan.hasNextInt());
-                    temp.add(tmpgrille);
+                        else
+                        {
+                            tmpgrille.GetCases()[id] = new PionBasique(new Emplacement(new Point(l, c), e), game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, info[3] == 1);
+                        }
 
-                }
-                BoardLoad(Actual_pos);
-                DJgame.miseAJour();
-                pions = new Pion[NBPIONS];
-                pions = Grille.Clone(temp.get(Actual_pos).GetCases());
-            } catch (IOException e) {
-                System.out.println("cannot write  in memory or cannot read file");
-                e.printStackTrace();
+                    } else {
+                        tmpgrille.GetCases()[id] = null;
+                    }
+                }while(scan.hasNextInt());
+                temp.add(tmpgrille);
+
             }
-
+            BoardLoad(Actual_pos);
+            DJgame.miseAJour();
+            pions = new Pion[NBPIONS];
+            pions = Grille.Clone(temp.get(Actual_pos).GetCases());
+        } catch (IOException e) {
+            System.out.println("cannot write  in memory or cannot read file");
+            e.printStackTrace();
         }
+
+    }
     public void CTRLZ()
     {
         if(Actual_pos>0)
@@ -455,14 +456,14 @@ public class ManageFiles   {
                     else
                     {
                         if(t_pion.ID>NBPIONS+2)
-                        if(t_pion.ID>NBPIONS+5)
-                        {
-                            S_j2=true;
-                        }
-                        else
-                        {
-                            S_j1=true;
-                        }
+                            if(t_pion.ID>NBPIONS+5)
+                            {
+                                S_j2=true;
+                            }
+                            else
+                            {
+                                S_j1=true;
+                            }
                     }
                 i++;
             }
@@ -538,11 +539,11 @@ public class ManageFiles   {
                     game.getJoueurs()[1].setFocus(pred_focusJ2);
                     break;
             }
-                pions=new Pion[NBPIONS+NBSTATUES];
-                for(Pion t_pion : game.getPions())
-                {
-                    pions[t_pion.ID]=t_pion;
-                }
+            pions=new Pion[NBPIONS+NBSTATUES];
+            for(Pion t_pion : game.getPions())
+            {
+                pions[t_pion.ID]=t_pion;
+            }
 
         }
     }
@@ -604,25 +605,25 @@ public class ManageFiles   {
             for(Pion t_pion : temp0)
             {
                 if(t_pion!=null)
-                if(t_pion instanceof PionBasique) {
-                    if (i < NBPIONS / 2) {
-                        j1++;
-                    } else {
-                        j2++;
-                    }
-                }
-                else
-                {
-                    if(t_pion.ID>NBPIONS+2)
-                    if(t_pion.ID>NBPIONS+5)
-                    {
-                        S_j2=true;
+                    if(t_pion instanceof PionBasique) {
+                        if (i < NBPIONS / 2) {
+                            j1++;
+                        } else {
+                            j2++;
+                        }
                     }
                     else
                     {
-                        S_j1=true;
+                        if(t_pion.ID>NBPIONS+2)
+                            if(t_pion.ID>NBPIONS+5)
+                            {
+                                S_j2=true;
+                            }
+                            else
+                            {
+                                S_j1=true;
+                            }
                     }
-                }
                 i++;
             }
             game.getJoueur(0).SetNbPionsRestants(temp.get(Actual_pos).nbrestantJ1);
@@ -751,7 +752,8 @@ public class ManageFiles   {
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 String name = child.getName();
-                savesNames.add(name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name);
+                if(name.contains(".TTYKM"))
+                    savesNames.add(name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name);
             }
         } else {
             System.out.println("Erreur : dossier de sauvegardes non trouvé");
@@ -812,55 +814,55 @@ public class ManageFiles   {
             Max_pos=temp.size();
             Actual_pos=Max_pos-1;
         }
-            if (af != null) {
-                if(Actual_pos-1>=0 && temp.get(Actual_pos-1).GetCases()[af.ID] == null)
+        if (af != null) {
+            if(Actual_pos-1>=0 && temp.get(Actual_pos-1).GetCases()[af.ID] == null)
+            {
+                if(af.getJoueur()==game.getJoueur(0))
                 {
-                    if(af.getJoueur()==game.getJoueur(0))
-                    {
-                        temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
-                        temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants()-1;
-                    }
-                    else
-                    {
-                        temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
-                        temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants()-1;
-                    }
-                }
-                if (af instanceof PionBasique) {
-
-                    pions[af.ID] = af.copy(af.getJoueur());
-                    temp.get(Actual_pos).GetCases()[af.ID] = (PionBasique) pions[af.ID];
-
-                } else {
-                    pions[af.ID] = af.copy();
-                    temp.get(Actual_pos).GetCases()[af.ID] = (Statue) pions[af.ID];
-                }
-
-
-            } else {
-                if (be != null) {
-                    if (be.ID == temp.get(Actual_pos).PionFocus)
-                        temp.get(Actual_pos).etat = ETAT.MOVE2;
-                    temp.get(Actual_pos).GetCases()[be.ID] = null;
-                    pions[be.ID] = null;
+                    temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
+                    temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants()-1;
                 }
                 else
                 {
                     temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
-                    temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
+                    temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants()-1;
                 }
+            }
+            if (af instanceof PionBasique) {
 
+                pions[af.ID] = af.copy(af.getJoueur());
+                temp.get(Actual_pos).GetCases()[af.ID] = (PionBasique) pions[af.ID];
+
+            } else {
+                pions[af.ID] = af.copy();
+                temp.get(Actual_pos).GetCases()[af.ID] = (Statue) pions[af.ID];
             }
 
-            temp.get(Actual_pos).FocusJ1=game.joueurs[0].getFocus();
-            temp.get(Actual_pos).FocusJ2=game.joueurs[1].getFocus();
-            Max_pos=temp.size();
+
+        } else {
+            if (be != null) {
+                if (be.ID == temp.get(Actual_pos).PionFocus)
+                    temp.get(Actual_pos).etat = ETAT.MOVE2;
+                temp.get(Actual_pos).GetCases()[be.ID] = null;
+                pions[be.ID] = null;
+            }
+            else
+            {
+                temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
+                temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
+            }
+
+        }
+
+        temp.get(Actual_pos).FocusJ1=game.joueurs[0].getFocus();
+        temp.get(Actual_pos).FocusJ2=game.joueurs[1].getFocus();
+        Max_pos=temp.size();
     }
-    
+
     private Pion[] filter(Pion[] t_pion)
     {
         ArrayList<Pion> t_pion2= new ArrayList<>();
-       int j=0;
+        int j=0;
         for(int i=0 ;i<t_pion.length;i++)
         {
             if(t_pion[i]!= null)
@@ -895,60 +897,60 @@ public class ManageFiles   {
                 tmp= tmp +"Blanc | ";
             }
 
-                if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.MOVE2)
-                {
-                    Point oldcoord=null;
-                    if(temp.get(i-1).GetCases()[t_grille.PionFocus] != null)
-                        oldcoord = temp.get(i-1).GetCases()[t_grille.PionFocus].getCoordonnees().copy();
+            if(t_grille.etat == ETAT.MOVE1 ||t_grille.etat == ETAT.MOVE2)
+            {
+                Point oldcoord=null;
+                if(temp.get(i-1).GetCases()[t_grille.PionFocus] != null)
+                    oldcoord = temp.get(i-1).GetCases()[t_grille.PionFocus].getCoordonnees().copy();
 
-                    Point coord=null;
-                    if(t_grille.GetCases()[t_grille.PionFocus] != null)
-                        coord =t_grille.GetCases()[t_grille.PionFocus].getCoordonnees().copy();
-                    if(oldcoord != null) {
-                        oldcoord = new Point(oldcoord.getL(),oldcoord.getC()+1);
-                        switch (temp.get(i-1).GetCases()[t_grille.PionFocus].getEpoque()) {
-                            case 0:
-                                tmp = tmp + "Passé ";
-                                break;
-                            case 1:
-                                tmp = tmp + "Présent ";
-                                break;
-                            case 2:
-                                tmp = tmp + "Futur ";
-                                break;
-                        }
-                        tmp = tmp + " ";
-                        tmp = tmp + Integer.toString(oldcoord.getC()+ 4 * oldcoord.getL()) + " -> ";
+                Point coord=null;
+                if(t_grille.GetCases()[t_grille.PionFocus] != null)
+                    coord =t_grille.GetCases()[t_grille.PionFocus].getCoordonnees().copy();
+                if(oldcoord != null) {
+                    oldcoord = new Point(oldcoord.getL(),oldcoord.getC()+1);
+                    switch (temp.get(i-1).GetCases()[t_grille.PionFocus].getEpoque()) {
+                        case 0:
+                            tmp = tmp + "Passé ";
+                            break;
+                        case 1:
+                            tmp = tmp + "Présent ";
+                            break;
+                        case 2:
+                            tmp = tmp + "Futur ";
+                            break;
                     }
-                    else
-                    {
-                        tmp = tmp + "MORT -> ";
-                    }
-                    if(coord != null) {
-                        coord = new Point(coord.getL() , coord.getC() + 1);
-                        switch (temp.get(i).GetCases()[t_grille.PionFocus].getEpoque()) {
-                            case 0:
-                                tmp = tmp + "Passé ";
-                                break;
-                            case 1:
-                                tmp = tmp + "Présent ";
-                                break;
-                            case 2:
-                                tmp = tmp + "Futur ";
-                                break;
-                        }
-                        tmp = tmp + Integer.toString(coord.getC()+4 * coord.getL()) + " ";
-                    }
-                    else {
-                        tmp = tmp + "MORT ";
-                    }
-
-
+                    tmp = tmp + " ";
+                    tmp = tmp + Integer.toString(oldcoord.getC()+ 4 * oldcoord.getL()) + " -> ";
                 }
                 else
                 {
-                    tmp= tmp +"Selectionne Focus ";
+                    tmp = tmp + "MORT -> ";
                 }
+                if(coord != null) {
+                    coord = new Point(coord.getL() , coord.getC() + 1);
+                    switch (temp.get(i).GetCases()[t_grille.PionFocus].getEpoque()) {
+                        case 0:
+                            tmp = tmp + "Passé ";
+                            break;
+                        case 1:
+                            tmp = tmp + "Présent ";
+                            break;
+                        case 2:
+                            tmp = tmp + "Futur ";
+                            break;
+                    }
+                    tmp = tmp + Integer.toString(coord.getC()+4 * coord.getL()) + " ";
+                }
+                else {
+                    tmp = tmp + "MORT ";
+                }
+
+
+            }
+            else
+            {
+                tmp= tmp +"Selectionne Focus ";
+            }
 
 
             if(Actual_pos == i)
