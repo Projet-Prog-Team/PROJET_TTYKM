@@ -131,13 +131,13 @@ public class ManageFiles   {
             Grille tmpgrille=new Grille(new Pion[game.NBPIONS+NBSTATUES]);
             for(Grille t_grille : temp)
             {
-                Writer.write((byte)t_grille.FocusJ1);
-                Writer.write((byte)t_grille.FocusJ2);
+                Writer.write(Integer.toString(t_grille.FocusJ1));
+                Writer.write(Integer.toString(t_grille.FocusJ2));
 
-                Writer.write((byte)t_grille.PionFocus);
-                Writer.write((byte)ETAT.Convert(t_grille.etat));
-                Writer.write((byte)t_grille.nbrestantJ1);
-                Writer.write((byte)t_grille.nbrestantJ2);
+                Writer.write(Integer.toString(t_grille.PionFocus));
+                Writer.write(Integer.toString(ETAT.Convert(t_grille.etat)));
+                Writer.write(Integer.toString(t_grille.nbrestantJ1));
+                Writer.write(Integer.toString(t_grille.nbrestantJ2));
                 do
                 {
                     int i =tmpgrille.Compare(t_grille.GetCases());
@@ -148,10 +148,10 @@ public class ManageFiles   {
                     Writer.write("\n");
                     if(t_grille.GetCases()[i] != null) {
 
-                        Writer.write((byte)t_grille.GetCases()[i].getCoordonnees().getC());
-                        Writer.write((byte)t_grille.GetCases()[i].getCoordonnees().getL());
-                        Writer.write((byte)t_grille.GetCases()[i].getEpoque());
-                        Writer.write((byte)(t_grille.GetCases()[i].focused ? 1 : 0));
+                        Writer.write(Integer.toString(t_grille.GetCases()[i].getCoordonnees().getC()));
+                        Writer.write(Integer.toString(t_grille.GetCases()[i].getCoordonnees().getL()));
+                        Writer.write(Integer.toString(t_grille.GetCases()[i].getEpoque()));
+                        Writer.write(Integer.toString(t_grille.GetCases()[i].focused ? 1 : 0));
                         if(i>=NBPIONS)
                         {
                             tmpgrille.GetCases()[i] = t_grille.GetCases()[i].copy();
@@ -346,10 +346,15 @@ public class ManageFiles   {
             game.getJoueur(1).setStatuePlaced(sinfo[9+add]==1);
             Grille tmpgrille = null;
             temp= new ArrayList<>();
-            byte[] info;
+            String idtmp=scan.nextLine();
             for(int i=0; i<Max_pos;i++)
             {
-                info = scan.nextLine().getBytes();
+                th=idtmp;
+                t_info = new char[th.length()];
+                th.getChars(0,th.length(),t_info,0);
+                 sinfo=new int[th.length()];
+                for (int k=0;k<th.length();k++)
+                    sinfo[k]= Character.getNumericValue(t_info[k]);
                 if(tmpgrille != null)
                 {
                     tmpgrille=new Grille(Grille.Clone(tmpgrille.GetCases()),tmpgrille.etat, tmpgrille.PionFocus,tmpgrille.FocusJ1, tmpgrille.FocusJ2,tmpgrille.nbrestantJ1,tmpgrille.nbrestantJ2);
@@ -359,20 +364,26 @@ public class ManageFiles   {
                     tmpgrille= new Grille(new Pion[game.NBPIONS+ game.NBSTATUES]);
                 }
 
-                tmpgrille.FocusJ1=info[0];
-                tmpgrille.FocusJ2=info[1];
-                tmpgrille.PionFocus= info[2];
-                tmpgrille.etat=ETAT.Convert(info[3]);
-                tmpgrille.nbrestantJ1 = info[4];
-                tmpgrille.nbrestantJ2 = info[5];
+                tmpgrille.FocusJ1=sinfo[0];
+                tmpgrille.FocusJ2=sinfo[1];
+                tmpgrille.PionFocus= sinfo[2];
+                tmpgrille.etat=ETAT.Convert(sinfo[3]);
+                tmpgrille.nbrestantJ1 = sinfo[4];
+                tmpgrille.nbrestantJ2 = sinfo[5];
+                idtmp = scan.nextLine();
                 do {
-                    String idtmp = scan.nextLine();
+
                     int id = Integer.parseInt(idtmp);
-                    info = scan.nextLine().getBytes();
-                    if (info[0] != '\t') {
-                        int c = info[0];
-                        int l = info[1];
-                        int e = info[2];
+                    th = scan.nextLine();
+                    t_info = new char[th.length()];
+                    th.getChars(0,th.length(),t_info,0);
+                    sinfo=new int[th.length()];
+                    for (int k=0;k<th.length();k++)
+                        sinfo[k]= Character.getNumericValue(t_info[k]);
+                    if (sinfo[0] != '\t') {
+                        int c = sinfo[0];
+                        int l = sinfo[1];
+                        int e = sinfo[2];
                         if(id>=NBPIONS)
                         {
                             int color=0;
@@ -388,13 +399,22 @@ public class ManageFiles   {
                         }
                         else
                         {
-                            tmpgrille.GetCases()[id] = new PionBasique(new Emplacement(new Point(l, c), e), game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, info[3] == 1);
+                            tmpgrille.GetCases()[id] = new PionBasique(new Emplacement(new Point(l, c), e), game.getJoueur(id >= NBPIONS / 2 ? 1 : 0), id, sinfo[3] == 1);
                         }
 
                     } else {
                         tmpgrille.GetCases()[id] = null;
                     }
-                }while(scan.hasNextInt());
+                    if(scan.hasNextLine())
+                    {
+                        idtmp=scan.nextLine();
+                    }
+                    else
+                    {
+                        idtmp="111111";
+                    }
+
+                }while(idtmp.length()!=6);
                 temp.add(tmpgrille);
 
             }
