@@ -19,20 +19,21 @@ public class ManageFiles   {
     private Pion[] pions;
     public int Actual_pos=0;
     public int Max_pos=1;
-
+    private boolean real;
     private ControleurMediateur controleur;
 
     private final int SEPSECT = 10000;
     private final int NBPIONS;
     private final int NBSTATUES;
 
-    public ManageFiles(ControleurMediateur t_controleur, String absolutepath, boolean real) {
+    public ManageFiles(ControleurMediateur t_controleur, String absolutepath, boolean t_real) {
         controleur = t_controleur;
         DJgame = controleur.dj;
         game = DJgame.getJeu();
         NBPIONS = game.NBPIONS;
         NBSTATUES = game.NBSTATUES;
         temp = new ArrayList<Grille>();
+        real=t_real;
         pions = new Pion[NBPIONS + NBSTATUES];
         if(real==true) {
             Pion[] tmp = game.getPions().toArray(new Pion[0]);
@@ -759,37 +760,30 @@ public class ManageFiles   {
 
     public void AddLog(ETAT t_etat)
     {
-        if(t_etat != null)
-        {
-            if(DJgame.getPionActuel() != null)
-            {
-                temp.add(new Grille(Grille.Clone(pions),t_etat,DJgame.getPionActuel().ID,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
-            }
-            else
-            {
-                temp.add(new Grille(Grille.Clone(pions),t_etat,0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
-            }
+        if(real) {
+            if (t_etat != null) {
+                if (DJgame.getPionActuel() != null) {
+                    temp.add(new Grille(Grille.Clone(pions), t_etat, DJgame.getPionActuel().ID, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(), game.joueurs[0].getNbPionsRestants(), game.joueurs[1].getNbPionsRestants()));
+                } else {
+                    temp.add(new Grille(Grille.Clone(pions), t_etat, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(), game.joueurs[0].getNbPionsRestants(), game.joueurs[1].getNbPionsRestants()));
+                }
 
-        }
-        else
-        {
-            if(DJgame.getPionActuel() != null)
-            {
-                temp.add(new Grille(Grille.Clone(pions),DJgame.getEtape(),DJgame.getPionActuel().ID,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
+            } else {
+                if (DJgame.getPionActuel() != null) {
+                    temp.add(new Grille(Grille.Clone(pions), DJgame.getEtape(), DJgame.getPionActuel().ID, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(), game.joueurs[0].getNbPionsRestants(), game.joueurs[1].getNbPionsRestants()));
+                } else {
+                    temp.add(new Grille(Grille.Clone(pions), DJgame.getEtape(), 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(), game.joueurs[0].getNbPionsRestants(), game.joueurs[1].getNbPionsRestants()));
+                }
             }
-            else
-            {
-                temp.add(new Grille(Grille.Clone(pions),DJgame.getEtape(),0,game.joueurs[0].getFocus(),game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
-            }
+            Max_pos = temp.size();
+            Actual_pos++;
         }
-        Max_pos=temp.size();
-        Actual_pos++;
 
     }
 
     public void UpdateLog(Pion be, Pion af)
     {
-        if(Actual_pos<(Max_pos-1))
+        if(Actual_pos<(Max_pos-1) && real)
         {
             System.out.println("changement");
             ArrayList<Grille> tmp = new ArrayList<>();
@@ -803,49 +797,45 @@ public class ManageFiles   {
             Max_pos=temp.size();
             Actual_pos=Max_pos-1;
         }
-        if (af != null) {
-            if(Actual_pos-1>=0 && temp.get(Actual_pos-1).GetCases()[af.ID] == null)
-            {
-                if(af.getJoueur()==game.getJoueur(0))
-                {
-                    temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
-                    temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants()-1;
+        if(real) {
+            if (af != null) {
+                if (Actual_pos - 1 >= 0 && temp.get(Actual_pos - 1).GetCases()[af.ID] == null) {
+                    if (af.getJoueur() == game.getJoueur(0)) {
+                        temp.get(Actual_pos).nbrestantJ2 = game.joueurs[1].getNbPionsRestants();
+                        temp.get(Actual_pos).nbrestantJ1 = game.joueurs[0].getNbPionsRestants() - 1;
+                    } else {
+                        temp.get(Actual_pos).nbrestantJ1 = game.joueurs[0].getNbPionsRestants();
+                        temp.get(Actual_pos).nbrestantJ2 = game.joueurs[1].getNbPionsRestants() - 1;
+                    }
                 }
-                else
-                {
-                    temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
-                    temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants()-1;
-                }
-            }
-            if (af instanceof PionBasique) {
+                if (af instanceof PionBasique) {
 
-                pions[af.ID] = af.copy(af.getJoueur());
-                temp.get(Actual_pos).GetCases()[af.ID] = (PionBasique) pions[af.ID];
+                    pions[af.ID] = af.copy(af.getJoueur());
+                    temp.get(Actual_pos).GetCases()[af.ID] = (PionBasique) pions[af.ID];
+
+                } else {
+                    pions[af.ID] = af.copy();
+                    temp.get(Actual_pos).GetCases()[af.ID] = (Statue) pions[af.ID];
+                }
+
 
             } else {
-                pions[af.ID] = af.copy();
-                temp.get(Actual_pos).GetCases()[af.ID] = (Statue) pions[af.ID];
+                if (be != null) {
+                    if (be.ID == temp.get(Actual_pos).PionFocus)
+                        temp.get(Actual_pos).etat = ETAT.MOVE2;
+                    temp.get(Actual_pos).GetCases()[be.ID] = null;
+                    pions[be.ID] = null;
+                } else {
+                    temp.get(Actual_pos).nbrestantJ1 = game.joueurs[0].getNbPionsRestants();
+                    temp.get(Actual_pos).nbrestantJ2 = game.joueurs[1].getNbPionsRestants();
+                }
+
             }
 
-
-        } else {
-            if (be != null) {
-                if (be.ID == temp.get(Actual_pos).PionFocus)
-                    temp.get(Actual_pos).etat = ETAT.MOVE2;
-                temp.get(Actual_pos).GetCases()[be.ID] = null;
-                pions[be.ID] = null;
-            }
-            else
-            {
-                temp.get(Actual_pos).nbrestantJ1=game.joueurs[0].getNbPionsRestants();
-                temp.get(Actual_pos).nbrestantJ2=game.joueurs[1].getNbPionsRestants();
-            }
-
+            temp.get(Actual_pos).FocusJ1 = game.joueurs[0].getFocus();
+            temp.get(Actual_pos).FocusJ2 = game.joueurs[1].getFocus();
+            Max_pos = temp.size();
         }
-
-        temp.get(Actual_pos).FocusJ1=game.joueurs[0].getFocus();
-        temp.get(Actual_pos).FocusJ2=game.joueurs[1].getFocus();
-        Max_pos=temp.size();
     }
 
     private Pion[] filter(Pion[] t_pion)
