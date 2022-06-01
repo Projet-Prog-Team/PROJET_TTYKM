@@ -277,9 +277,9 @@ public class DeroulementJeu extends Observable implements Comparable  {
         int dC = dest.getC() - pion.getCoordonnees().getC();
         Point pointSD = new Point(dest.getL() + dL, dest.getC() + dC); // Derrière le pionDestination"
         //System.out.println("pionActuel :" + pion + "\n" + "dest : " + dest + "\n" + "pionDestination : " + pionDestination +  "\npointSD : " + pointSD + "\n-------------------------\n");
-
         if (pion instanceof PionBasique) {
             // Pull
+
             Point casPull = null;
             Pion pionDerrierePion = j.getPion(new Emplacement(new Point(pion.getCoordonnees().getL() - dL, pion.getCoordonnees().getC() - dC), pion.getEpoque()));
             if (pionDerrierePion instanceof Statue && !constructionStatue && pion.equals(getPionActuel())) {
@@ -320,9 +320,13 @@ public class DeroulementJeu extends Observable implements Comparable  {
                         // Puis déplacer pion & return true
                         coup.deplace(pion.getEmplacement().copy(), new Emplacement(dest, pion.getEpoque()));
                         j.getPions().remove(pionDestination);
-                        if(real)
-                            MemoryManager.UpdateLog(pionDestination,null);
                         pion.setCoordonnees(dest);
+                        if(real)
+                        {
+                            MemoryManager.UpdateLog(pionDestination,null);
+                            MemoryManager.UpdateLog(null,pion);
+                        }
+
                         pousse = true;
                     } else {
                         // return appel récursif sur pionDestination avec pointSD
