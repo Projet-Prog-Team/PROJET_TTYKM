@@ -26,7 +26,7 @@ public class ManageFiles   {
     private final int NBPIONS;
     private final int NBSTATUES;
 
-    public ManageFiles(ControleurMediateur t_controleur, String absolutepath) {
+    public ManageFiles(ControleurMediateur t_controleur, String absolutepath, boolean real) {
         controleur = t_controleur;
         DJgame = controleur.dj;
         game = DJgame.getJeu();
@@ -34,54 +34,43 @@ public class ManageFiles   {
         NBSTATUES = game.NBSTATUES;
         temp = new ArrayList<Grille>();
         pions = new Pion[NBPIONS + NBSTATUES];
-        Pion[] tmp = game.getPions().toArray(new Pion[0]);
-        for (int i = 0; i < tmp.length; i++) {
-            if(tmp[i] instanceof PionBasique)
-            {
-                pions[tmp[i].ID] = tmp[i].copy(tmp[i].getJoueur());
-            }
-            else
-            {
-                pions[tmp[i].ID] = tmp[i].copy();
-            }
-        }
-        temp.add(new Grille(Grille.Clone(pions), ETAT.IDLE, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(),game.joueurs[0].getNbPionsRestants(),game.joueurs[1].getNbPionsRestants()));
-        try
-        {
-            File root = new File("./");
-            path = root.getCanonicalPath();
-            File [] list = root.listFiles();
-            if(list != null)
-            {
-                for(File tmpfile : list)
-                {
-
-                    if(tmpfile.isDirectory() && tmpfile.getName().equals("saves"))
-                        path=tmpfile.getCanonicalPath();
+        if(real==true) {
+            Pion[] tmp = game.getPions().toArray(new Pion[0]);
+            for (int i = 0; i < tmp.length; i++) {
+                if (tmp[i] instanceof PionBasique) {
+                    pions[tmp[i].ID] = tmp[i].copy(tmp[i].getJoueur());
+                } else {
+                    pions[tmp[i].ID] = tmp[i].copy();
                 }
             }
-            if(System.getProperty("os.name").toLowerCase().contains("win"))
-            {
-                if(path.equals(root.getCanonicalPath()))
-                {
-                    new File(path+"\\saves\\").mkdirs();
-                }
-                path = path+"\\";
-            }
-            else
-            {
-                if(path.equals(root.getCanonicalPath())) {
-                    new File(path+"/saves/").mkdirs();
-                }
-                path = path + "/";
-            }
+            temp.add(new Grille(Grille.Clone(pions), ETAT.IDLE, 0, game.joueurs[0].getFocus(), game.joueurs[1].getFocus(), game.joueurs[0].getNbPionsRestants(), game.joueurs[1].getNbPionsRestants()));
+            try {
+                File root = new File("./");
+                path = root.getCanonicalPath();
+                File[] list = root.listFiles();
+                if (list != null) {
+                    for (File tmpfile : list) {
 
-        }
-        catch(IOException e)
-        {
-            System.out.println(e);
-        }
+                        if (tmpfile.isDirectory() && tmpfile.getName().equals("saves"))
+                            path = tmpfile.getCanonicalPath();
+                    }
+                }
+                if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                    if (path.equals(root.getCanonicalPath())) {
+                        new File(path + "\\saves\\").mkdirs();
+                    }
+                    path = path + "\\";
+                } else {
+                    if (path.equals(root.getCanonicalPath())) {
+                        new File(path + "/saves/").mkdirs();
+                    }
+                    path = path + "/";
+                }
 
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+        }
     }
 
     public String GetPath()

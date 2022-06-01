@@ -37,7 +37,7 @@ public class DeroulementJeu extends Observable implements Comparable  {
         else
         {
 
-            MemoryManager= new ManageFiles(controleur,"./saves/");
+            MemoryManager= new ManageFiles(controleur,"./saves/",real);
         }
 
         constructionStatue = false;
